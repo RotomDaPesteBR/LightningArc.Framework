@@ -1,44 +1,26 @@
----
-uid: value-objects
-level: 100
-summary: "Guide on using immutable Value Objects in the LightningArc.Utils library to ensure domain integrity and type safety."
-keywords: "Value Objects, DDD, Domain Driven Design, Immutable, Email, Validation, C#"
----
+# Value Objects
 
-# Immutable Value Objects
+Value Objects are immutable types that represent domain concepts defined by their attributes rather than a persistent identity.
 
-Value Objects are objects whose equality is based on their value rather than a unique identity. In `LightningArc.Utils`, they are implemented as `record` types to ensure immutability and built-in structural equality.
+## `Email` Value Object
+**Namespace**: `LightningArc.Abstractions.ValueObjects`
 
-## The Email Value Object
-
-The `Email` type is a specialized value object that guarantees its contents always represent a valid email address.
-
-### Key Features
-- **Validation on Creation**: It is impossible to create an `Email` object with an invalid format.
-- **Implicit Conversion**: Seamlessly converts to and from `string` for easy integration with standard APIs.
-- **Immutability**: Once created, the value cannot be changed.
+Used to encapsulate email validation logic and ensure data integrity.
 
 ### Usage
-
 ```csharp
-// Recommended creation
-var email = Email.Create("user@domain.com");
+// Creation (throws ArgumentException on invalid format)
+Email email = Email.Create("user@example.com");
 
-// Implicit conversion
-string raw = email;
-Email fromString = "test@test.com"; // Validates here
+// Implicit conversion from string
+Email email = "user@example.com";
 
-// JSON Integration
-// Automatically serialized as a string if EmailJsonConverter is registered.
+// Access value
+string raw = email.Value;
+string rawImplicit = email; // Implicit to string
 ```
 
-## JSON Configuration
-
-To ensure Value Objects are serialized as simple values (instead of objects with a `Value` property), register the custom converters:
-
-```csharp
-services.Configure<JsonOptions>(options => 
-{
-    options.SerializerOptions.Converters.AddJsonConverters();
-});
-```
+### Features
+- **Regex Validation**: Built-in validation for standard email formats.
+- **Immutability**: Once created, the value cannot be changed.
+- **Equality**: Two `Email` objects are equal if their `Value` strings are identical.

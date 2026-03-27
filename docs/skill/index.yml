@@ -1,85 +1,34 @@
-- name: Getting Started
-  path: README.md
-  summary: Overview of the Utils library ecosystem.
-  keywords: "overview, setup, installation"
+- name: Core Principles
+  path: SKILL.md
+  summary: Essential architectural constraints and coding rules for AI.
+  keywords: "principles, rules, constraints, functional"
 
-- name: Technical API Reference
-  path: api/README.md
-  summary: Detailed technical documentation by namespace.
-  keywords: "api, reference, technical, members"
-
-- name: Result Pattern (Core)
+- name: Result Pattern Guide
   path: content/result-pattern.md
-  summary: Core guide on functional error handling.
-  keywords: "result, success, failure, chaining"
+  summary: How to handle successes and failures using the functional Result pattern.
+  keywords: "result, success, failure, chaining, deconstruction, aggregate"
 
-- name: Result Class Reference
-  path: api/LightningArc.Results/Results/Result.md
-  summary: Detailed API for Result and Result<TValue>.
-  keywords: "result, success, failure, code, message"
-
-- name: Error Handling Reference
-  path: api/LightningArc.Results/Results/Error.md
-  summary: Standardized Error class and module system.
-  keywords: "error, details, code, prefix, suffix"
-
-- name: TaskResult (Async)
-  path: api/LightningArc.Results/Results/TaskResult.md
-  summary: Awaitable async result wrapper.
-  keywords: "taskresult, async, await, task"
-
-- name: Value Objects Guide
+- name: Value Objects
   path: content/value-objects.md
-  summary: Guide on immutable domain types.
-  keywords: "email, immutable, record, ddd"
-
-- name: Email Value Object
-  path: api/LightningArc.Abstractions/ValueObjects/Email.md
-  summary: API reference for the Email domain primitive.
-  keywords: "email, validation, regex, create"
+  summary: Guide on immutable domain types like Email.
+  keywords: "email, value object, immutable, validation"
 
 - name: Web API Integration
   path: content/web-api.md
-  summary: Connecting Results to ASP.NET Core.
-  keywords: "aspnet, minimal api, iresult, endpointresult"
+  summary: Mapping domain results to HTTP responses in ASP.NET Core.
+  keywords: "aspnet, endpointresult, exceptionhandler, mapping"
 
-- name: EndpointResult Reference
-  path: api/LightningArc.Results.AspNetCore/Results/EndpointResult.md
-  summary: API for mapping Results to HTTP responses.
-  keywords: "iresult, endpointresult, statuscode, mapping"
-
-- name: Data Access & Mappers
+- name: Data & Mapping
   path: content/data-access.md
-  summary: Repository, Unit of Work and IMapper adapters.
-  keywords: "repository, ef, dapper, automapper, mapster"
+  summary: Repository pattern, Unit of Work, and object mapping abstractions.
+  keywords: "data, repository, unit of work, mapper"
 
-- name: IRepository Interface
-  path: api/LightningArc.Data.Abstractions/Repositories/IRepository.md
-  summary: Base repository abstractions.
-  keywords: "repository, interface, entity"
+- name: Technical Reference
+  path: api/reference.md
+  summary: Summary of the most important classes and methods.
+  keywords: "api, reference, methods, properties, signatures"
 
-- name: IUnitOfWork Interface
-  path: api/LightningArc.Data.Abstractions/UnitOfWork/IUnitOfWork.md
-  summary: Transaction management abstraction.
-  keywords: "unitofwork, transaction, commit, rollback"
-
-- name: Metalama Extensions
-  path: content/metalama.md
-  summary: AOP and compile-time code generation extensions.
-  keywords: "metalama, aop, aspect, codegen"
-
-- name: Sample Implementation
+- name: Golden Sample
   path: code/SampleService.cs
-  summary: Reference service showing all library patterns in action.
-  keywords: "sample, example, best practice, service"
-
-- name: Extension Methods (Result)
-  path: api/LightningArc.Results/Results/Extensions/Result/
-  summary: Fluent API extensions like Map, Bind, Ensure, and Match.
-  keywords: "extensions, fluent, functional, map, bind"
-
-- name: Error Modules Catalog
-  path: api/LightningArc.Results/Results/Errors/Modules/
-  summary: Technical reference for all predefined error modules.
-  keywords: "validation, resource, application, codes"
-
+  summary: End-to-end reference implementation showing all patterns in action.
+  keywords: "sample, implementation, example, service, controller"

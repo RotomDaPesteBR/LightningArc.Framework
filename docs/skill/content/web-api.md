@@ -1,51 +1,38 @@
----
-uid: web-api
-level: 100
-summary: "Instructions on bridging the Result Pattern with ASP.NET Core IResult for clean, consistent Web API responses."
-keywords: "Web API, ASP.NET Core, Minimal API, IResult, EndpointResult, HTTP Status Codes"
----
-
 # Web API Integration
 
-`LightningArc.AspNetCoreCoreCoreCore` provides tools to bridge the gap between your domain logic (using `Result`) and the HTTP layer.
+The **`LightningArc.Results.AspNetCore`** library bridges the gap between your domain logic and HTTP responses.
 
-## EndpointResult
-
-`EndpointResult` is an adapter that implements `IResult`. It automatically maps the status code and message from a `Result` object to the appropriate HTTP response.
-
-### Automatic Mapping
-
-| Result Code | HTTP Status Code |
-|-------------|------------------|
-| 100 (Ok) | 200 OK |
-| 101 (Created) | 201 Created |
-| 102 (Accepted) | 202 Accepted |
-| 103 (NoContent)| 204 No Content |
-| 4XXX (Validation) | 400 Bad Request |
-| 5XXX (NotFound) | 404 Not Found |
-| 2XXX (Auth) | 401 Unauthorized / 403 Forbidden |
-
-### Usage in Minimal APIs
-
-You can return a `Result` directly by casting it to `EndpointResult`.
+## `EndpointResult`
+Used as a return type in Controllers or Minimal APIs to automatically map `Result` objects to HTTP Status Codes and Problem Details.
 
 ```csharp
-app.MapGet("/users/{id}", async (int id, IUserService service) => 
-{
-    Result<User> result = await service.GetUser(id);
-    return (EndpointResult<User>)result;
-});
+[HttpGet]
+public async Task<EndpointResult<User>> Get(int id) => 
+    await _service.GetByIdAsync(id);
 ```
 
-## OpenAPI (Swagger) Support
+### Implicit Mappings
+- `Success.Ok` -> 200 OK
+- `Success.Created` -> 201 Created
+- `Error.Validation.*` -> 400 Bad Request
+- `Error.Resource.NotFound` -> 404 Not Found
+- `Error.*` (unmapped) -> 500 Internal Server Error
 
-To ensure Value Objects like `Email` are displayed correctly as strings in the Swagger UI, register the schema transformers:
+## Global Exception Handling
+The library provides **`ResultExceptionHandler`** to catch raw exceptions and return them as RFC 7807 Problem Details.
+
+### Registration
+```csharp
+builder.Services.AddEndpointResults();
+// ...
+app.UseExceptionHandler();
+```
+
+## OpenAPI Support
+Ensure your Swagger/OpenAPI documentation reflects the correct schema for `Email` and other types:
 
 ```csharp
-builder.Services.AddOpenApi(options => 
-{
+builder.Services.AddOpenApi(options => {
     options.AddSchemaTransformers();
 });
 ```
-
-

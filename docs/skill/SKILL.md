@@ -1,74 +1,78 @@
 ---
-name: lightning-arc-utils
-description: Comprehensive documentation skill for the LightningArc.Utils C# library ecosystem. Use for Result patterns, Domain Value Objects, and ASP.NET Core integration.
+name: lightning-arc
+description: Expert skill for the LightningArc C# library ecosystem. Specializing in functional error handling (Result Pattern), Domain-Driven Design (Value Objects), and clean architecture integration.
 ---
 
-# LightningArc.Utils Documentation Skill
+# LightningArc AI Skill
 
-This skill contains the complete documentation for `LightningArc.Utils`, including conceptual guides, architectural patterns, and API references.
+This skill provides the architectural constraints, coding standards, and API reference needed to build robust applications using the LightningArc ecosystem.
 
-## Directory Structure
+## 🛠️ Core Principles for AI
 
-| Directory | Contents |
-|-----------|----------|
-| `Skill/content/` | Conceptual documentation (Result Pattern, Value Objects, Web Integration, Metalama, Data Access) |
-| `Skill/code/` | Reference implementations and sample code. |
-| `API/` | Detailed API reference Markdown files (per file mirror) |
-| `core-features/`, `data-access/`, `web-integration/`, `advanced/` | High-level usage guides and examples |
+1.  **Always use `Result<T>`**: Never throw exceptions for expected business failures. Return `Error` types from the appropriate module.
+2.  **Explicit over Implicit**: Prefer `Match` or `Bind` over manual `IsSuccess` checks where possible to maintain functional purity.
+3.  **Modern C# Ergnonomics**: Leverage the library's syntactic sugar:
+    *   `if (result)` instead of `if (result.IsSuccess)`.
+    *   Deconstruction: `var (success, value, error) = result;`.
+    *   Error Aggregation: `error1 + error2`.
+4.  **Async by Default**: Use `TaskResult<T>` for all I/O operations.
 
-## Finding Information
+## 📂 Knowledge Base Structure
 
-1. **Search by Keywords**: Use `grep` to find specific patterns or classes in the documentation:
-   ```bash
-   grep -r "Match" docs/API/
-   grep -r "Error.Validation" docs/API/
-   ```
-2. **Browse Conceptual Docs**: Start with `docs/core-features/result-pattern.md` for the core library logic.
-3. **Reference Code**: Check `docs/Skill/code/SampleService.cs` for a complete end-to-end example of the patterns.
+| Section | Description |
+|---------|-------------|
+| `docs/getting-started/` | Installation and core philosophy. |
+| `docs/core-features/` | Detailed guides on Result, Errors, and Value Objects. |
+| `docs/web-integration/` | ASP.NET Core integration details. |
+| `docs/api/` | Technical signatures for all public members. |
+| `docs/skill/code/` | Reference implementations. |
 
-## Key Entry Points
+## 🧩 Common Snippets & Patterns
 
-| Topic | File | Description |
-|-------|------|-------------|
-| **Result Pattern** | `docs/core-features/result-pattern.md` | Core functional logic for success/failure handling. |
-| **Value Objects** | `docs/core-features/value-objects.md` | Immutable domain types (e.g., Email). |
-| **Web Integration** | `docs/web-integration/results-mapping.md` | Mapping Results to HTTP responses. |
-| **Data & Mappers** | `docs/data-access/abstractions.md` | Repositories, UoW, and Mapping abstractions. |
-| **Metalama** | `docs/advanced/metalama.md` | AOP extensions and code generation. |
-
-## Common Patterns
-
-### Functional Pipeline
-Always chain operations to maintain a clear flow of data and error propagation.
-
+### 1. Creating a Service Method
 ```csharp
-return await GetProduct(id)
-    .Ensure(p => p.Stock > 0, Error.Resource.Unavailable("Out of stock"))
-    .Map(p => p.Price * taxRate)
-    .Match(
-        success => Result.Success(success.Value),
-        error => Result.Failure(error)
-    );
+public async TaskResult<UserDto> RegisterUser(string email, string password)
+{
+    // 1. Value Object Creation
+    return Email.Create(email) 
+        // 2. Functional Chaining
+        .Bind(e => _authService.CheckUniqueness(e))
+        .BindAsync(e => _repository.AddAsync(new User(e, password)))
+        // 3. Mapping to DTO
+        .Map(user => user.ToDto());
+}
 ```
 
-### Returning Results from Web Endpoints
-Leverage implicit conversion to `EndpointResult` for clean APIs.
-
+### 2. Handling Multiple Validations
 ```csharp
-app.MapDelete("/resource/{id}", (int id) => 
-    service.Delete(id)); // Automatically returns 204 or 404
+public Result ValidateOrder(OrderRequest request)
+{
+    Error? errors = null;
+    
+    if (string.IsNullOrEmpty(request.Id)) 
+        errors += Error.Validation.MissingField("Id is required");
+        
+    if (request.Amount <= 0)
+        errors += Error.Validation.ValueOutOfRange("Amount must be positive");
+        
+    return errors != null ? errors : Result.Success();
+}
 ```
 
-## Best Practices
+### 3. Controller Action (Cleanest way)
+```csharp
+[HttpPost]
+public async Task<EndpointResult<UserDto>> Create(UserRequest req) => 
+    await _service.RegisterUser(req.Email, req.Password);
+```
 
-| Rule | Description |
-|------|-------------|
-| **No Exceptions** | Use `Result.Failure(error)` for expected failures. |
-| **Always Match** | Use the `Match` method at the end of your chain to ensure all paths are handled. |
-| **Typed Errors** | Use nested modules in `Error` (Validation, Resource, etc.). |
-| **Async First** | Prefer `TaskResult<T>` and async extension methods. |
+## ⚠️ Coding Standards
 
-## External Resources
-*   **GitHub**: https://github.com/LightningArc/Utils
-*   **Docs Root**: docs/getting-started/introduction.md
+- **Namespaces**: Always use `LightningArc.*`. Pruned namespaces are: `Results`, `Abstractions`, `Json`, `Data`, `Mappers`, `Metalama`.
+- **Error Codes**: Composite code = `(Prefix * 1000) + Suffix`.
+- **Aggregates**: When combining errors of different modules, the code becomes `99001` (General Aggregate).
 
+## 🔍 API Discovery
+If unsure about a method, look into:
+- `docs/api/Core/Results/Results/Extensions/Result/` for fluent methods.
+- `docs/api/Core/Results/Results/Errors/Modules/` for error types.

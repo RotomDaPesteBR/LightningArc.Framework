@@ -1,83 +1,56 @@
----
-uid: result-pattern
-level: 100
-summary: "Comprehensive guide on the Functional Result Pattern implementation in LightningArc.Utils, detailing how to replace exceptions with robust success/failure models."
-keywords: "Result Pattern, Functional Programming, Error Handling, Success, Failure, C#, LightningArc"
----
-
 # Functional Result Pattern
 
-The Result pattern is a functional programming concept that represents the outcome of an operation as a single object, which can either be a **Success** or a **Failure**. This approach avoids the use of exceptions for expected business logic failures, leading to more predictable and maintainable code.
+The Result pattern represents the outcome of an operation as a single object, which can either be a **Success** or a **Failure**. This approach avoids exceptions for expected business logic failures.
 
-## Core Concepts
+## Core Types
+- `Result`: For operations without a return value.
+- `Result<TValue>`: For operations returning `TValue`.
+- `Error`: Typed failure information with hierarchical codes.
+- `AggregateError`: A collection of multiple errors (e.g., validation summary).
 
-In `LightningArc.Utils`, the pattern is implemented via two main classes:
-- `Result`: Represents an operation with no return value.
-- `Result<TValue>`: Represents an operation that returns a value of type `TValue` on success.
+## Modern C# Ergonomics
 
-### Why use Result Pattern?
-
-1. **Explicit Error Handling**: The compiler forces you to acknowledge that an operation can fail.
-2. **Performance**: Avoids the high overhead of throwing and catching exceptions.
-3. **Flow Control**: Enables a fluent, pipeline-based approach to business logic.
-
-## Creating Results
-
-### Success
+### Boolean Logic
+Use results directly in `if` statements:
 ```csharp
-// Non-generic success (200 OK equivalent)
-var res = Result.Success();
-
-// Generic success with value
-var valRes = Result.Success(42);
-
-// Semantic success types
-var created = Result.Created(newItem);
-var accepted = Result.Accepted();
+Result result = DoWork();
+if (result) { /* Success path */ }
+if (!result) { /* Failure path */ }
 ```
 
-### Failure
+### Deconstruction
+Positionally extract values:
 ```csharp
-// Using predefined error modules
-var error = Error.Resource.NotFound("User not found");
-var fail = Result.Failure(error);
-
-// Implicit conversion
-Result<User> implicitFail = Error.Validation.InvalidFormat("Invalid email");
+var (isSuccess, value, error) = result; // For Result<T>
+var (isSuccess, error) = result;        // For Result
+var (code, message, details) = error;   // For Error
 ```
 
-## Chaining Operations
-
-The library provides powerful extension methods to chain operations:
-
-| Method | Description |
-|--------|-------------|
-| `Map` | Transforms the success value. Skips on failure. |
-| `Bind` | Chains another operation that returns a `Result`. |
-| `Ensure` | Validates a condition. If false, turns success into failure. |
-| `Tap` | Executes a side-effect on success without changing the value. |
-| `Match` | Unwraps the result into a final value by handling both cases. |
-
-### Example Chain
+### Error Aggregation
+Combine multiple errors using the `+` operator:
 ```csharp
-public Result<UserProfile> UpdateUser(int id, UpdateDto dto)
-{
-    return _repo.FindById(id)
-        .Ensure(user => !user.IsLocked, Error.Authentication.Forbidden("User locked"))
-        .Map(user => UpdateProperties(user, dto))
-        .Bind(user => _repo.Save(user))
-        .Tap(user => _logger.LogInformation($"User {id} updated"));
-}
+Error errors = Error.Validation.MissingField("Name") + 
+               Error.Validation.InvalidFormat("Email");
+
+// Result maintains all details from both errors.
 ```
+
+## Chaining (Fluent API)
+
+| Method | Finality |
+|--------|----------|
+| `Bind` | Chain another `Result` operation. |
+| `Map` | Transform the success value. |
+| `Ensure` | Validate a condition on the success value. |
+| `Tap` | Execute side-effects (e.g., Logging). |
+| `OnFailure` | Execute logic only on failure. |
+| `Match` | Final unwrapping of success and failure cases. |
 
 ## Async Support
-
-Use `TaskResult<T>` for asynchronous flows. It is awaitable and supports fluent chaining.
+Use `TaskResult<T>` for I/O bound operations. It allows seamless chaining of `Async` methods.
 
 ```csharp
-public TaskResult<User> GetUserAsync(int id) => _service.Fetch(id);
-
-// Usage
-var result = await GetUserAsync(1)
-    .MapAsync(u => u.ToDto());
+public async TaskResult<User> GetUserAsync(int id) => 
+    await _db.Users.FindAsync(id)
+        .MapAsync(u => u.ToDto());
 ```

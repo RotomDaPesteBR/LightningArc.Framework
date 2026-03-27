@@ -1,54 +1,65 @@
----
-uid: data-access
-level: 100
-summary: "Conceptual guide on Data Access patterns, Repositories, Unit of Work, and Mapper adapters."
-keywords: "Repository, Unit of Work, ADO.NET, Dapper, Entity Framework, AutoMapper, Mapster"
----
+# Data Access & SQL Builder
 
-# Data Access & Mappers
+The **`LightningArc.Data`** module provides abstractions for repositories and a metadata-driven SQL Builder.
 
-The library provides abstractions and concrete implementations for common data access patterns, supporting both high-level ORMs like Entity Framework and low-level tools like Dapper/ADO.NET.
+## SQL Builder
+**Namespace**: `LightningArc.Data.ADO.SqlBuilder`
 
-## Repository Pattern
+The SQL Builder uses table metadata (column names, keys, ordering) to generate dialect-specific SQL statements.
 
-Repositories are abstracted via `IRepository<TEntity>`. Specialized versions exist for different technologies:
+### 1. Define Table Metadata
+First, create a collection of `ColumnDefinition` describing your table structure.
 
-### ADO.NET / Dapper
-Use `IDbRepository<T>` for repositories that need direct access to `DbConnection` and `DbTransaction`.
-- **Static Creation**: Supports `.Create()` static abstract methods for factory-based instantiation.
-
-### Entity Framework Core
-Use `RepositoryBase<TEntity, TContext>` to implement standard EF repositories with built-in `DbSet` management.
-
-## Unit of Work (UoW)
-
-Coordinating multiple repository operations within a single transaction is handled by `IUnitOfWork`.
-
-- **Begin/Commit/Rollback**: Standard transactional methods.
-- **IDbUnitOfWork**: Specialized for ADO.NET, exposing the underlying `Connection` and `Transaction`.
-
-## Object Mapping (IMapper)
-
-The library abstracts object-to-object mapping, allowing you to swap mapping libraries easily.
-
-### Available Adapters
-- `Mappers.AutoMapper`: Adapter for the AutoMapper library.
-- `Mappers.Mapster`: Adapter for the Mapster library.
-
-### Registration
 ```csharp
-// In Dependency Injection
-services.AddAutoMapperAdapter(cfg => {
-    cfg.CreateMap<User, UserDto>();
-});
-
-// Or Mapster
-services.AddMapsterAdapter();
+var columns = new List<ColumnDefinition>
+{
+    new("Id", isKey: true),
+    new("Name"),
+    new("Email"),
+    new("CreatedAt", order: new OrderDefinition(OrderDirection.Descending, priority: 1))
+};
 ```
 
-### Usage
+### 2. Instantiate and Build
+Instantiate the `SqlBuilder` with the table name, columns, and target dialect.
+
 ```csharp
-public class MyService(IMapper mapper) {
-    public UserDto GetDto(User user) => mapper.Map<UserDto>(user);
+var builder = new SqlBuilder("Users", columns, SqlDialect.SqlServer);
+
+// Generate SELECT
+string selectAll = builder.Select.Build();
+string selectById = builder.Select.Build(filterByKey: true);
+
+// Generate INSERT
+string insert = builder.Insert.Build();
+
+// Generate UPDATE
+string update = builder.Update.Build();
+
+// Generate DELETE
+string delete = builder.Delete.Build();
+```
+
+---
+
+## Repository & Unit of Work
+**Namespace**: `LightningArc.Data.Abstractions`
+
+### Repository Implementation
+Always inherit from `RepositoryBase<T, TKey>` when using ADO.NET or Entity Framework to leverage standardized CRUD operations.
+
+```csharp
+public class UserRepo(IConnectionFactory factory) : RepositoryBase<User, int>(factory)
+{
+    // Inherits: FindAsync, AddAsync, UpdateAsync, DeleteAsync, etc.
 }
+```
+
+### Unit of Work Pattern
+Use `IUnitOfWork` to wrap multiple repository operations in a single transaction.
+
+```csharp
+using var uow = await _uowFactory.CreateAsync();
+// ... execute repo calls ...
+await uow.CommitAsync();
 ```

@@ -1,53 +1,65 @@
-using LightningArc.Results;
 using LightningArc.Abstractions.ValueObjects;
+using LightningArc.Results;
+using LightningArc.Results.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Docs.Skill.Code;
-
-/// <summary>
-/// Reference implementation showing best practices using LightningArc.Utils.
-/// </summary>
-public class UserService(IUserRepository repo, IMapper mapper, ILogger logger)
+namespace LightningArc.Samples
 {
-    public async TaskResult<UserResponse> RegisterUser(RegisterRequest request)
+    public class UserDto(string email, string name);
+
+    /// <summary>
+    /// Demonstrates best practices for using the LightningArc ecosystem.
+    /// </summary>
+    public class UserService
     {
-        // 1. Validate Input using Value Objects and Ensure
-        return await Result.Success(request)
-            .Ensure(req => !string.IsNullOrEmpty(req.Name), Error.Validation.MissingField("Name is required"))
-            .Bind(req => CreateEmail(req.Email)) // Try create Value Object
-            .BindAsync(email => CheckAvailability(email))
-            
-            // 2. Map to Domain Entity
-            .Map(email => new User { 
-                Name = request.Name, 
-                Email = email,
-                Status = UserStatus.Pending 
-            })
-            
-            // 3. Persist using Repository
-            .BindAsync(user => repo.Save(user))
-            
-            // 4. Side effects
-            .Tap(user => logger.LogInformation("User {Id} registered", user.Id))
-            
-            // 5. Final Mapping to Response DTO
-            .Map(user => mapper.Map<UserResponse>(user));
+        public async TaskResult<UserDto> RegisterUserAsync(string emailRaw, string name)
+        {
+            // 1. Validation using Error Aggregation (+)
+            Error? validationErrors = null;
+            if (string.IsNullOrWhiteSpace(name))
+                validationErrors += Error.Validation.MissingField("Name is required");
+
+            if (validationErrors != null)
+                return validationErrors;
+
+            // 2. Value Object Creation and Functional Chaining
+            return await Email.Create(emailRaw) // Returns Result<Email>
+                .BindAsync(email => CheckDatabaseUniqueness(email))
+                .Map(email => new UserDto(email, name))
+                .Tap(user => NotifyAdmin(user));
+        }
+
+        private async TaskResult<Email> CheckDatabaseUniqueness(Email email)
+        {
+            await Task.Delay(10); // Simulate DB
+            return email; // Success
+        }
+
+        private void NotifyAdmin(UserDto user) { /* Side effect */ }
     }
 
-    private Result<Email> CreateEmail(string raw)
+    /// <summary>
+    /// Demonstrates seamless Web API integration.
+    /// </summary>
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UsersController(UserService service) : ControllerBase
     {
-        try {
-            return Email.Create(raw);
-        } catch {
-            return Error.Validation.InvalidFormat("Email address is invalid");
+        [HttpPost]
+        public async Task<EndpointResult<UserDto>> Register(string email, string name)
+        {
+            // The Result<UserDto> is automatically converted to EndpointResult<UserDto>
+            // which maps to 200 OK, 400 Bad Request, etc., with RFC 7807 support.
+            var result = await service.RegisterUserAsync(email, name);
+            
+            // Example of modern C# ergonomics (Deconstruction)
+            if (!result)
+            {
+                var (code, message, details) = result.Error;
+                // Log or handle specifically...
+            }
+
+            return result;
         }
     }
-
-    private async TaskResult<Email> CheckAvailability(Email email)
-    {
-        var exists = await repo.ExistsByEmail(email);
-        return exists 
-            ? Error.Resource.AlreadyExists("Email already in use") 
-            : email;
-    }
 }
-
