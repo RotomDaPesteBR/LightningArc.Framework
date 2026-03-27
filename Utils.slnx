@@ -13,6 +13,7 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/docs/">
+    <Project Path="docs/Documentation.csproj" />
     <File Path="docs/Directory.Build.props" />
     <File Path="docs/README.md" />
   </Folder>

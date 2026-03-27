@@ -64,7 +64,7 @@
   
   <!-- Metalama -->
   <PropertyGroup>
-      <MetalamaPackagesVersion>2026.0.17</MetalamaPackagesVersion> 
+      <MetalamaPackagesVersion>2026.0.20</MetalamaPackagesVersion> 
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Metalama.Framework" Version="$(MetalamaPackagesVersion)" />
