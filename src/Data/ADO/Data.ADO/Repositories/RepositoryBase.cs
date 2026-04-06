@@ -127,6 +127,38 @@ public abstract class RepositoryBase
     }
 
     /// <summary>
+    /// Asynchronously retrieves a database connection. Returns the existing connection if provided,
+    /// or creates a new one using the connection factory.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>A task that contains an instance of <see cref="System.Data.Common.DbConnection"/>.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the repository is not properly initialized with a connection or a factory.</exception>
+    protected async Task<DbConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
+    {
+        if (DbConnection != null)
+        {
+            return DbConnection;
+        }
+
+        if (ConnectionFactory == null)
+            throw new InvalidOperationException("Repository not properly initialized.");
+
+        DbConnection dbConnection = ConnectionFactory.GetConnection();
+
+        if (dbConnection.State != ConnectionState.Open)
+        {
+            await dbConnection.OpenAsync(cancellationToken);
+        }
+
+        if (Logger.IsEnabled(LogLevel.Debug))
+        {
+            Logger.LogDebug("Connection opened");
+        }
+
+        return dbConnection;
+    }
+
+    /// <summary>
     /// Closes and disposes of the provided database connection if it was not externally managed
     /// (i.e., if no transaction or persistent connection was provided).
     /// </summary>
