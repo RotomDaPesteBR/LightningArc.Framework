@@ -16,8 +16,17 @@
     <!-- Output -->
     <OutputType>Library</OutputType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    
+
     <!-- Build -->
     <NoWarn>$(NoWarn);NU5128</NoWarn>
+
+    <!-- Analyzers reference (exclude the analyzers project itself) -->
+    <_IncludeAnalyzers Condition="'$(MSBuildProjectFile)' != 'LightningArc.Analyzers.csproj'">true</_IncludeAnalyzers>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(_IncludeAnalyzers)' == 'true'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)Analyzers/LightningArc.Analyzers.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
 </Project>
