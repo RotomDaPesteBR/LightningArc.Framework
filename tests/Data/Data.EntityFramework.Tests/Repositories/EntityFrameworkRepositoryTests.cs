@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using LightningArc.Data.Abstractions.Mappers;
 using LightningArc.Data.EntityFramework.Repositories;
-using LightningArc.Data.Tests.Mocks;
+using LightningArc.Data.ADO.Tests.Mocks;
 
 namespace LightningArc.Data.Tests.Repositories;
 
@@ -83,4 +83,5 @@ public class EntityFrameworkRepositoryTests
         await Assert.That(mapper).IsEqualTo(mockMapper);
     }
 }
+
 

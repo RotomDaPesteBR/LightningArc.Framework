@@ -1,5 +1,5 @@
 using LightningArc.Data.ADO.Factories;
-using LightningArc.Data.Tests.Mocks;
+using LightningArc.Data.ADO.Tests.Mocks;
 
 namespace LightningArc.Data.Tests.Factories;
 
@@ -36,4 +36,5 @@ public class RepositoryFactoryTests
         await Assert.That(repository.InjectedMapper).IsEqualTo(_mapper);
     }
 }
+
 

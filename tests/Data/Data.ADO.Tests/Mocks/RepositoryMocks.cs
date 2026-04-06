@@ -3,7 +3,7 @@ using LightningArc.Data.Abstractions.Mappers;
 using LightningArc.Data.ADO.Factories;
 using LightningArc.Data.ADO.Repositories;
 
-namespace LightningArc.Data.Tests.Mocks;
+namespace LightningArc.Data.ADO.Tests.Mocks;
 
 public class MockConnectionFactory : IConnectionFactory
 {
@@ -48,4 +48,5 @@ public class TestRepository : RepositoryBase, IDbRepository<TestRepository>
         Microsoft.Extensions.Logging.ILogger<TestRepository>? logger = null
     ) => new(connectionFactory, mapper);
 }
+
 

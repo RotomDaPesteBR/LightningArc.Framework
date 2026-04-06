@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using LightningArc.Data.Abstractions.Mappers;
 using LightningArc.Data.ADO.Factories;
 using LightningArc.Data.ADO.Repositories;
-using LightningArc.Data.Tests.Mocks;
+using LightningArc.Data.ADO.Tests.Mocks;
 using Microsoft.Extensions.Logging;
 
 namespace LightningArc.Data.Tests.Repositories;
@@ -167,4 +167,5 @@ public class RepositoryBaseTests
         await Assert.That(mockConn.DisposeCount).IsEqualTo(1);
     }
 }
+
 
