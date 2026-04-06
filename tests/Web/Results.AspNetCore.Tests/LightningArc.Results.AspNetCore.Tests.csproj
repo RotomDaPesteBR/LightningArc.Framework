@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <GenerateTestingPlatformEntryPoint>true</GenerateTestingPlatformEntryPoint>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="TUnit.AspNetCore" />
+    <ProjectReference Include="..\..\..\src\Web\Results.AspNetCore\LightningArc.Results.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\Core\Json\LightningArc.Json.csproj" />
+    <ProjectReference Include="..\..\..\src\Core\Utils\LightningArc.Utils.csproj" />
+    <ProjectReference Include="..\Results.AspNetCore.TestServer\LightningArc.TestServer.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.Build.NoTargets/3.7.134">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>LightningArc.Documentation</RootNamespace>
+    <AssemblyName>LightningArc.Documentation</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="**/*.md" />
+    <None Include="**/*.yml" />
+    <None Include="**/*.cs" />
+    <None Remove="bin/**" />
+    <None Remove="obj/**" />
+  </ItemGroup>
+</Project>

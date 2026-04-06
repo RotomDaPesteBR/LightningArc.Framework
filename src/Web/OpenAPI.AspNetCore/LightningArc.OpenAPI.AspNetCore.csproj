@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+	<TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+	<OutputType>Library</OutputType>
+	  
+	<RootNamespace>LightningArc.OpenAPI.AspNetCore</RootNamespace>
+	<NoWarn>IDE0130</NoWarn>
+  </PropertyGroup>
+	
+  <PropertyGroup>
+	<AssemblyName>LightningArc.OpenAPI.AspNetCore</AssemblyName>
+	<PackageTags>Utils</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\..\Core\\Primitives\\LightningArc.Primitives.csproj" />
+  </ItemGroup>
+	
+  <ItemGroup>
+	<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  </ItemGroup>
+</Project>
+
+
+
+
+
+

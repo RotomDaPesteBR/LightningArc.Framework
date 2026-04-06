@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Data\ADO\Data.ADO\LightningArc.Data.ADO.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\Data.Abstractions\LightningArc.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\ADO\Data.ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj" />
+  </ItemGroup>
+</Project>
+
+
+

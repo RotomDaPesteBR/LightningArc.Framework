@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
+
+	<RootNamespace>LightningArc.Primitives</RootNamespace>
+
+	<NoWarn>$(NoWarn);IDE0130</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+	<AssemblyName>LightningArc.Primitives</AssemblyName>
+	<PackageTags>Utils</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+	<PackageReference Include="PolySharp" PrivateAssets="All" />
+  </ItemGroup>
+</Project>
+
+
+

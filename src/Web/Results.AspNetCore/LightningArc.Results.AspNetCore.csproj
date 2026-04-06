@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net9.0;net10.0</TargetFrameworks>
+    <OutputType>Library</OutputType>
+    <RootNamespace>LightningArc.Results.AspNetCore</RootNamespace>
+    <NoWarn>IDE0130</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>LightningArc.Results.AspNetCore</AssemblyName>
+    <PackageTags>Utils</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageReference Include="System.Text.Json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Results\LightningArc.Results.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="LightningArc.Utils" />
+  </ItemGroup>
+</Project>
+

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+	<TargetFrameworks>net6.0;net9.0;net10.0</TargetFrameworks>
+	<OutputType>Library</OutputType>
+
+	<RootNamespace>LightningArc.CORS.AspNetCore</RootNamespace>
+	<NoWarn>IDE0130</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+	<AssemblyName>LightningArc.CORS.AspNetCore</AssemblyName>
+	<PackageTags>Metalama, PostSharp, Aspect, Attribute</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+</Project>
+
+
+
+

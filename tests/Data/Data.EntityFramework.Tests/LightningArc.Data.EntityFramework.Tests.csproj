@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    <ProjectReference Include="..\..\..\src\Data\EF\Data.EntityFramework\LightningArc.Data.EntityFramework.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\Data.Abstractions\LightningArc.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\Data.ADO.Tests\LightningArc.Data.ADO.Tests.csproj" />
+  </ItemGroup>
+</Project>
+
+
+
+
+

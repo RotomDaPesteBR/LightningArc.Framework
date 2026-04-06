@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+	<TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
+
+	<RootNamespace>LightningArc.Data.ADO.SqlBuilder</RootNamespace>
+
+	<NoWarn>$(NoWarn);IDE0130</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+	<AssemblyName>LightningArc.Data.ADO.SqlBuilder</AssemblyName>
+	<PackageTags>Utils, Data, ADO</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+	<PackageReference Include="PolySharp" PrivateAssets="All" />
+  </ItemGroup>
+</Project>
+
+
+
