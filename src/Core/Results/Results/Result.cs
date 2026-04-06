@@ -243,6 +243,12 @@ public class Result : IEquatable<Result>
     /// <returns>A new instance of <see cref="Result"/> indicating success.</returns>
     public static Result NoContent() => new(Results.Success.NoContent());
 
+    /// <summary>
+    /// Starts a fluent aggregation process to collect multiple results or exceptions.
+    /// </summary>
+    /// <returns>A new <see cref="ResultAggregator"/> instance.</returns>
+    public static ResultAggregator Aggregate() => new();
+
     // Métodos de fábrica que criam um Result com valor
 
     /// <summary>

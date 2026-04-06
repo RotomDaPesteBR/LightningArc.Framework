@@ -1,5 +1,5 @@
-using LightningArc.Results.Messages;
 using System.Globalization;
+using LightningArc.Results.Messages;
 
 namespace LightningArc.Results
 {
@@ -152,10 +152,10 @@ namespace LightningArc.Results
                 return hash;
             }
 #else
-            var hash = new HashCode();
+            HashCode hash = new();
             hash.Add(CodePrefix);
             hash.Add(CodeSuffix);
-            foreach (var detail in Details)
+            foreach (ErrorDetail detail in Details)
             {
                 hash.Add(detail);
             }
@@ -180,7 +180,11 @@ namespace LightningArc.Results
         /// <param name="code">The full error code.</param>
         /// <param name="message">The descriptive message.</param>
         /// <param name="details">The list of additional error details.</param>
-        public void Deconstruct(out int code, out string message, out IReadOnlyList<ErrorDetail> details)
+        public void Deconstruct(
+            out int code,
+            out string message,
+            out IReadOnlyList<ErrorDetail> details
+        )
         {
             code = Code;
             message = Message;
@@ -199,12 +203,19 @@ namespace LightningArc.Results
         {
             var errors = new List<Error> { left, right };
 
-            if (left.Code == right.Code)
-            {
-                return new AggregateError(left.CodePrefix, left.CodeSuffix, left._messageProvider, errors);
-            }
-
-            return new AggregateError((int)ModuleCodes.General, 1, "Multiple errors occurred.", errors);
+            return left.Code == right.Code
+                ? new AggregateError(
+                    left.CodePrefix,
+                    left.CodeSuffix,
+                    left._messageProvider,
+                    errors
+                )
+                : new AggregateError(
+                    (int)ModuleCodes.General,
+                    1,
+                    "Multiple errors occurred.",
+                    errors
+                );
         }
 
         /// <summary>
@@ -226,4 +237,3 @@ namespace LightningArc.Results
         }
     }
 }
-

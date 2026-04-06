@@ -210,10 +210,19 @@
   <data name="Validation_MissingField" xml:space="preserve">
     <value>Um ou mais campos obrigatórios estão ausentes.</value>
   </data>
+  <data name="Validation_MissingField_WithParam" xml:space="preserve">
+    <value>O campo {0} é obrigatório.</value>
+  </data>
   <data name="Validation_ValueOutOfRange" xml:space="preserve">
     <value>Um ou mais valores estão fora do intervalo permitido.</value>
   </data>
+  <data name="Validation_ValueOutOfRange_WithParam" xml:space="preserve">
+    <value>O valor do campo {0} está fora do intervalo permitido.</value>
+  </data>
   <data name="Validation_InvalidParameter" xml:space="preserve">
     <value>Um ou mais parâmetros na entrada são inválidos.</value>
+  </data>
+  <data name="Validation_InvalidParameter_WithParam" xml:space="preserve">
+    <value>O parâmetro {0} é inválido.</value>
   </data>
 </root>
