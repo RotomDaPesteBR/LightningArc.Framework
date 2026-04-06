@@ -16,6 +16,7 @@
     <!-- Build -->
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts</ArtifactsPath>
+    <VSTestResultsDirectory>$(ArtifactsPath)\TestResults</VSTestResultsDirectory>
   </PropertyGroup>
 
   <PropertyGroup>
