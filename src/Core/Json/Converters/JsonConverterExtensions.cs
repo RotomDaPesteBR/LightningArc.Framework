@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using LightningArc.Abstractions.ValueObjects;
+using LightningArc.Primitives.ValueObjects;
 
 namespace LightningArc.Json.Converters
 {
@@ -15,7 +15,7 @@ namespace LightningArc.Json.Converters
         /// <returns>The same collection of converters with the infrastructure services added.</returns>
         public static ICollection<JsonConverter> AddJsonConverters(this ICollection<JsonConverter> converters)
         {
-            converters.Add(new EmailJsonConverter());
+            converters.Add(new ValueObjectJsonConverterFactory());
 
             return converters;
         }
