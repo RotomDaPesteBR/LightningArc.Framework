@@ -46,12 +46,25 @@ string delete = builder.Delete.Build();
 **Namespace**: `LightningArc.Data.Abstractions`
 
 ### Repository Implementation
-Always inherit from `RepositoryBase<T, TKey>` when using ADO.NET or Entity Framework to leverage standardized CRUD operations.
+Always inherit from `RepositoryBase` when using ADO.NET or Entity Framework to leverage standardized CRUD operations.
 
 ```csharp
-public class UserRepo(IConnectionFactory factory) : RepositoryBase<User, int>(factory)
+public class UserRepo(IConnectionFactory factory, IMapper? mapper = null)
+    : RepositoryBase<User, UserDto>(factory, mapper)
 {
-    // Inherits: FindAsync, AddAsync, UpdateAsync, DeleteAsync, etc.
+    public async Task<List<UserDto>> GetAllAsync(CancellationToken ct = default)
+    {
+        DbConnection? conn = null;
+        try
+        {
+            conn = await GetConnectionAsync(ct); // Always prefer the async version
+            // ... query with Dapper or ADO.NET ...
+        }
+        finally
+        {
+            ReleaseConnection(conn); // Never pass null here
+        }
+    }
 }
 ```
 
@@ -63,3 +76,5 @@ using var uow = await _uowFactory.CreateAsync();
 // ... execute repo calls ...
 await uow.CommitAsync();
 ```
+
+> **LARC020**: The analyzer warns on sync `GetConnection()` inside async methods. Always prefer `await GetConnectionAsync(ct)`.

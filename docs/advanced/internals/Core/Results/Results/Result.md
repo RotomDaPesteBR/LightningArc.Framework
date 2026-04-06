@@ -18,6 +18,9 @@ The `Result` class is the core component of the functional error handling patter
 *   `Error`: Accessor for the `Error` object. Throws `ResultAccessFailedException` if accessed on a successful result.
 *   `SuccessDetails`: Accessor for the `Success` object. Throws `ResultAccessFailedException` if accessed on a failed result.
 
+#### Safe Access Methods
+*   `TryGetError(out Error error)`: Attempt-free error retrieval. Returns `true` if the result is a failure; otherwise `false`. Prefer this over accessing `.Error` directly.
+
 #### Internal State
 *   `_error`: Nullable field holding the `Error` object (null if success).
 *   `_success`: Nullable field holding the `Success` object (null if failure).
@@ -44,6 +47,9 @@ Inherits from `Result` and adds a typed value to the success state.
 
 #### Properties
 *   `Value`: Accessor for the encapsulated value. Throws `ResultAccessFailedException` if accessed on a failed result.
+
+#### Safe Access Methods
+*   `TryGetValue(out TValue value)`: Attempt-free value retrieval. Returns `true` if the result is successful; otherwise `false`. Prefer this over accessing `.Value` directly. (LARC001 warns on unsafe `.Value` access.)
 
 #### Factory Methods
 *   `Success<TValue>(TValue value)`: Creates a success result with a value.

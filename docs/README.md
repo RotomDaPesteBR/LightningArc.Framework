@@ -30,6 +30,12 @@ Extensões específicas para ASP.NET Core.
 - [CORS Policies](web-integration/cors.md): Configurações simplificadas de segurança.
 - [OpenAPI](web-integration/openapi.md): Suporte aprimorado para Swagger e documentação de API.
 
+### 3. [Analyzers](analyzers/README.md)
+Análise estática em tempo de compilação para o ecossistema.
+- [Regras Result](analyzers/result-rules.md): LARC001–LARC003 — Uso seguro de `.Value`, `.Error` e descarte de `Result`.
+- [Regras ValueObject](analyzers/value-object-rules.md): LARC010–LARC012 — Conversão implícita e criação descartada.
+- [Regras Data & Infra](analyzers/infra-rules.md): LARC020–LARC030 — Conexões síncronas, HostedServices vazios e `ReleaseConnection(null)`.
+
 ### 4. [Advanced Topics](advanced/metalama.md)
 Recursos para cenários complexos.
 - [Metalama](advanced/metalama.md): Programação orientada a aspectos (AOP) em tempo de compilação.

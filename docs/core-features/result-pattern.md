@@ -40,7 +40,25 @@ var (isSuccess, value, error) = result;
 var (code, message, details) = error;
 ```
 
-### 2.3. Conversões Explícitas
+### 2.3. Acesso Seguro (TryGetValue / TryGetError)
+Evite exceções ao acessar valores ou erros de forma segura:
+
+```csharp
+Result<int> result = DoWork();
+
+if (result.TryGetValue(out int value))
+{
+    // Sucesso, 'value' contém o resultado
+}
+
+Result failureResult = DoSomethingElse();
+if (failureResult.TryGetError(out Error error))
+{
+    // Falha, 'error' contém o motivo
+}
+```
+
+### 2.4. Conversões Explícitas
 Acesse o valor ou o erro de um `Result<T>` através de casting (gera exceção se o estado for inválido):
 
 ```csharp

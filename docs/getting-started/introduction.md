@@ -24,6 +24,10 @@ Pontes de integração com frameworks populares da indústria.
 - **`LightningArc.Mappers.*`**: Adaptadores para AutoMapper e Mapster.
 - **`LightningArc.Metalama`**: Integração com Programação Orientada a Aspectos.
 
+### 3. Analyzers (Análise Estática)
+Um projeto único de Roslyn Analyzers com regras de compilação para todo o ecossistema.
+- **`LightningArc.Analyzers`**: 9 regras e 2 code fixes para Result, ValueObjects e Data.
+
 ---
 
 ## 💡 Filosofia de Design

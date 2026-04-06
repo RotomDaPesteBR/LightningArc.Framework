@@ -24,21 +24,21 @@ public class UserRepository : RepositoryBase<UserModel, User>, IRepository<UserR
     public UserRepository(IConnectionFactory factory, IMapper? mapper) : base(factory, mapper) { }
 
     // Implement Static Factory (Required for RepositoryFactory)
-    public static UserRepository Create(IConnectionFactory factory, IMapper? mapper, ILogger<UserRepository>? logger) 
+    public static UserRepository Create(IConnectionFactory factory, IMapper? mapper, ILogger<UserRepository>? logger)
         => new UserRepository(factory, mapper);
-        
-    public async Task<User> GetById(int id)
+
+    public async Task<User> GetByIdAsync(int id, CancellationToken ct = default)
     {
         DbConnection? connection = null;
-        try 
+        try
         {
-            connection = GetConnection();
+            connection = await GetConnectionAsync(ct);
             // ... get UserModel from DB ...
             // return Mapper != null ? Mapper.Map<User>(userModel) : (User)userModel;
         }
-        finally 
+        finally
         {
-            FinalizeConnection(connection);
+            ReleaseConnection(connection);
         }
     }
 }

@@ -19,7 +19,7 @@ public class UserRepository : RepositoryBase<UserEntity, UserDto>
 
         try
         {
-            connection = GetConnection();
+            connection = await GetConnectionAsync(ct);
 
             var entities = await connection.QueryAsync<UserEntity>(
                 new CommandDefinition(

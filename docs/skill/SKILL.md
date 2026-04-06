@@ -10,12 +10,14 @@ This skill provides the architectural constraints, coding standards, and API ref
 ## 🛠️ Core Principles for AI
 
 1.  **Always use `Result<T>`**: Never throw exceptions for expected business failures. Return `Error` types from the appropriate module.
-2.  **Explicit over Implicit**: Prefer `Match` or `Bind` over manual `IsSuccess` checks where possible to maintain functional purity.
-3.  **Modern C# Ergnonomics**: Leverage the library's syntactic sugar:
+2.  **Safe access over direct access**: Prefer `TryGetValue` / `TryGetError` over `.Value` / `.Error` to avoid `ResultAccessFailedException`.
+3.  **Explicit over Implicit**: Prefer `Match` or `Bind` over manual `IsSuccess` checks where possible to maintain functional purity.
+4.  **Modern C# Ergnonomics**: Leverage the library's syntactic sugar:
     *   `if (result)` instead of `if (result.IsSuccess)`.
     *   Deconstruction: `var (success, value, error) = result;`.
     *   Error Aggregation: `error1 + error2`.
-4.  **Async by Default**: Use `TaskResult<T>` for all I/O operations.
+5.  **Async by Default**: Use `async`/`await` and `GetConnectionAsync` for data access.
+6.  **Analyzers**: LARC rules are enforced at compile time. See `docs/analyzers/` for rule details.
 
 ## 📂 Knowledge Base Structure
 
@@ -23,6 +25,7 @@ This skill provides the architectural constraints, coding standards, and API ref
 |---------|-------------|
 | `docs/getting-started/` | Installation and core philosophy. |
 | `docs/core-features/` | Detailed guides on Result, Errors, and Value Objects. |
+| `docs/analyzers/` | Static analysis rules enforced at compile time. |
 | `docs/web-integration/` | ASP.NET Core integration details. |
 | `docs/api/` | Technical signatures for all public members. |
 | `docs/skill/code/` | Reference implementations. |
