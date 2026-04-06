@@ -1,6 +1,6 @@
-# LightningArc.Utils
+# LightningArc.Core
 
-**LightningArc.Utils** is a comprehensive set of C# utilities and patterns designed to promote clean, expressive, and robust code in .NET applications. It focuses on Functional Error Handling, Domain-Driven Design primitives, and seamless ASP.NET Core integration.
+**LightningArc.Core** is a comprehensive set of C# utilities and patterns designed to promote clean, expressive, and robust code in .NET applications. It focuses on Functional Error Handling, Domain-Driven Design primitives, and seamless ASP.NET Core integration.
 
 ## 📚 Documentation
 
@@ -16,9 +16,9 @@ The solution is divided into three main layers:
 ### 1. Core Layer
 The foundation of the ecosystem, compatible with any .NET application.
 
-*   **`LightningArc.Utils.Results`**: A robust implementation of the **Result Pattern** (Success/Failure) to replace exceptions for flow control.
-*   **`LightningArc.Utils.Abstractions`**: Common base types and Value Objects (e.g., `Email`) with built-in validation.
-*   **`LightningArc.Utils.Json`**: `System.Text.Json` converters to serialize Value Objects as simple types.
+*   **`LightningArc.Core.Results`**: A robust implementation of the **Result Pattern** (Success/Failure) to replace exceptions for flow control.
+*   **`LightningArc.Core.Abstractions`**: Common base types and Value Objects (e.g., `Email`) with built-in validation.
+*   **`LightningArc.Core.Json`**: `System.Text.Json` converters to serialize Value Objects as simple types.
 
 ### 2. Web Layer
 Extensions and adapters for ASP.NET Core applications.
@@ -30,14 +30,14 @@ Extensions and adapters for ASP.NET Core applications.
 ### 3. Meta Layer
 Metaprogramming tools powered by **Metalama**.
 
-*   **`LightningArc.Utils.Metalama`**: Extensions and Factories to simplify the creation of Aspects (AOP), such as generating async wrappers or injecting method parameters at compile time.
+*   **`LightningArc.Core.Metalama`**: Extensions and Factories to simplify the creation of Aspects (AOP), such as generating async wrappers or injecting method parameters at compile time.
 
 ## 🚀 Quick Start
 
 ### Error Handling with Results
 
 ```csharp
-using LightningArc.Utils.Results;
+using LightningArc.Core.Results;
 
 public Result<User> CreateUser(string email)
 {

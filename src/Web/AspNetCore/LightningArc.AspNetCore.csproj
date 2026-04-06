@@ -3,12 +3,12 @@
         <TargetFrameworks>net6.0;net9.0;net10.0</TargetFrameworks>
         <OutputType>Library</OutputType>
 
-        <RootNamespace>LightningArc.Utils.AspNetCore</RootNamespace>
+        <RootNamespace>LightningArc.AspNetCore</RootNamespace>
         <NoWarn>IDE0130;NU5128</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>
-        <AssemblyName>LightningArc.Utils.AspNetCore</AssemblyName>
+        <AssemblyName>LightningArc.AspNetCore</AssemblyName>
         <PackageTags>Utils</PackageTags>
         <IncludeBuildOutput>false</IncludeBuildOutput>
     </PropertyGroup>

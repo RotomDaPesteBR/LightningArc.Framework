@@ -1,3 +1,4 @@
+using LightningArc.Primitives.ValueObjects;
 using LightningArc.Results;
 
 namespace LightningArc.Primitives.Results
@@ -22,7 +23,7 @@ namespace LightningArc.Primitives.Results
                 return Result.Success(result!);
             }
 
-            return Error.Validation($"'{value}' is not a valid email address.", nameof(value));
+            return Error.Validation.InvalidParameter($"'{value}' is not a valid email address.");
         }
     }
 }

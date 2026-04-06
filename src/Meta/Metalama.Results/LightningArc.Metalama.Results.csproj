@@ -24,7 +24,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Metalama\LightningArc.Metalama.csproj" />
 		<ProjectReference Include="..\..\Core\Results\LightningArc.Results.csproj" />
-		<!--<MetalamaCompileTimeAssembly Include="..\Utils.Metalama\bin\$(Configuration)\netstandard2.0\LightningArc.Utils.Metalama.dll" />-->
+		<!--<MetalamaCompileTimeAssembly Include="..\Utils.Metalama\bin\$(Configuration)\netstandard2.0\LightningArc.Core.Metalama.dll" />-->
 	</ItemGroup>
 
 	<!--

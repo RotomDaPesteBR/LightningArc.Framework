@@ -19,7 +19,7 @@
     <ProjectReference Include="..\..\Core\Results\LightningArc.Results.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <InternalsVisibleTo Include="LightningArc.Utils" />
+    <InternalsVisibleTo Include="LightningArc.Core" />
   </ItemGroup>
 </Project>
 

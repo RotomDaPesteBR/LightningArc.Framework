@@ -47,7 +47,7 @@ $projects_to_pack = @(
     "src\Core\Abstractions\Abstractions.csproj",
     "src\Core\Json\Json.csproj",
     "src\Core\Results\Results.csproj",
-    "src\Core\Utils\Utils.csproj",
+    "src\Core\Core\Utils.csproj",
 
     # Data
     "src\Data\Data.Abstractions\Data.Abstractions.csproj",

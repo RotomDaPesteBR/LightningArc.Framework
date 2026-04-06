@@ -2,13 +2,13 @@
   <PropertyGroup>
 	<TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
 
-	<RootNamespace>LightningArc.Utils</RootNamespace>
+	<RootNamespace>LightningArc.Core</RootNamespace>
 
 	<NoWarn>$(NoWarn);IDE0130</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
-	<AssemblyName>LightningArc.Utils</AssemblyName>
+	<AssemblyName>LightningArc.Core</AssemblyName>
 	<PackageTags>Utils</PackageTags>
 
 	<IncludeBuildOutput>false</IncludeBuildOutput>

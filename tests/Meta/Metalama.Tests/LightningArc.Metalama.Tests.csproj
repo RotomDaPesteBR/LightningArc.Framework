@@ -13,12 +13,12 @@
   </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\Core\Utils\LightningArc.Utils.csproj" />
+        <ProjectReference Include="..\..\..\src\Core\Core\LightningArc.Core.csproj" />
         <ProjectReference Include="..\..\..\src\Meta\Metalama\LightningArc.Metalama.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <MetalamaCompileTimeAssembly Include="../../../src/Core/Utils/bin/$(Configuration)/netstandard2.0/LightningArc.Utils.dll" />
+        <MetalamaCompileTimeAssembly Include="../../../src/Core/Core/bin/$(Configuration)/netstandard2.0/LightningArc.Core.dll" />
         <MetalamaCompileTimeAssembly Include="../../../src/Meta/Metalama/bin/$(Configuration)/netstandard2.0/LightningArc.Metalama.dll" />
     </ItemGroup>
 

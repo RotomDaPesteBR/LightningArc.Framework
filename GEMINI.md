@@ -4,7 +4,7 @@ This `GEMINI.md` file provides context for AI agents interacting with the `Utils
 
 ## Project Overview
 
-**Utils** (Namespace: `LightningArc.Utils`) is a collection of C# utilities and patterns designed to promote clean, expressive, and robust code in .NET applications.
+**Utils** (Namespace: `LightningArc.Core`) is a collection of C# utilities and patterns designed to promote clean, expressive, and robust code in .NET applications.
 
 *   **Primary Focus:** Functional Result Pattern (Error Handling), Immutable Value Objects, and ASP.NET Core Integration.
 *   **Technologies:** .NET (Multi-targeted: `netstandard2.0`, `net6.0`, `net9.0`, `net10.0`), ASP.NET Core, Metalama (AOP).
@@ -56,9 +56,9 @@ This project uses standard .NET CLI tools and a custom PowerShell script for pac
     *   `Nullable`: Enabled (Strict null safety).
     *   **Documentation:** XML documentation is required.
 *   **Namespaces:**
-    *   Core: `LightningArc.Utils.*`
-    *   Web: `LightningArc.Utils.AspNetCore.*`
-    *   Meta: `LightningArc.Utils.Metalama.*`
+    *   Core: `LightningArc.Core.*`
+    *   Web: `LightningArc.AspNetCore.*`
+    *   Meta: `LightningArc.Core.Metalama.*`
 
 ## Key Files
 

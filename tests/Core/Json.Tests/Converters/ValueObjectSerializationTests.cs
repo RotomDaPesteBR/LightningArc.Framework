@@ -87,7 +87,7 @@ public class ValueObjectSerializationTests
         }
         catch (JsonException ex)
         {
-            await Assert.That(ex.Message).Contains("não é um endereço de e-mail válido");
+            await Assert.That(ex.Message).Contains("is not a valid email address");
         }
     }
 }

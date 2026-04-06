@@ -12,7 +12,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
 
             // Act & Assert
             await Assert.That(() => { string result = url!; }).Throws<InvalidOperationException>()
-                .WithMessage("Não é possível converter um ValueObject nulo para string.");
+                .WithMessage("Cannot convert a null ValueObject to string.");
         }
 
         [Test]
@@ -23,7 +23,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
 
             // Act & Assert
             await Assert.That(() => { string result = cpf!; }).Throws<InvalidOperationException>()
-                .WithMessage("Não é possível converter um ValueObject nulo para string.");
+                .WithMessage("Cannot convert a null ValueObject to string.");
         }
 
         [Test]
@@ -34,7 +34,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
 
             // Act & Assert
             await Assert.That(() => { string result = cnpj!; }).Throws<InvalidOperationException>()
-                .WithMessage("Não é possível converter um ValueObject nulo para string.");
+                .WithMessage("Cannot convert a null ValueObject to string.");
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
 
             // Act & Assert
             await Assert.That(() => { string result = phone!; }).Throws<InvalidOperationException>()
-                .WithMessage("Não é possível converter um ValueObject nulo para string.");
+                .WithMessage("Cannot convert a null ValueObject to string.");
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
 
             // Act & Assert
             await Assert.That(() => { string result = email!; }).Throws<InvalidOperationException>()
-                .WithMessage("Não é possível converter um ValueObject nulo para string.");
+                .WithMessage("Cannot convert a null ValueObject to string.");
         }
     }
 }

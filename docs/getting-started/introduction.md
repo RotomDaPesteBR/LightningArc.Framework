@@ -15,7 +15,7 @@ Bibliotecas agnósticas de framework que definem os padrões base do sistema.
 - **`LightningArc.Results`**: Implementação completa do padrão Result.
 - **`LightningArc.Primitives`**: Contratos, Value Objects e tipos base.
 - **`LightningArc.Json`**: Utilitários para serialização moderna.
-- **`LightningArc.Utils`**: O "canivete suíço" com helpers generalistas.
+- **`LightningArc.Core`**: O "canivete suíço" com helpers generalistas.
 
 ### 2. Integrations (Extensões)
 Pontes de integração com frameworks populares da indústria.

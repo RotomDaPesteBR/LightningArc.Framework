@@ -22,9 +22,10 @@
   </Folder>
   <Folder Name="/src/Core/">
     <Project Path="src/Core/Primitives/LightningArc.Primitives.csproj" />
+    <Project Path="src/Core/Primitives.Results/LightningArc.Primitives.Results.csproj" />
     <Project Path="src/Core/Json/LightningArc.Json.csproj" />
     <Project Path="src/Core/Results/LightningArc.Results.csproj" />
-    <Project Path="src/Core/Utils/LightningArc.Utils.csproj" />
+    <Project Path="src/Core/Core/LightningArc.Core.csproj" />
   </Folder>
   <Folder Name="/src/Data/">
     <Project Path="src/Data/Data.Abstractions/LightningArc.Data.Abstractions.csproj" />
@@ -50,7 +51,7 @@
     <Project Path="src/Web/CORS.AspNetCore/LightningArc.CORS.AspNetCore.csproj" />
     <Project Path="src/Web/OpenAPI.AspNetCore/LightningArc.OpenAPI.AspNetCore.csproj" />
     <Project Path="src/Web/Results.AspNetCore/LightningArc.Results.AspNetCore.csproj" />
-    <Project Path="src/Web/Utils.AspNetCore/LightningArc.Utils.AspNetCore.csproj" />
+    <Project Path="src/Web/AspNetCore/LightningArc.AspNetCore.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />
