@@ -18,7 +18,7 @@ public static partial class ErrorMappingServiceExtensions
     /// <returns>The service instance for call chaining.</returns>
     public static ErrorMappingService MapApplication(this ErrorMappingService service)
     {
-        // Módulo APPLICATION (Prefixo 1)
+        // APPLICATION module (Prefix 1)
         service.Map<Error.Application.InternalError>(HttpStatusCode.InternalServerError, LocalizationManager.GetErrorTitle("Application_Internal"), "urn:api-errors:internal");
         service.Map<Error.Application.InvalidParameterError>(HttpStatusCode.BadRequest, LocalizationManager.GetErrorTitle("Application_InvalidParameter"), "urn:api-errors:invalid-parameter");
         service.Map<Error.Application.InvalidOperationError>(HttpStatusCode.BadRequest, LocalizationManager.GetErrorTitle("Application_InvalidOperation"), "urn:api-errors:invalid-operation");

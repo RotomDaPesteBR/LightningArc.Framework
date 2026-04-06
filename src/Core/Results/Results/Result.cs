@@ -249,7 +249,7 @@ public class Result : IEquatable<Result>
     /// <returns>A new <see cref="ResultAggregator"/> instance.</returns>
     public static ResultAggregator Aggregate() => new();
 
-    // Métodos de fábrica que criam um Result com valor
+    // Factory methods that create a Result with value
 
     /// <summary>
     /// Transforms a non-generic <see cref="Result"/> (without a value) into a <see cref="Result{TValue}"/> (with a value).

@@ -18,7 +18,7 @@ public static partial class ErrorMappingServiceExtensions
     /// <returns>The service instance for call chaining.</returns>
     public static ErrorMappingService MapExternal(this ErrorMappingService service)
     {
-        // Módulo EXTERNAL (Prefixo 8)
+        // EXTERNAL module (Prefix 8)
         service.Map<Error.External.RateLimitExceededError>(HttpStatusCode.TooManyRequests, LocalizationManager.GetErrorTitle("External_RateLimitExceeded"), "urn:api-errors:external-rate-limit");
         service.Map<Error.External.ApiQuotaExceededError>(HttpStatusCode.TooManyRequests, LocalizationManager.GetErrorTitle("External_ApiQuotaExceeded"), "urn:api-errors:external-quota-exceeded");
         service.Map<Error.External.InvalidApiResponseError>(HttpStatusCode.BadGateway, LocalizationManager.GetErrorTitle("External_InvalidApiResponse"), "urn:api-errors:external-invalid-api-response");

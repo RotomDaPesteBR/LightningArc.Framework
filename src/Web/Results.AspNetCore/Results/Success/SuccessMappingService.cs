@@ -38,26 +38,26 @@ public class SuccessMappingService
     )
     {
         _logger = logger;
-        _logger.LogInformation("Iniciando o mapeamento de sucessos HTTP para a API...");
+        _logger.LogInformation("Starting HTTP success mapping for the API...");
 
-        // Mapeamentos de Sucesso da Biblioteca
-        // ------------------------------------
+        // Library success mappings
+        // ------------------------
         Map<Success.OkSuccess>(HttpStatusCode.OK, "OK");
-        Map<Success.CreatedSuccess>(HttpStatusCode.Created, "Criado");
-        Map<Success.AcceptedSuccess>(HttpStatusCode.Accepted, "Aceito");
-        Map<Success.NoContentSuccess>(HttpStatusCode.NoContent, "Sem Conteúdo");
+        Map<Success.CreatedSuccess>(HttpStatusCode.Created, "Created");
+        Map<Success.AcceptedSuccess>(HttpStatusCode.Accepted, "Accepted");
+        Map<Success.NoContentSuccess>(HttpStatusCode.NoContent, "No Content");
 
         Map(typeof(Success<>.OkSuccess), HttpStatusCode.OK, "OK");
-        Map(typeof(Success<>.CreatedSuccess), HttpStatusCode.Created, "Criado");
-        Map(typeof(Success<>.AcceptedSuccess), HttpStatusCode.Accepted, "Aceito");
-        Map(typeof(Success<>.NoContentSuccess), HttpStatusCode.NoContent, "Sem Conteúdo");
+        Map(typeof(Success<>.CreatedSuccess), HttpStatusCode.Created, "Created");
+        Map(typeof(Success<>.AcceptedSuccess), HttpStatusCode.Accepted, "Accepted");
+        Map(typeof(Success<>.NoContentSuccess), HttpStatusCode.NoContent, "No Content");
 
         if (options.Value.SuccessMappings.Count > 0)
         {
             if (_logger.IsEnabled(LogLevel.Information))
             {
                 _logger.LogInformation(
-                    "Adicionando {Count} mapeamentos de sucesso personalizados.",
+                    "Adding {Count} custom success mappings.",
                     options.Value.SuccessMappings.Count
                 );
             }
@@ -73,7 +73,7 @@ public class SuccessMappingService
         if (_logger.IsEnabled(LogLevel.Information))
         {
             _logger.LogInformation(
-                "Mapeamento de sucessos HTTP concluído. {Count} sucessos registrados.",
+                "HTTP success mapping completed. {Count} successes registered.",
                 _mappings.Count
             );
         }
@@ -92,7 +92,7 @@ public class SuccessMappingService
         if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug(
-                "Mapeado sucesso {SuccessType} para Status {StatusCode} e Título '{Title}'.",
+                "Mapped success {SuccessType} to Status {StatusCode} and Title '{Title}'.",
                 typeof(TSuccess).Name,
                 (int)statusCode,
                 title
@@ -112,7 +112,7 @@ public class SuccessMappingService
         if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug(
-                "Mapeado sucesso {SuccessType} para Status {StatusCode} e Título '{Title}'.",
+                "Mapped success {SuccessType} to Status {StatusCode} and Title '{Title}'.",
                 successTypeDefinition.Name,
                 (int)statusCode,
                 title
@@ -134,22 +134,22 @@ public class SuccessMappingService
 
         Type? typeToLookup = successType;
 
-        // 2. Se for um tipo genérico aninhado (ex: Success<User>.OkSuccess)
-        //    precisamos extrair sua definição genérica.
+        // 2. If it's a nested generic type (e.g. Success<User>.OkSuccess)
+        //    we need to extract its generic definition.
         if (successType.IsGenericType && successType.IsNested)
         {
-            // Obtém o tipo pai (ex: Success<User>)
+            // Get the parent type (e.g. Success<User>)
             Type? declaringType = successType.DeclaringType;
 
-            // Se o tipo pai for genérico, precisamos construir o tipo de busca:
+            // If the parent type is generic, we need to build the lookup type:
             if (declaringType?.IsGenericType == true)
             {
                 try
                 {
-                    // 2a. Obtém o tipo de definição genérica do pai (ex: Success<>)
+                    // 2a. Get the generic type definition of the parent (e.g. Success<>)
                     Type genericParentDef = declaringType.GetGenericTypeDefinition();
 
-                    // 2b. Encontra o tipo aninhado correspondente na definição genérica do pai (ex: Success<>.{Operation}Success)
+                    // 2b. Find the corresponding nested type in the parent's generic definition (e.g. Success<>.{Operation}Success)
                     Type genericTypeDefinition = genericParentDef.GetNestedType(
                         successType.Name,
                         BindingFlags.Public | BindingFlags.NonPublic
@@ -158,12 +158,12 @@ public class SuccessMappingService
                 }
                 catch (Exception ex)
                 {
-                    // Log de erro se a reflexão falhar de forma inesperada.
+                    // Log error if reflection fails unexpectedly.
                     if (_logger.IsEnabled(LogLevel.Error))
                     {
                         _logger.LogError(
                             ex,
-                            "Erro ao tentar obter a definição de tipo genérico para o sucesso aninhado '{SuccessType}'.",
+                            "Error trying to get generic type definition for nested success '{SuccessType}'.",
                             successType.Name
                         );
                     }
@@ -174,23 +174,23 @@ public class SuccessMappingService
             }
         }
 
-        // 3. Tenta obter o mapeamento com o tipo de lookup (que será o tipo exato, ou a definição genérica).
+        // 3. Try to get the mapping with the lookup type (either the exact type or the generic definition).
         if (_mappings.TryGetValue(typeToLookup, out SuccessMapping? mapping))
         {
             return mapping;
         }
 
-        // 4. Tenta obter o mapeamento pelo tipo exato (caso o mapeamento genérico falhe ou seja um mapeamento personalizado exato)
+        // 4. Try exact type as fallback (in case the generic mapping failed or it's an exact custom mapping)
         if (typeToLookup != successType && _mappings.TryGetValue(successType, out SuccessMapping? exactMapping))
         {
             return exactMapping;
         }
 
-        // Ação de Log para sucessos não mapeados
+        // Log action for unmapped successes
         if (_logger.IsEnabled(LogLevel.Warning))
         {
             _logger.LogWarning(
-                "Nenhum mapeamento HTTP encontrado para o tipo de sucesso '{SuccessType}'. Retornando padrão.",
+                "No HTTP mapping found for success type '{SuccessType}'. Returning default.",
                 success.GetType().Name
             );
         }

@@ -17,7 +17,7 @@ public static partial class ErrorMappingServiceExtensions
     /// <returns>The service instance for call chaining.</returns>
     public static ErrorMappingService MapNetwork(this ErrorMappingService service)
     {
-        // Módulo NETWORK
+        // NETWORK module
         service.Map<Error.Network.ConnectionFailedError>(
             HttpStatusCode.ServiceUnavailable,
             LocalizationManager.GetErrorTitle("Network_ConnectionFailed"),

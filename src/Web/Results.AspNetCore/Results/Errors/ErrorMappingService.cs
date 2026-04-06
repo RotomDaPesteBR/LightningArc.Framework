@@ -49,13 +49,13 @@ public class ErrorMappingService
 
         if (_logger.IsEnabled(LogLevel.Information))
         {
-            _logger.LogInformation("Iniciando o mapeamento de erros HTTP para a API...");
+            _logger.LogInformation("Starting HTTP error mapping for the API...");
         }
 
-        // Mapeamentos de Erros da biblioteca
+        // Library error mappings
         this.MapDefaultErrors();
 
-        // Mapeamentos de Erros personalizados
+        // Custom error mappings
         int count = options.Value.ErrorMappings.Count;
 
         if (count > 0)
@@ -65,7 +65,7 @@ public class ErrorMappingService
             if (_logger.IsEnabled(LogLevel.Information))
             {
                 _logger.LogInformation(
-                    "Adicionando {Count} mapeamento{s} de erro personalizado{s}.",
+                    "Adding {Count} custom error mapping{s}.",
                     count,
                     plural,
                     plural
@@ -83,7 +83,7 @@ public class ErrorMappingService
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug(
-                        "Mapeado erro {ErrorType} para Status {StatusCode} e Tipo '{ProblemType}'.",
+                        "Mapped error {ErrorType} to Status {StatusCode} and Type '{ProblemType}'.",
                         mapping.ErrorType.Name,
                         (int)mapping.StatusCode,
                         mapping.Type
@@ -95,7 +95,7 @@ public class ErrorMappingService
         if (_logger.IsEnabled(LogLevel.Information))
         {
             _logger.LogInformation(
-                "Mapeamento de erros HTTP concluído. {Count} erros registrados.",
+                "HTTP error mapping completed. {Count} errors registered.",
                 _mappings.Count
             );
         }
@@ -116,7 +116,7 @@ public class ErrorMappingService
         if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug(
-                "Mapeado erro {ErrorType} para Status {StatusCode} e Tipo '{ProblemType}'.",
+                "Mapped error {ErrorType} to Status {StatusCode} and Type '{ProblemType}'.",
                 typeof(TError).Name,
                 (int)statusCode,
                 type
@@ -139,7 +139,7 @@ public class ErrorMappingService
             if (_logger.IsEnabled(LogLevel.Information))
             {
                 _logger.LogInformation(
-                    "Mapeamento encontrado para o erro {ErrorCode}. Mapeado para o status HTTP {HttpStatusCode}.",
+                    "Found mapping for error {ErrorCode}. Mapped to HTTP status {HttpStatusCode}.",
                     error.Code,
                     (int)mapping.StatusCode
                 );
@@ -148,12 +148,12 @@ public class ErrorMappingService
             return mapping;
         }
 
-        // Ação de Log para erros não mapeados
+        // Log action for unmapped errors
 
         if (_logger.IsEnabled(LogLevel.Warning))
         {
             _logger.LogWarning(
-                "Nenhum mapeamento HTTP encontrado para o tipo de erro '{ErrorType}'. Retornando padrão.",
+                "No HTTP mapping found for error type '{ErrorType}'. Returning default.",
                 error.GetType().Name
             );
         }

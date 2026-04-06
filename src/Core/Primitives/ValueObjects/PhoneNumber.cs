@@ -16,7 +16,7 @@ namespace LightningArc.Primitives.ValueObjects
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException("O número de telefone não pode ser nulo ou vazio.", nameof(value));
+                throw new ArgumentException("The phone number cannot be null or empty.", nameof(value));
             }
 
             var numericPhone = new string(value.Where(char.IsDigit).ToArray());
@@ -24,7 +24,7 @@ namespace LightningArc.Primitives.ValueObjects
             // Basic validation: length between 7 and 15 digits (E.164 standard)
             if (numericPhone.Length < 7 || numericPhone.Length > 15)
             {
-                throw new ArgumentException($"O número de telefone '{value}' é inválido.", nameof(value));
+                throw new ArgumentException($"The phone number '{value}' is invalid.", nameof(value));
             }
 
             Value = numericPhone;
@@ -60,7 +60,7 @@ namespace LightningArc.Primitives.ValueObjects
         /// <summary>
         /// Implicitly converts a <see cref="PhoneNumber"/> object to its <see cref="string"/> representation.
         /// </summary>
-        public static implicit operator string(PhoneNumber phone) => phone?.Value ?? throw new InvalidOperationException("Não é possível converter um ValueObject nulo para string.");
+        public static implicit operator string(PhoneNumber phone) => phone?.Value ?? throw new InvalidOperationException("Cannot convert a null ValueObject to string.");
 
         /// <summary>
         /// Implicitly converts a <see cref="string"/> to a <see cref="PhoneNumber"/> object.

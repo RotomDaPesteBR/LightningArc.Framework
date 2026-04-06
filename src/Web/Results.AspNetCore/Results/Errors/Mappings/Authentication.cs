@@ -18,7 +18,7 @@ public static partial class ErrorMappingServiceExtensions
     /// <returns>The service instance for call chaining.</returns>
     public static ErrorMappingService MapAuthentication(this ErrorMappingService service)
     {
-        // Módulo AUTHENTICATION (Prefixo 4)
+        // AUTHENTICATION module (Prefix 4)
         service.Map<Error.Authentication.UnauthorizedError>(HttpStatusCode.Unauthorized, LocalizationManager.GetErrorTitle("Authentication_Unauthorized"), "urn:api-errors:auth-failed");
         service.Map<Error.Authentication.ForbiddenError>(HttpStatusCode.Forbidden, LocalizationManager.GetErrorTitle("Authentication_Forbidden"), "urn:api-errors:auth-forbidden");
         service.Map<Error.Authentication.TokenExpiredError>(HttpStatusCode.Unauthorized, LocalizationManager.GetErrorTitle("Authentication_TokenExpired"), "urn:api-errors:auth-token-expired");

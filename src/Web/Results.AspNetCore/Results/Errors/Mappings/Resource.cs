@@ -18,7 +18,7 @@ public static partial class ErrorMappingServiceExtensions
     /// <returns>The service instance for call chaining.</returns>
     public static ErrorMappingService MapResource(this ErrorMappingService service)
     {
-        // Módulo RESOURCE (Prefixo 3)
+        // RESOURCE module (Prefix 3)
         service.Map<Error.Resource.NotFoundError>(HttpStatusCode.NotFound, LocalizationManager.GetErrorTitle("Resource_NotFound"), "urn:api-errors:resource-not-found");
         service.Map<Error.Resource.AlreadyExistsError>(HttpStatusCode.Conflict, LocalizationManager.GetErrorTitle("Resource_AlreadyExists"), "urn:api-errors:resource-already-exists");
         service.Map<Error.Resource.UnavailableError>(HttpStatusCode.ServiceUnavailable, LocalizationManager.GetErrorTitle("Resource_Unavailable"), "urn:api-errors:resource-unavailable");

@@ -16,12 +16,12 @@ namespace LightningArc.Primitives.ValueObjects
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException("A URL não pode ser nula ou vazia.", nameof(value));
+                throw new ArgumentException("The URL cannot be null or empty.", nameof(value));
             }
 
             if (!Uri.TryCreate(value, UriKind.Absolute, out _))
             {
-                throw new ArgumentException($"O valor '{value}' não é uma URL absoluta válida.", nameof(value));
+                throw new ArgumentException($"The value '{value}' is not a valid absolute URL.", nameof(value));
             }
 
             Value = value;
@@ -57,7 +57,7 @@ namespace LightningArc.Primitives.ValueObjects
         /// <summary>
         /// Implicitly converts a <see cref="Url"/> object to its <see cref="string"/> representation.
         /// </summary>
-        public static implicit operator string(Url url) => url?.Value ?? throw new InvalidOperationException("Não é possível converter um ValueObject nulo para string.");
+        public static implicit operator string(Url url) => url?.Value ?? throw new InvalidOperationException("Cannot convert a null ValueObject to string.");
 
         /// <summary>
         /// Implicitly converts a <see cref="string"/> to a <see cref="Url"/> object.

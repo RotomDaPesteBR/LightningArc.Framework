@@ -18,7 +18,7 @@ public static partial class ErrorMappingServiceExtensions
     /// <returns>The service instance for call chaining.</returns>
     public static ErrorMappingService MapIO(this ErrorMappingService service)
     {
-        // Módulo IO
+        // I/O module
         service.Map<Error.IO.FileNotFoundError>(HttpStatusCode.NotFound, LocalizationManager.GetErrorTitle("IO_FileNotFound"), "urn:api-errors:io-file-not-found");
         service.Map<Error.IO.DirectoryNotFoundError>(HttpStatusCode.NotFound, LocalizationManager.GetErrorTitle("IO_DirectoryNotFound"), "urn:api-errors:io-directory-not-found");
         service.Map<Error.IO.PermissionDeniedError>(HttpStatusCode.InternalServerError, LocalizationManager.GetErrorTitle("IO_PermissionDenied"), "urn:api-errors:io-permission-denied");

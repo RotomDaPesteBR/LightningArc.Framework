@@ -11,7 +11,7 @@ public static partial class ErrorMappingServiceExtensions
     /// </summary>
     public static ErrorMappingService MapRequest(this ErrorMappingService service)
     {
-        // Módulo REQUEST (Prefixo 11)
+        // REQUEST module (Prefix 11)
         service.Map<Error.Request.InvalidRequestError>(
             HttpStatusCode.BadRequest,
             LocalizationManager.GetErrorTitle("Request_InvalidRequest"),

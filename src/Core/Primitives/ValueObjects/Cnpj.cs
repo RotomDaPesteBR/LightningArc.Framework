@@ -16,24 +16,24 @@ namespace LightningArc.Primitives.ValueObjects
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException("O CNPJ não pode ser nulo ou vazio.", nameof(value));
+                throw new ArgumentException("The CNPJ cannot be null or empty.", nameof(value));
             }
 
             var numericCnpj = new string(value.Where(char.IsDigit).ToArray());
 
             if (numericCnpj.Length != 14)
             {
-                throw new ArgumentException($"O CNPJ '{value}' deve ter exatamente 14 dígitos.", nameof(value));
+                throw new ArgumentException($"The CNPJ '{value}' must have exactly 14 digits.", nameof(value));
             }
 
             if (HasAllSameDigits(numericCnpj))
             {
-                throw new ArgumentException($"O CNPJ '{value}' é inválido.", nameof(value));
+                throw new ArgumentException($"The CNPJ '{value}' is invalid.", nameof(value));
             }
 
             if (!IsValidChecksum(numericCnpj))
             {
-                throw new ArgumentException($"O CNPJ '{value}' é inválido.", nameof(value));
+                throw new ArgumentException($"The CNPJ '{value}' is invalid.", nameof(value));
             }
 
             Value = numericCnpj;
@@ -105,7 +105,7 @@ namespace LightningArc.Primitives.ValueObjects
         /// <summary>
         /// Implicitly converts a <see cref="Cnpj"/> object to its <see cref="string"/> representation.
         /// </summary>
-        public static implicit operator string(Cnpj cnpj) => cnpj?.Value ?? throw new InvalidOperationException("Não é possível converter um ValueObject nulo para string.");
+        public static implicit operator string(Cnpj cnpj) => cnpj?.Value ?? throw new InvalidOperationException("Cannot convert a null ValueObject to string.");
 
         /// <summary>
         /// Implicitly converts a <see cref="string"/> to a <see cref="Cnpj"/> object.

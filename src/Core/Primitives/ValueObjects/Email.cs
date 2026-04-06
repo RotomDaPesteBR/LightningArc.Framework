@@ -34,12 +34,12 @@ namespace LightningArc.Primitives.ValueObjects
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException("O endereço de e-mail não pode ser nulo ou vazio.", nameof(value));
+                throw new ArgumentException("The email address cannot be null or empty.", nameof(value));
             }
 
             if (!Regex.IsMatch(value, EmailRegexPattern, RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250)))
             {
-                throw new ArgumentException($"O valor '{value}' não é um endereço de e-mail válido.", nameof(value));
+                throw new ArgumentException($"The value '{value}' is not a valid email address.", nameof(value));
             }
 
             Value = value;
@@ -79,7 +79,7 @@ namespace LightningArc.Primitives.ValueObjects
         /// </summary>
         /// <param name="email">The <see cref="Email"/> object to be converted.</param>
         /// <returns>The email address string.</returns>
-        public static implicit operator string(Email email) => email?.Value ?? throw new InvalidOperationException("Não é possível converter um ValueObject nulo para string.");
+        public static implicit operator string(Email email) => email?.Value ?? throw new InvalidOperationException("Cannot convert a null ValueObject to string.");
 
         /// <summary>
         /// Implicitly converts a <see cref="string"/> to an <see cref="Email"/> object.

@@ -17,7 +17,7 @@ public static partial class ErrorMappingServiceExtensions
     /// <returns>The service instance for call chaining.</returns>
     public static ErrorMappingService MapSystem(this ErrorMappingService service)
     {
-        // Módulo SYSTEM (Prefixo 10)
+        // SYSTEM module (Prefix 10)
         service.Map<Error.System.ConfigurationError>(
             HttpStatusCode.InternalServerError,
             LocalizationManager.GetErrorTitle("System_Configuration"),

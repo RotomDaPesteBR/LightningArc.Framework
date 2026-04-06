@@ -18,7 +18,7 @@ public static partial class ErrorMappingServiceExtensions
     /// <returns>The service instance for call chaining.</returns>
     public static ErrorMappingService MapValidation(this ErrorMappingService service)
     {
-        // Módulo VALIDATION
+        // VALIDATION module
         service.Map<Error.Validation.InvalidFormatError>(HttpStatusCode.BadRequest, LocalizationManager.GetErrorTitle("Validation_InvalidFormat"), "urn:api-errors:data-invalid-format");
         service.Map<Error.Validation.InvalidSchemaError>(HttpStatusCode.BadRequest, LocalizationManager.GetErrorTitle("Validation_InvalidSchema"), "urn:api-errors:data-invalid-schema");
         service.Map<Error.Validation.DeserializationFailedError>(HttpStatusCode.BadRequest, LocalizationManager.GetErrorTitle("Validation_DeserializationFailed"), "urn:api-errors:data-deserialization-failed");

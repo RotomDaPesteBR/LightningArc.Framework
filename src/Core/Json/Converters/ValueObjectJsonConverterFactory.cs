@@ -52,7 +52,7 @@ namespace LightningArc.Json.Converters
             {
                 // Looking for the static 'Create' method that takes the underlying value type as parameter.
                 _createMethod = typeof(TValueObject).GetMethod("Create", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(TValue) }, null)
-                                ?? throw new InvalidOperationException($"O tipo {typeof(TValueObject).Name} deve possuir um método estático 'Create({typeof(TValue).Name})'.");
+                                ?? throw new InvalidOperationException($"Type {typeof(TValueObject).Name} must have a static method 'Create({typeof(TValue).Name})'.");
             }
 
             public override TValueObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -82,7 +82,7 @@ namespace LightningArc.Json.Converters
                 }
                 catch (Exception ex)
                 {
-                    throw new JsonException($"Erro ao criar o Value Object {typeof(TValueObject).Name}: {ex.Message}", ex);
+                    throw new JsonException($"Error creating Value Object {typeof(TValueObject).Name}: {ex.Message}", ex);
                 }
             }
 

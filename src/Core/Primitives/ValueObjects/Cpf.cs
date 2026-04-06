@@ -28,19 +28,19 @@ namespace LightningArc.Primitives.ValueObjects
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                throw new ArgumentException("O CPF não pode ser nulo ou vazio.", nameof(value));
+                throw new ArgumentException("The CPF cannot be null or empty.", nameof(value));
             }
 
             var cleanCpf = new string(value.Where(char.IsDigit).ToArray());
 
             if (cleanCpf.Length != 11 || IsRepeatedDigits(cleanCpf))
             {
-                throw new ArgumentException($"O valor '{value}' não é um CPF válido.", nameof(value));
+                throw new ArgumentException($"The value '{value}' is not a valid CPF.", nameof(value));
             }
 
             if (!IsValidCpf(cleanCpf))
             {
-                throw new ArgumentException($"O valor '{value}' não é um CPF válido.", nameof(value));
+                throw new ArgumentException($"The value '{value}' is not a valid CPF.", nameof(value));
             }
 
             Value = cleanCpf;
@@ -106,7 +106,7 @@ namespace LightningArc.Primitives.ValueObjects
         /// <summary>
         /// Implicitly converts a <see cref="Cpf"/> object to its <see cref="string"/> representation.
         /// </summary>
-        public static implicit operator string(Cpf cpf) => cpf?.Value ?? throw new InvalidOperationException("Não é possível converter um ValueObject nulo para string.");
+        public static implicit operator string(Cpf cpf) => cpf?.Value ?? throw new InvalidOperationException("Cannot convert a null ValueObject to string.");
 
         /// <summary>
         /// Implicitly converts a <see cref="string"/> to a <see cref="Cpf"/> object.

@@ -18,7 +18,7 @@ public static partial class ErrorMappingServiceExtensions
     /// <returns>The service instance for call chaining.</returns>
     public static ErrorMappingService MapConcurrency(this ErrorMappingService service)
     {
-        // Módulo CONCURRENCY (Prefixo 9)
+        // CONCURRENCY module (Prefix 9)
         service.Map<Error.Concurrency.ConflictError>(HttpStatusCode.Conflict, LocalizationManager.GetErrorTitle("Concurrency_Conflict"), "urn:api-errors:concurrency-conflict");
         service.Map<Error.Concurrency.LockedError>(HttpStatusCode.Locked, LocalizationManager.GetErrorTitle("Concurrency_Locked"), "urn:api-errors:concurrency-locked");
         service.Map<Error.Concurrency.StaleDataError>(HttpStatusCode.Conflict, LocalizationManager.GetErrorTitle("Concurrency_StaleData"), "urn:api-errors:concurrency-stale-data");
