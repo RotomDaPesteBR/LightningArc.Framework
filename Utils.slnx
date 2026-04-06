@@ -13,131 +13,131 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/docs/">
-    <Project Path="docs/Documentation.csproj" />
     <File Path="docs/Directory.Build.props" />
     <File Path="docs/README.md" />
+    <Project Path="docs/LightningArc.Documentation.csproj" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />
   </Folder>
   <Folder Name="/src/Core/">
-    <Project Path="src/Core/Abstractions/Abstractions.csproj" />
-    <Project Path="src/Core/Json/Json.csproj" />
-    <Project Path="src/Core/Results/Results.csproj" />
-    <Project Path="src/Core/Utils/Utils.csproj" />
+    <Project Path="src/Core/Primitives/LightningArc.Primitives.csproj" />
+    <Project Path="src/Core/Json/LightningArc.Json.csproj" />
+    <Project Path="src/Core/Results/LightningArc.Results.csproj" />
+    <Project Path="src/Core/Utils/LightningArc.Utils.csproj" />
   </Folder>
   <Folder Name="/src/Data/">
-    <Project Path="src/Data/Data.Abstractions/Data.Abstractions.csproj" />
+    <Project Path="src/Data/Data.Abstractions/LightningArc.Data.Abstractions.csproj" />
   </Folder>
   <Folder Name="/src/Data/ADO/">
-    <Project Path="src/Data/ADO/Data.ADO.SqlBuilder/Data.ADO.SqlBuilder.csproj" />
-    <Project Path="src/Data/ADO/Data.ADO.Oracle/Data.ADO.Oracle.csproj" />
-    <Project Path="src/Data/ADO/Data.ADO.SqlServer/Data.ADO.SqlServer.csproj" />
-    <Project Path="src/Data/ADO/Data.ADO/Data.ADO.csproj" />
+    <Project Path="src/Data/ADO/Data.ADO.SqlBuilder/LightningArc.Data.ADO.SqlBuilder.csproj" />
+    <Project Path="src/Data/ADO/Data.ADO.Oracle/LightningArc.Data.ADO.Oracle.csproj" />
+    <Project Path="src/Data/ADO/Data.ADO.SqlServer/LightningArc.Data.ADO.SqlServer.csproj" />
+    <Project Path="src/Data/ADO/Data.ADO/LightningArc.Data.ADO.csproj" />
   </Folder>
   <Folder Name="/src/Data/EF/">
-    <Project Path="src/Data/EF/Data.EntityFramework/Data.EntityFramework.csproj" />
+    <Project Path="src/Data/EF/Data.EntityFramework/LightningArc.Data.EntityFramework.csproj" />
   </Folder>
   <Folder Name="/src/Data/Mappers/">
-    <Project Path="src/Data/Mappers/Mappers.AutoMapper/Mappers.AutoMapper.csproj" />
-    <Project Path="src/Data/Mappers/Mappers.Mapster/Mappers.Mapster.csproj" />
+    <Project Path="src/Data/Mappers/Mappers.AutoMapper/LightningArc.Mappers.AutoMapper.csproj" />
+    <Project Path="src/Data/Mappers/Mappers.Mapster/LightningArc.Mappers.Mapster.csproj" />
   </Folder>
   <Folder Name="/src/Meta/">
-    <Project Path="src/Meta/Metalama.Results/Metalama.Results.csproj" />
-    <Project Path="src/Meta/Metalama/Metalama.csproj" />
+    <Project Path="src/Meta/Metalama.Results/LightningArc.Metalama.Results.csproj" />
+    <Project Path="src/Meta/Metalama/LightningArc.Metalama.csproj" />
   </Folder>
   <Folder Name="/src/Web/">
-    <Project Path="src/Web/CORS.AspNetCore/CORS.AspNetCore.csproj" />
-    <Project Path="src/Web/OpenAPI.AspNetCore/OpenAPI.AspNetCore.csproj" />
-    <Project Path="src/Web/Results.AspNetCore/Results.AspNetCore.csproj" />
-    <Project Path="src/Web/Utils.AspNetCore/Utils.AspNetCore.csproj" />
+    <Project Path="src/Web/CORS.AspNetCore/LightningArc.CORS.AspNetCore.csproj" />
+    <Project Path="src/Web/OpenAPI.AspNetCore/LightningArc.OpenAPI.AspNetCore.csproj" />
+    <Project Path="src/Web/Results.AspNetCore/LightningArc.Results.AspNetCore.csproj" />
+    <Project Path="src/Web/Utils.AspNetCore/LightningArc.Utils.AspNetCore.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />
   </Folder>
   <Folder Name="/tests/Core/">
-    <Project Path="tests/Core/Abstractions.Tests/Abstractions.Tests.csproj">
+    <Project Path="tests/Core/Primitives.Tests/LightningArc.Primitives.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Core/Json.Tests/Json.Tests.csproj">
+    <Project Path="tests/Core/Json.Tests/LightningArc.Json.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Core/Results.Tests/Results.Tests.csproj">
+    <Project Path="tests/Core/Results.Tests/LightningArc.Results.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
   </Folder>
   <Folder Name="/tests/Data/">
-    <Project Path="tests/Data/Data.Abstractions.Tests/Data.Abstractions.Tests.csproj">
+    <Project Path="tests/Data/Data.Abstractions.Tests/LightningArc.Data.Abstractions.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Data/Data.ADO.Oracle.Tests/Data.ADO.Oracle.Tests.csproj">
+    <Project Path="tests/Data/Data.ADO.Oracle.Tests/LightningArc.Data.ADO.Oracle.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Data/Data.ADO.SqlServer.Tests/Data.ADO.SqlServer.Tests.csproj">
+    <Project Path="tests/Data/Data.ADO.SqlServer.Tests/LightningArc.Data.ADO.SqlServer.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Data/Data.ADO.Tests/Data.ADO.Tests.csproj">
+    <Project Path="tests/Data/Data.ADO.Tests/LightningArc.Data.ADO.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Data/Data.EntityFramework.Tests/Data.EntityFramework.Tests.csproj">
+    <Project Path="tests/Data/Data.EntityFramework.Tests/LightningArc.Data.EntityFramework.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Data/Data.ADO.SqlBuilder.Tests/Data.ADO.SqlBuilder.Tests.csproj">
+    <Project Path="tests/Data/Data.ADO.SqlBuilder.Tests/LightningArc.Data.ADO.SqlBuilder.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Data/Mappers.AutoMapper.Tests/Mappers.AutoMapper.Tests.csproj">
+    <Project Path="tests/Data/Mappers.AutoMapper.Tests/LightningArc.Mappers.AutoMapper.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Data/Mappers.Mapster.Tests/Mappers.Mapster.Tests.csproj">
+    <Project Path="tests/Data/Mappers.Mapster.Tests/LightningArc.Mappers.Mapster.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
   </Folder>
   <Folder Name="/tests/Meta/">
-    <Project Path="tests/Meta/Metalama.Tests/Metalama.Tests.csproj">
+    <Project Path="tests/Meta/Metalama.Tests/LightningArc.Metalama.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Meta/Metalama.Results.Tests/Metalama.Results.Tests.csproj">
+    <Project Path="tests/Meta/Metalama.Results.Tests/LightningArc.Metalama.Results.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
   </Folder>
   <Folder Name="/tests/Web/">
-    <Project Path="tests/Web/Results.AspNetCore.Tests/Results.AspNetCore.Tests.csproj">
+    <Project Path="tests/Web/Results.AspNetCore.Tests/LightningArc.Results.AspNetCore.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Web/CORS.AspNetCore.Tests/CORS.AspNetCore.Tests.csproj">
+    <Project Path="tests/Web/CORS.AspNetCore.Tests/LightningArc.CORS.AspNetCore.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
     </Project>
-    <Project Path="tests/Web/OpenAPI.AspNetCore.Tests/OpenAPI.AspNetCore.Tests.csproj">
+    <Project Path="tests/Web/OpenAPI.AspNetCore.Tests/LightningArc.OpenAPI.AspNetCore.Tests.csproj">
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />

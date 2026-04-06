@@ -12,6 +12,9 @@
     <!-- Code Analysis & Quality -->
     <AnalysisLevel>latest</AnalysisLevel>
     <NoWarn>$(NoWarn);IDE0130</NoWarn>
+
+    <!-- Build -->
+    <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
 
   <PropertyGroup>
