@@ -4,7 +4,7 @@ using LightningArc.Results.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LightningArc.Results.AspNetCore.Tests.API.Controllers
+namespace LightningArc.TestServer.Controllers
 {
     [ApiController]
     [EnableCors("AllowAll")]
@@ -46,7 +46,7 @@ namespace LightningArc.Results.AspNetCore.Tests.API.Controllers
 
                 return value is not null
                     ? Result.Success(value)
-                    : Error.Resource.NotFound($"Não foi encontrado");
+                    : Error.Resource.NotFound($"Nï¿½o foi encontrado");
             });
         }
 
@@ -65,12 +65,12 @@ namespace LightningArc.Results.AspNetCore.Tests.API.Controllers
             }
             else if (id >= 2)
             {
-                result = Error.Database.ConnectionFailed("Falha na conexão do banco de dados");
+                result = Error.Database.ConnectionFailed("Falha na conexï¿½o do banco de dados");
             }
             else if (id == -1)
             {
                 result = Error.Application.InvalidParameter(
-                    "Id inválido",
+                    "Id invï¿½lido",
                     new ErrorDetail("Id", id.ToString()),
                     new ErrorDetail("Code", (id + 1).ToString())
                 );

@@ -5,7 +5,7 @@ using LightningArc.Results.AspNetCore.Extensions;
 using LightningArc.Results;
 using LightningArc.Results.AspNetCore;
 
-namespace LightningArc.Results.AspNetCore.Tests.API.Controllers
+namespace LightningArc.TestServer.Controllers
 {
     [ApiController]
     [Route("v1/[Controller]")]
