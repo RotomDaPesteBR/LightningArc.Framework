@@ -195,6 +195,23 @@ public class Result : IEquatable<Result>
     }
 
     /// <summary>
+    /// Attempts to retrieve the error, returning true if the result is a failure.
+    /// </summary>
+    /// <param name="error">The error if the result is a failure; otherwise, <c>null</c>.</param>
+    /// <returns>True if the result is a failure; otherwise, false.</returns>
+    public bool TryGetError(out Error error)
+    {
+        if (IsFailure)
+        {
+            error = _error!;
+            return true;
+        }
+
+        error = null!;
+        return false;
+    }
+
+    /// <summary>
     /// Checks if two <see cref="Result"/> instances are equal.
     /// </summary>
     public static bool operator ==(Result? left, Result? right)
@@ -495,6 +512,23 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     public override int GetHashCode()
     {
         return base.GetHashCode();
+    }
+
+    /// <summary>
+    /// Attempts to retrieve the success value, returning true if the result is successful.
+    /// </summary>
+    /// <param name="value">The success value if the result is successful; otherwise, <c>default</c>.</param>
+    /// <returns>True if the result is successful; otherwise, false.</returns>
+    public bool TryGetValue(out TValue value)
+    {
+        if (IsSuccess)
+        {
+            value = _success!.Value;
+            return true;
+        }
+
+        value = default!;
+        return false;
     }
 
     /// <summary>
