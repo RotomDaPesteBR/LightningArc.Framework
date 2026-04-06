@@ -42,32 +42,32 @@ Write-Host "Package Version: $current_version" -ForegroundColor Green
 Write-Host "Output Directory: $output_dir" -ForegroundColor Green
 
 # List of projects you want to pack (adjust these paths according to your libraries)
-$projects_to_pack = @(
     # Core
-    "src\Core\Abstractions\Abstractions.csproj",
-    "src\Core\Json\Json.csproj",
-    "src\Core\Results\Results.csproj",
-    "src\Core\Core\Utils.csproj",
+    "src\Core\Primitives\LightningArc.Primitives.csproj",
+    "src\Core\Primitives.Results\LightningArc.Primitives.Results.csproj",
+    "src\Core\Results\LightningArc.Results.csproj",
+    "src\Core\Json\LightningArc.Json.csproj",
+    "src\Core\Core\LightningArc.Core.csproj",
 
     # Data
-    "src\Data\Data.Abstractions\Data.Abstractions.csproj",
-    "src\Data\Mappers\Mappers.AutoMapper\Mappers.AutoMapper.csproj",
-    "src\Data\Mappers\Mappers.Mapster\Mappers.Mapster.csproj",
-    "src\Data\ADO\Data.ADO\Data.ADO.csproj",
-    "src\Data\ADO\Data.ADO.SqlBuilder\Data.ADO.SqlBuilder.csproj",
-    "src\Data\ADO\Data.ADO.Oracle\Data.ADO.Oracle.csproj",
-    "src\Data\ADO\Data.ADO.SqlServer\Data.ADO.SqlServer.csproj",
-    "src\Data\EF\Data.EntityFramework\Data.EntityFramework.csproj",
+    "src\Data\Data.Abstractions\LightningArc.Data.Abstractions.csproj",
+    "src\Data\Mappers\Mappers.AutoMapper\LightningArc.Mappers.AutoMapper.csproj",
+    "src\Data\Mappers\Mappers.Mapster\LightningArc.Mappers.Mapster.csproj",
+    "src\Data\ADO\Data.ADO\LightningArc.Data.ADO.csproj",
+    "src\Data\ADO\Data.ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj",
+    "src\Data\ADO\Data.ADO.Oracle\LightningArc.Data.ADO.Oracle.csproj",
+    "src\Data\ADO\Data.ADO.SqlServer\LightningArc.Data.ADO.SqlServer.csproj",
+    "src\Data\EF\Data.EntityFramework\LightningArc.Data.EntityFramework.csproj",
 
     # AspNetCore
-    "src\Web\Results.AspNetCore\Results.AspNetCore.csproj",
-    "src\Web\CORS.AspNetCore\CORS.AspNetCore.csproj",
-    "src\Web\OpenAPI.AspNetCore\OpenAPI.AspNetCore.csproj",
-    "src\Web\Utils.AspNetCore\Utils.AspNetCore.csproj",
+    "src\Web\Results.AspNetCore\LightningArc.Results.AspNetCore.csproj",
+    "src\Web\CORS.AspNetCore\LightningArc.CORS.AspNetCore.csproj",
+    "src\Web\OpenAPI.AspNetCore\LightningArc.OpenAPI.AspNetCore.csproj",
+    "src\Web\AspNetCore\LightningArc.AspNetCore.csproj",
 
     # Meta
-    "src\Meta\Metalama\Metalama.csproj",
-    "src\Meta\Metalama.Results\Metalama.Results.csproj"
+    "src\Meta\Metalama\LightningArc.Metalama.csproj",
+    "src\Meta\Metalama.Results\LightningArc.Metalama.Results.csproj"
 )
 
 # --- General Clean and Build ---
