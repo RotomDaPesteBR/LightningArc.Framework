@@ -1,4 +1,4 @@
-using LightningArc.Abstractions.ValueObjects;
+using LightningArc.Primitives.ValueObjects;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 

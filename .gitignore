@@ -400,9 +400,16 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+.claude/
+.gemini/
+
 conductor/
+docs/superpowers/
 
 .artifacts/
+
+src/artifacts/
+tests/artifacts/
 
 bin/
 
