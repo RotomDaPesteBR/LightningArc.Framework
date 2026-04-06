@@ -13,7 +13,7 @@ The `Email` type is an immutable Value Object that guarantees a valid email form
 You can create an `Email` object using the static `Create` method. This method validates the input immediately.
 
 ```csharp
-using LightningArc.Abstractions.ValueObjects;
+using LightningArc.Primitives.ValueObjects;
 
 // 1. Explicit Creation (Recommended)
 try 

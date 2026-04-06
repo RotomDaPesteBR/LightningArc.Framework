@@ -1,6 +1,6 @@
 # Email
 
-**Namespace:** `LightningArc.Abstractions.ValueObjects`  
+**Namespace:** `LightningArc.Primitives.ValueObjects`  
 **Type:** `record`
 
 Represents a validated email address value object. This type ensures immutability and guarantees that the email format is valid at the moment of creation.
@@ -45,7 +45,7 @@ Represents a validated email address value object. This type ensures immutabilit
 ## Usage Example
 
 ```csharp
-using LightningArc.Abstractions.ValueObjects;
+using LightningArc.Primitives.ValueObjects;
 
 // Direct creation
 var email = Email.Create("contact@lightningarc.com");

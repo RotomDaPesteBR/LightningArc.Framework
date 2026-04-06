@@ -13,7 +13,7 @@ O ecossistema é dividido em duas grandes categorias:
 ### 1. Core (Fundação)
 Bibliotecas agnósticas de framework que definem os padrões base do sistema.
 - **`LightningArc.Results`**: Implementação completa do padrão Result.
-- **`LightningArc.Abstractions`**: Contratos, Value Objects e tipos base.
+- **`LightningArc.Primitives`**: Contratos, Value Objects e tipos base.
 - **`LightningArc.Json`**: Utilitários para serialização moderna.
 - **`LightningArc.Utils`**: O "canivete suíço" com helpers generalistas.
 

@@ -1,4 +1,4 @@
-using LightningArc.Abstractions.ValueObjects;
+using LightningArc.Primitives.ValueObjects;
 using LightningArc.Results;
 using LightningArc.Results.AspNetCore;
 using Microsoft.AspNetCore.Mvc;

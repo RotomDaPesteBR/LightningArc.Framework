@@ -1,14 +1,22 @@
 <Project>
   <PropertyGroup>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <!-- Disable all build actions -->
+    <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
+    <IsTestProject>false</IsTestProject>
+    
+    <!-- Speed: Skip compilation and standard tasks -->
+    <Configurations>Debug;Release;LamaDebug;Test</Configurations>
+    <SkipBuild>true</SkipBuild>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <CopyBuildOutputToPublishDirectory>false</CopyBuildOutputToPublishDirectory>
+    <NoWarn>$(NoWarn);CS2008</NoWarn> <!-- Ignore 'no source files' warning -->
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="**/*" Exclude="bin\**;obj\**;*.csproj" />
-  </ItemGroup>
+
+  <Target Name="Build" />
+  <Target Name="Clean" />
+  <Target Name="Rebuild" />
+  <Target Name="Publish" />
 </Project>

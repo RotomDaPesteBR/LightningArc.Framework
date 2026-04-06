@@ -1,7 +1,7 @@
 # Email.cs Implementation Details
 
 **File Path:** `Core/Abstractions/ValueObjects/Email.cs`
-**Namespace:** `LightningArc.Abstractions.ValueObjects`
+**Namespace:** `LightningArc.Primitives.ValueObjects`
 
 ## Overview
 The `Email` class is a **Value Object** implemented as a C# `record`. It encapsulates the concept of an email address, ensuring that any instance of this type contains a syntactically valid email string. It enforces validation at the time of creation, preventing the existence of invalid `Email` objects within the domain.

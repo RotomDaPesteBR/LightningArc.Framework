@@ -3,7 +3,7 @@
 Value Objects are immutable types that represent domain concepts defined by their attributes rather than a persistent identity.
 
 ## `Email` Value Object
-**Namespace**: `LightningArc.Abstractions.ValueObjects`
+**Namespace**: `LightningArc.Primitives.ValueObjects`
 
 Used to encapsulate email validation logic and ensure data integrity.
 
