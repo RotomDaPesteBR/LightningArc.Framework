@@ -8,8 +8,8 @@ on:
     branches: [main, dev]
 
 env:
-  DOTNET_VERSION: '9.0.x'
-  CONFIGURATION: Release
+  DOTNET_VERSION: '10.0.x'
+  CONFIGURATION: Test
 
 jobs:
   build-and-test:
@@ -31,7 +31,7 @@ jobs:
         run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
 
       - name: Test
-        run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal
+        run: dotnet test --no-build --verbosity normal
 
   pack:
     name: Pack NuGet Packages
@@ -56,7 +56,7 @@ jobs:
           Write-Host "version=$tag" >> $env:GITHUB_OUTPUT
 
       - name: Build & Pack
-        run: dotnet build --configuration ${{ env.CONFIGURATION }} -p:PackageVersion=${{ steps.version.outputs.version }} -p:ContinuousIntegrationBuild=true
+        run: dotnet build -c Release -p:PackageVersion=${{ steps.version.outputs.version }} -p:ContinuousIntegrationBuild=true
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
