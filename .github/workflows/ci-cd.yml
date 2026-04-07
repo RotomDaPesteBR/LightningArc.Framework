@@ -1,0 +1,90 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, dev]
+    tags: ['v*']
+  pull_request:
+    branches: [main, dev]
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  CONFIGURATION: Release
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
+
+      - name: Test
+        run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal
+
+  pack:
+    name: Pack NuGet Packages
+    needs: build-and-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Extract version from tag
+        shell: pwsh
+        id: version
+        run: |
+          $tag = "${{ github.ref_name }}"
+          Write-Host "version=$tag"
+          Write-Host "version=$tag" >> $env:GITHUB_OUTPUT
+
+      - name: Build & Pack
+        run: dotnet build --configuration ${{ env.CONFIGURATION }} -p:PackageVersion=${{ steps.version.outputs.version }} -p:ContinuousIntegrationBuild=true
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: .artifacts/package/Release/
+
+      # TODO: Publish to NuGet.org when ready
+      # - name: Publish to NuGet
+      #   run: dotnet nuget push .artifacts\package\Release\*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+
+  create-release:
+    name: Create GitHub Release
+    needs: pack
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            *.nupkg
+            *.snupkg

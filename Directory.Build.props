@@ -24,7 +24,21 @@
     <Authors>João Pedro S. Souza</Authors>
     <Company>LightningArc</Company>
     <Copyright>Copyright © $([System.DateTime]::Now.Year) João Pedro S. Souza</Copyright>
+
+    <!-- NuGet Package Metadata -->
+    <PackageProjectUrl>https://github.com/RotomDaPesteBR/Utils</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/RotomDaPesteBR/Utils</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <!-- Include README and LICENSE in NuGet packages -->
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildThisFileDirectory)README.md')" />
+    <None Include="$(MSBuildThisFileDirectory)LICENSE.md" Pack="true" PackagePath="\" Condition="Exists('$(MSBuildThisFileDirectory)LICENSE.md')" />
+  </ItemGroup>
 
   <!-- Release Optimization -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
