@@ -1,0 +1,107 @@
+using LightningArc.Primitives;
+
+namespace LightningArc.Primitives.ValueObjects;
+
+/// <summary>
+/// Represents a validated password with configurable strength policy.
+/// </summary>
+public record Password : IValueObject<string>
+{
+    /// <summary>
+    /// Gets the raw password value.
+    /// </summary>
+    public string Value { get; }
+
+    /// <summary>
+    /// Gets the strength level of the password.
+    /// </summary>
+    public PasswordStrength Strength { get; }
+
+    private Password(string value, PasswordStrength minimumStrength)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException("The password cannot be null or empty.", nameof(value));
+        }
+
+        if (value.Length < 8)
+        {
+            throw new ArgumentException("The password must have at least 8 characters.", nameof(value));
+        }
+
+        if (!value.Any(char.IsDigit))
+        {
+            throw new ArgumentException("The password must contain at least one digit.", nameof(value));
+        }
+
+        if (!value.Any(char.IsUpper)) // uppercase check
+        {
+            throw new ArgumentException("The password must contain at least one uppercase letter.", nameof(value));
+        }
+
+        if (!value.Any(char.IsLower)) // lowercase check
+        {
+            throw new ArgumentException("The password must contain at least one lowercase letter.", nameof(value));
+        }
+
+        Strength = CalculateStrength(value);
+
+        if ((int)Strength < (int)minimumStrength)
+        {
+            throw new ArgumentException(
+                $"The password strength '{Strength}' does not meet the minimum requirement '{minimumStrength}'.",
+                nameof(value));
+        }
+
+        Value = value;
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="Password"/> from the specified string value.
+    /// </summary>
+    public static Password Create(string value, PasswordStrength minimumStrength = PasswordStrength.Moderate) => new(value, minimumStrength);
+
+    /// <summary>
+    /// Tries to create a new <see cref="Password"/> from the specified string value.
+    /// </summary>
+    public static bool TryCreate(string value, out Password? result, PasswordStrength minimumStrength = PasswordStrength.Moderate)
+    {
+        try
+        {
+            result = new Password(value, minimumStrength);
+            return true;
+        }
+        catch (ArgumentException)
+        {
+            result = null;
+            return false;
+        }
+    }
+
+    private static PasswordStrength CalculateStrength(string value)
+    {
+        int score = 0;
+        if (value.Length >= 10) score++;
+        if (value.Any(char.IsSymbol)) score++;
+        if (value.Length >= 14) score++;
+        if (value.Length >= 18) score++;
+
+        if (score >= 4) return PasswordStrength.Strong;
+
+        return score switch
+        {
+            >= 2 => PasswordStrength.Moderate,
+            _ => PasswordStrength.Weak
+        };
+    }
+
+    /// <summary>
+    /// Implicitly converts a <see cref="Password"/> to its <see cref="string"/> representation.
+    /// </summary>
+    public static implicit operator string(Password password) => password?.Value ?? throw new InvalidOperationException("Cannot convert a null ValueObject to string.");
+
+    /// <summary>
+    /// Returns a masked string to prevent accidental password exposure.
+    /// </summary>
+    public override string ToString() => new('*', Value.Length);
+}

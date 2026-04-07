@@ -67,7 +67,6 @@ public class ErrorMappingService
                 _logger.LogInformation(
                     "Adding {Count} custom error mapping{s}.",
                     count,
-                    plural,
                     plural
                 );
             }
