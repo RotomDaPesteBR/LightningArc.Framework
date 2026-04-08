@@ -31,7 +31,7 @@ jobs:
         run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
 
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test --configuration Test --no-build --verbosity normal
 
   pack:
     name: Pack NuGet Packages

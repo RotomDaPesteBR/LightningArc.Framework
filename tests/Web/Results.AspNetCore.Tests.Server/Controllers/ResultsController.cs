@@ -4,7 +4,7 @@ using LightningArc.Results.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LightningArc.TestServer.Controllers
+namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
 {
     [ApiController]
     [EnableCors("AllowAll")]

@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using LightningArc.CORS.AspNetCore;
 using LightningArc.Json.Converters;
+using LightningArc.Results;
 using LightningArc.Results.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +18,7 @@ builder.Services.AddEndpointResults(
     wrapSuccessResponses: true,
     configureMappings: (successes, errors) =>
     {
-        errors.Map<LightningArc.Results.Business.OrderRejectedError>(HttpStatusCode.UnprocessableEntity, "Pedido Rejeitado", "urn:api-errors:order-rejected");
+        errors.Map<Business.OrderRejectedError>(HttpStatusCode.UnprocessableEntity, "Pedido Rejeitado", "urn:api-errors:order-rejected");
     });
 
 var app = builder.Build();
@@ -29,7 +30,7 @@ app.MapControllers();
 
 app.Run();
 
-namespace LightningArc.TestServer
+namespace LightningArc.Results.AspNetCore.Tests.Server
 {
     public partial class Program { }
 }

@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+
     <PackageReference Include="TUnit.AspNetCore" />
+
     <ProjectReference Include="..\..\..\src\Web\Results.AspNetCore\LightningArc.Results.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\src\Core\Json\LightningArc.Json.csproj" />
     <ProjectReference Include="..\..\..\src\Core\Core\LightningArc.Core.csproj" />
-    <ProjectReference Include="..\Results.AspNetCore.TestServer\LightningArc.TestServer.csproj" />
+    <ProjectReference Include="..\Results.AspNetCore.Tests.Server\LightningArc.Results.AspNetCore.Tests.Server.csproj" />
   </ItemGroup>
 </Project>

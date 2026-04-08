@@ -11,7 +11,7 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     
     <!-- Speed: Only build in Test configuration -->
-    <Configurations>Test</Configurations>
+    <Configurations>Debug;Release;LamaDebug;Test</Configurations>
   </PropertyGroup>
 
   <Target Name="SkipTestBuild" BeforeTargets="BeforeBuild" Condition="'$(Configuration)' != 'Test'">
@@ -29,11 +29,6 @@
 
   <ItemGroup>
     <PackageReference Include="TUnit" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="coverlet.collector">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

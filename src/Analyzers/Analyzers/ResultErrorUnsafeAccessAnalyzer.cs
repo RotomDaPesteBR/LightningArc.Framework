@@ -8,7 +8,8 @@ namespace LightningArc.Analyzers;
 
 /// <summary>
 /// LARC002 - Detects access to .Error property on Result types without
-/// a prior IsFailure check or TryGetError call in the nearest enclosing if statement.
+/// a prior IsFailure check or TryGetError call in the nearest enclosing if statement,
+/// ternary expression, or logical OR/AND short-circuited check.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
@@ -52,7 +53,17 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
         if (!IsResultType(namedType))
             return;
 
-        if (IsGuarded(memberAccess, context.SemanticModel, context.CancellationToken))
+        // Suppress: access is inside a conversion operator (by design, these operators are intentionally unsafe).
+        if (IsInsideConversionOperator(memberAccess))
+            return;
+
+        // Suppress: null-forgiving operator (!) applied to the Error access indicates the developer
+        // has already acknowledged the risk and suppressed nullable analysis explicitly.
+        if (HasNullForgivingOperator(memberAccess))
+            return;
+
+        if (ResultGuardHelper.IsGuardedByIsFailure(memberAccess, context.SemanticModel) ||
+            ResultGuardHelper.IsGuardedByTryCall(memberAccess, context.SemanticModel, "TryGetError"))
             return;
 
         var diagnostic = Diagnostic.Create(Rule, memberAccess.Name.GetLocation(), namedType.Name);
@@ -76,25 +87,16 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
         return false;
     }
 
-    private static bool IsGuarded(
-        MemberAccessExpressionSyntax memberAccess,
-        SemanticModel semanticModel,
-        CancellationToken ct)
+    private static bool IsInsideConversionOperator(MemberAccessExpressionSyntax memberAccess)
     {
         var current = memberAccess.Parent;
         while (current != null)
         {
-            if (current is IfStatementSyntax ifStatement)
-            {
-                if (ConditionChecksIsFailure(ifStatement.Condition, memberAccess.Expression, semanticModel))
-                    return true;
-
-                if (ConditionCallsTryGetError(ifStatement.Condition, memberAccess.Expression, semanticModel))
-                    return true;
-            }
+            if (current is ConversionOperatorDeclarationSyntax)
+                return true;
 
             if (current is MethodDeclarationSyntax or LocalFunctionStatementSyntax)
-                break;
+                return false;
 
             current = current.Parent;
         }
@@ -102,76 +104,9 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
         return false;
     }
 
-    private static bool ConditionChecksIsFailure(
-        ExpressionSyntax condition,
-        ExpressionSyntax resultExpression,
-        SemanticModel semanticModel)
+    private static bool HasNullForgivingOperator(MemberAccessExpressionSyntax memberAccess)
     {
-        // result.IsFailure
-        if (condition is MemberAccessExpressionSyntax memberAccess &&
-            memberAccess.Name.Identifier.ValueText == "IsFailure")
-        {
-            return ExpressionsAreEquivalent(memberAccess.Expression, resultExpression) ||
-                   ExpressionReferencesSameResult(memberAccess.Expression, resultExpression, semanticModel);
-        }
-
-        // !result.IsSuccess (equivalent to IsFailure)
-        if (condition is PrefixUnaryExpressionSyntax prefix &&
-            prefix.OperatorToken.IsKind(SyntaxKind.ExclamationToken) &&
-            prefix.Operand is MemberAccessExpressionSyntax negatedAccess &&
-            negatedAccess.Name.Identifier.ValueText == "IsSuccess")
-        {
-            return ExpressionsAreEquivalent(negatedAccess.Expression, resultExpression) ||
-                   ExpressionReferencesSameResult(negatedAccess.Expression, resultExpression, semanticModel);
-        }
-
-        return false;
-    }
-
-    private static bool ConditionCallsTryGetError(
-        ExpressionSyntax condition,
-        ExpressionSyntax resultExpression,
-        SemanticModel semanticModel)
-    {
-        if (condition is not InvocationExpressionSyntax invocation)
-            return false;
-
-        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
-            return false;
-
-        if (memberAccess.Name.Identifier.ValueText != "TryGetError")
-            return false;
-
-        return ExpressionsAreEquivalent(memberAccess.Expression, resultExpression) ||
-               ExpressionReferencesSameResult(memberAccess.Expression, resultExpression, semanticModel);
-    }
-
-    private static bool ExpressionsAreEquivalent(ExpressionSyntax a, ExpressionSyntax b)
-    {
-        return a.ToString().Trim() == b.ToString().Trim();
-    }
-
-    private static bool ExpressionReferencesSameResult(
-        ExpressionSyntax a,
-        ExpressionSyntax b,
-        SemanticModel semanticModel)
-    {
-        var symbolA = GetSymbol(a, semanticModel);
-        var symbolB = GetSymbol(b, semanticModel);
-
-        if (symbolA != null && symbolB != null)
-            return SymbolEqualityComparer.Default.Equals(symbolA, symbolB);
-
-        return false;
-    }
-
-    private static ISymbol? GetSymbol(ExpressionSyntax expression, SemanticModel semanticModel)
-    {
-        return expression switch
-        {
-            IdentifierNameSyntax id => semanticModel.GetSymbolInfo(id).Symbol,
-            MemberAccessExpressionSyntax member => semanticModel.GetSymbolInfo(member.Expression).Symbol,
-            _ => semanticModel.GetSymbolInfo(expression).Symbol
-        };
+        return memberAccess.Parent is PostfixUnaryExpressionSyntax postfix &&
+               postfix.IsKind(SyntaxKind.SuppressNullableWarningExpression);
     }
 }

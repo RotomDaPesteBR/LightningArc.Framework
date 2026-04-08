@@ -3,7 +3,17 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Remove="TUnit" />
+
+    <Using Remove="TUnit.Core" />
+    <Using Remove="TUnit.Assertions" />
+    <Using Remove="TUnit.Assertions.Extensions" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Web\Results.AspNetCore\LightningArc.Results.AspNetCore.csproj" />

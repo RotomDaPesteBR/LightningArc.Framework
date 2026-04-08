@@ -6,7 +6,7 @@ using LightningArc.Results.AspNetCore;
 
 namespace LightningArc.Results.AspNetCore.Tests;
 
-public class WebIntegrationTests : WebApplicationTest<ResultsWebApplicationFactory, LightningArc.TestServer.Program>
+public class WebIntegrationTests : WebApplicationTest<ResultsWebApplicationFactory, LightningArc.Results.AspNetCore.Tests.Server.Program>
 {
     [Test]
     public async Task Get_TestResultById_0_ShouldReturnOk()
