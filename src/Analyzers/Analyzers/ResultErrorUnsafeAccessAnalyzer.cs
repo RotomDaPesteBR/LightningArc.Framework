@@ -72,7 +72,7 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
 
     private static bool IsResultType(INamedTypeSymbol namedType)
     {
-        if (namedType.IsGenericType && namedType.Name == "Result")
+        if (namedType.Name == "Result")
             return true;
 
         if (namedType.BaseType != null && IsResultType(namedType.BaseType))

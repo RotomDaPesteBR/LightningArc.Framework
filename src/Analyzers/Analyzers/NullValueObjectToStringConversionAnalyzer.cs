@@ -41,6 +41,42 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
 
         context.RegisterSyntaxNodeAction(AnalyzeAssignment, SyntaxKind.SimpleAssignmentExpression);
         context.RegisterSyntaxNodeAction(AnalyzeArgument, SyntaxKind.Argument);
+        context.RegisterSyntaxNodeAction(AnalyzeVariableDeclarator, SyntaxKind.VariableDeclarator);
+    }
+
+    /// <summary>
+    /// Detects: string s = nullableValueObject;
+    /// </summary>
+    private static void AnalyzeVariableDeclarator(SyntaxNodeAnalysisContext context)
+    {
+        if (context.Node is not VariableDeclaratorSyntax declarator)
+            return;
+
+        if (declarator.Initializer == null)
+            return;
+
+        // Check if the variable is typed as string
+        var symbol = context.SemanticModel.GetDeclaredSymbol(declarator) as ILocalSymbol;
+        ITypeSymbol? declaredType = null;
+        if (symbol != null)
+        {
+            declaredType = symbol.Type;
+        }
+        else if (context.SemanticModel.GetDeclaredSymbol(declarator) is IFieldSymbol fieldSymbol)
+        {
+            declaredType = fieldSymbol.Type;
+        }
+
+        if (declaredType?.SpecialType != SpecialType.System_String)
+            return;
+
+        // Check if the assigned value is a nullable ValueObject
+        var valueTypeInfo = context.SemanticModel.GetTypeInfo(declarator.Initializer.Value);
+        if (valueTypeInfo.Type != null && IsNullableValueObject(valueTypeInfo.Type))
+        {
+            var diagnostic = Diagnostic.Create(Rule, declarator.Initializer.Value.GetLocation());
+            context.ReportDiagnostic(diagnostic);
+        }
     }
 
     /// <summary>
@@ -56,34 +92,9 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
         if (leftTypeInfo.Type?.SpecialType != SpecialType.System_String)
             return;
 
-        // Check if the right side is a nullable ValueObject identifier
-        if (assignment.Right is not IdentifierNameSyntax { Identifier.ValueText: { } varName })
-            return;
-
-        var symbol = context.SemanticModel.GetSymbolInfo(assignment.Right).Symbol as ILocalSymbol;
-        if (symbol == null)
-        {
-            // Could be a field or parameter
-            var fieldOrParamSymbol = context.SemanticModel.GetSymbolInfo(assignment.Right).Symbol;
-            if (fieldOrParamSymbol is IFieldSymbol or IParameterSymbol or IPropertySymbol)
-            {
-                var fieldType = fieldOrParamSymbol switch
-                {
-                    IFieldSymbol f => f.Type,
-                    IParameterSymbol p => p.Type,
-                    IPropertySymbol pr => pr.Type,
-                    _ => null
-                };
-                if (fieldType != null && IsNullableValueObject(fieldType))
-                {
-                    var diagnostic = Diagnostic.Create(Rule, assignment.Right.GetLocation());
-                    context.ReportDiagnostic(diagnostic);
-                }
-            }
-            return;
-        }
-
-        if (IsNullableValueObject(symbol.Type))
+        // Check if the right side is a nullable ValueObject
+        var rightTypeInfo = context.SemanticModel.GetTypeInfo(assignment.Right);
+        if (rightTypeInfo.Type != null && IsNullableValueObject(rightTypeInfo.Type))
         {
             var diagnostic = Diagnostic.Create(Rule, assignment.Right.GetLocation());
             context.ReportDiagnostic(diagnostic);
@@ -95,31 +106,18 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
     /// </summary>
     private static void AnalyzeArgument(SyntaxNodeAnalysisContext context)
     {
-        if (context.Node is not ArgumentSyntax { Expression: IdentifierNameSyntax argIdent })
+        if (context.Node is not ArgumentSyntax argument)
             return;
 
         // Get the expected parameter type from the invocation
-        var typeInfo = context.SemanticModel.GetTypeInfo(argIdent);
+        var typeInfo = context.SemanticModel.GetTypeInfo(argument.Expression);
         if (typeInfo.ConvertedType?.SpecialType != SpecialType.System_String)
             return;
 
-        // Check if the argument symbol is a nullable ValueObject
-        var argSymbol = context.SemanticModel.GetSymbolInfo(argIdent).Symbol;
-        if (argSymbol == null)
-            return;
-
-        var argType = argSymbol switch
+        // Check if the expression type is a nullable ValueObject
+        if (typeInfo.Type != null && IsNullableValueObject(typeInfo.Type))
         {
-            ILocalSymbol local => local.Type,
-            IParameterSymbol param => param.Type,
-            IFieldSymbol field => field.Type,
-            IPropertySymbol prop => prop.Type,
-            _ => null
-        };
-
-        if (argType != null && IsNullableValueObject(argType))
-        {
-            var diagnostic = Diagnostic.Create(Rule, argIdent.GetLocation());
+            var diagnostic = Diagnostic.Create(Rule, argument.Expression.GetLocation());
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -131,7 +129,9 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
             !type.Name.EndsWith("ValueObject"))
             return false;
 
-        // Check if nullable (reference type or nullable annotation)
+        // In #nullable enable context, NotAnnotated means non-nullable (e.g., Email)
+        // Annotated means nullable (e.g., Email?)
+        // None means we are not in a nullable context, or it's a value type (not our case)
         return type.NullableAnnotation != NullableAnnotation.NotAnnotated;
     }
 }

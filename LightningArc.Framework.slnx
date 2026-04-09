@@ -59,6 +59,9 @@
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />
   </Folder>
+  <Folder Name="/tests/Analyzers/">
+    <Project Path="tests/Analyzers/LightningArc.Analyzers.Tests/LightningArc.Analyzers.Tests.csproj" />
+  </Folder>
   <Folder Name="/tests/Core/">
     <Project Path="tests/Core/Primitives.Tests/LightningArc.Primitives.Tests.csproj">
       <Configuration Solution="Debug|*" Project="Test" />

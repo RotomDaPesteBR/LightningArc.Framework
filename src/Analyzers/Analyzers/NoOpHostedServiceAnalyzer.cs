@@ -59,7 +59,7 @@ public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
         if (!IsNoOpStartAsync(methodDeclaration))
             return;
 
-        var diagnostic = Diagnostic.Create(Rule, methodDeclaration.GetLocation());
+        var diagnostic = Diagnostic.Create(Rule, methodDeclaration.Identifier.GetLocation());
         context.ReportDiagnostic(diagnostic);
     }
 

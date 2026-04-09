@@ -41,6 +41,35 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
 
         context.RegisterSyntaxNodeAction(AnalyzeAssignment, SyntaxKind.SimpleAssignmentExpression);
         context.RegisterSyntaxNodeAction(AnalyzeArgument, SyntaxKind.Argument);
+        context.RegisterSyntaxNodeAction(AnalyzeVariableDeclarator, SyntaxKind.VariableDeclarator);
+    }
+
+    private static void AnalyzeVariableDeclarator(SyntaxNodeAnalysisContext context)
+    {
+        if (context.Node is not VariableDeclaratorSyntax declarator)
+            return;
+
+        if (declarator.Initializer?.Value is not LiteralExpressionSyntax literal ||
+            !literal.IsKind(SyntaxKind.StringLiteralExpression))
+            return;
+
+        // Get the type the variable is declared as
+        var symbol = context.SemanticModel.GetDeclaredSymbol(declarator) as ILocalSymbol;
+        if (symbol?.Type is not INamedTypeSymbol destType)
+        {
+            // Could be a field
+            var fieldSymbol = context.SemanticModel.GetDeclaredSymbol(declarator) as IFieldSymbol;
+            if (fieldSymbol?.Type is not INamedTypeSymbol fieldType)
+                return;
+            destType = fieldType;
+        }
+
+        var typeName = destType.Name;
+        if (IsKnownValueObjectTypeName(typeName))
+        {
+            var diagnostic = Diagnostic.Create(Rule, declarator.Initializer.Value.GetLocation(), typeName);
+            context.ReportDiagnostic(diagnostic);
+        }
     }
 
     private static void AnalyzeAssignment(SyntaxNodeAnalysisContext context)
