@@ -26,7 +26,7 @@ namespace LightningArc.Results.Tests
             Result result = expectedError;
 
             // Act
-            var (isSuccess, error) = result;
+            (bool isSuccess, Error? error) = result;
 
             // Assert
             await Assert.That(isSuccess).IsFalse();
@@ -41,7 +41,7 @@ namespace LightningArc.Results.Tests
             Result<int> result = expectedValue;
 
             // Act
-            var (isSuccess, value, error) = result;
+            (bool isSuccess, int value, Error? error) = result;
 
             // Assert
             await Assert.That(isSuccess).IsTrue();
@@ -56,7 +56,7 @@ namespace LightningArc.Results.Tests
             Error error = Error.Validation.InvalidParameter("My Error", [new ErrorDetail("F1", "M1")]);
 
             // Act
-            var (code, message, details) = error;
+            (int code, string message, var details) = error;
 
             // Assert
             await Assert.That(code).IsEqualTo(error.Code);
@@ -68,15 +68,15 @@ namespace LightningArc.Results.Tests
         public async Task ErrorCombination_OperatorPlus_ShouldCreateAggregateError()
         {
             // Arrange
-            var error1 = Error.Validation.InvalidParameter("Error 1", [new ErrorDetail("Field1", "Required")]);
-            var error2 = Error.Application.Internal("Error 2", [new ErrorDetail("System", "Down")]);
+            Error error1 = Error.Validation.InvalidParameter("Error 1", [new ErrorDetail("Field1", "Required")]);
+            Error error2 = Error.Application.Internal("Error 2", [new ErrorDetail("System", "Down")]);
 
             // Act
-            var combined = error1 + error2;
+            Error combined = error1 + error2;
 
             // Assert
             await Assert.That(combined).IsTypeOf<AggregateError>();
-            var aggregate = (AggregateError)combined;
+            AggregateError aggregate = (AggregateError)combined;
             await Assert.That(aggregate.Errors.Count).IsEqualTo(2);
             await Assert.That(combined.Code).IsEqualTo(99001); // General module
             await Assert.That(combined.Details.Count).IsEqualTo(2);
@@ -86,19 +86,19 @@ namespace LightningArc.Results.Tests
         public async Task AggregateError_Flatten_ShouldRemoveNestedAggregates()
         {
             // Arrange
-            var e1 = Error.Validation.InvalidFormat("E1");
-            var e2 = Error.Validation.InvalidFormat("E2");
-            var e3 = Error.Validation.InvalidFormat("E3");
+            Error e1 = Error.Validation.InvalidFormat("E1");
+            Error e2 = Error.Validation.InvalidFormat("E2");
+            Error e3 = Error.Validation.InvalidFormat("E3");
 
-            var agg1 = e1 + e2; // Aggregate with [e1, e2]
-            var agg2 = agg1 + e3; // Aggregate with [agg1, e3]
+            Error agg1 = e1 + e2; // Aggregate with [e1, e2]
+            Error agg2 = agg1 + e3; // Aggregate with [agg1, e3]
 
             // Act
-            var flattened = ((AggregateError)agg2).Flatten();
+            AggregateError flattened = ((AggregateError)agg2).Flatten();
 
             // Assert
             await Assert.That(flattened.Errors.Count).IsEqualTo(3);
-            await Assert.That(flattened.Errors).IsEquivalentTo(new[] { e1, e2, e3 });
+            await Assert.That(flattened.Errors).IsEquivalentTo([e1, e2, e3]);
         }
 
         [Test]

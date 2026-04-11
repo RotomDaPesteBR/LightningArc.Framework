@@ -10,7 +10,8 @@
 
   <PropertyGroup>
 	<AssemblyName>LightningArc.Primitives.Results</AssemblyName>
-	<PackageTags>Utils</PackageTags>
+	<PackageTags>lightningarc dotnet clean-code value-objects domain-driven-design validation email cpf cnpj</PackageTags>
+	<Description>Functional extensions that integrate LightningArc Primitives with the Result pattern for fluent validation.</Description>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

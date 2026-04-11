@@ -8,8 +8,8 @@ namespace LightningArc.Results.Tests
         public async Task Error_SameCodeAndDetails_ShouldBeEqual()
         {
             // Arrange
-            var error1 = Error.Validation.InvalidParameter("Same message", new ErrorDetail("Field", "Error"));
-            var error2 = Error.Validation.InvalidParameter("Different message", new ErrorDetail("Field", "Error"));
+            Error error1 = Error.Validation.InvalidParameter("Same message", new ErrorDetail("Field", "Error"));
+            Error error2 = Error.Validation.InvalidParameter("Different message", new ErrorDetail("Field", "Error"));
 
             // Assert
             await Assert.That(error1).IsEqualTo(error2);
@@ -20,8 +20,8 @@ namespace LightningArc.Results.Tests
         public async Task Error_DifferentDetails_ShouldNotBeEqual()
         {
             // Arrange
-            var error1 = Error.Validation.InvalidParameter("Msg", new ErrorDetail("Field1", "Error"));
-            var error2 = Error.Validation.InvalidParameter("Msg", new ErrorDetail("Field2", "Error"));
+            Error error1 = Error.Validation.InvalidParameter("Msg", new ErrorDetail("Field1", "Error"));
+            Error error2 = Error.Validation.InvalidParameter("Msg", new ErrorDetail("Field2", "Error"));
 
             // Assert
             await Assert.That(error1).IsNotEqualTo(error2);
@@ -32,8 +32,8 @@ namespace LightningArc.Results.Tests
         public async Task Success_SameCode_ShouldBeEqual()
         {
             // Arrange
-            var success1 = Success.Ok("Msg 1");
-            var success2 = Success.Ok("Msg 2");
+            Success success1 = Success.Ok("Msg 1");
+            Success success2 = Success.Ok("Msg 2");
 
             // Assert
             await Assert.That(success1).IsEqualTo(success2);

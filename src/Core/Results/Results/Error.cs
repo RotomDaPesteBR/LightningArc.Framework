@@ -145,7 +145,7 @@ namespace LightningArc.Results
                 int hash = 17;
                 hash = hash * 23 + CodePrefix.GetHashCode();
                 hash = hash * 23 + CodeSuffix.GetHashCode();
-                foreach (var detail in Details)
+                foreach (ErrorDetail detail in Details)
                 {
                     hash = hash * 23 + detail.GetHashCode();
                 }

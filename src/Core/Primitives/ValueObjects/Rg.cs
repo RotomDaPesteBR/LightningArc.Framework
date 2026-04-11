@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using LightningArc.Primitives;
 
@@ -15,26 +16,14 @@ namespace LightningArc.Primitives.ValueObjects
         /// </summary>
         public string Value { get; }
 
-        private Rg(string value)
+        internal Rg(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (!IsValid(value, out string? errorMessage))
             {
-                throw new ArgumentException("The RG cannot be null or empty.", nameof(value));
+                throw new ArgumentException(errorMessage, nameof(value));
             }
 
-            var cleanRg = Clean(value);
-
-            if (cleanRg.Length < 7 || cleanRg.Length > 11)
-            {
-                throw new ArgumentException($"The value '{value}' is not a valid RG.", nameof(value));
-            }
-
-            if (!Regex.IsMatch(cleanRg, RgRegexPattern, RegexOptions.None, TimeSpan.FromMilliseconds(50)))
-            {
-                throw new ArgumentException($"The value '{value}' is not a valid RG.", nameof(value));
-            }
-
-            Value = cleanRg;
+            Value = Clean(value);
         }
 
         /// <summary>
@@ -45,21 +34,39 @@ namespace LightningArc.Primitives.ValueObjects
         /// <summary>
         /// Tries to create a new <see cref="Rg"/> from the specified string value.
         /// </summary>
-        public static bool TryCreate(string value, out Rg? result)
+        public static bool TryCreate(string value, [NotNullWhen(true)] out Rg? result)
         {
-            try
+            if (IsValid(value, out _))
             {
                 result = new Rg(value);
                 return true;
             }
-            catch (ArgumentException)
-            {
-                result = null;
-                return false;
-            }
+
+            result = null;
+            return false;
         }
 
-        private static string Clean(string value) => new(value.Where(c => char.IsDigit(c) || c == 'X' || c == 'x').ToArray());
+        internal static bool IsValid(string value, [NotNullWhen(false)] out string? errorMessage)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                errorMessage = "The RG cannot be null or empty.";
+                return false;
+            }
+
+            string cleanRg = Clean(value);
+
+            if (cleanRg.Length < 7 || cleanRg.Length > 11 || !Regex.IsMatch(cleanRg, RgRegexPattern, RegexOptions.None, TimeSpan.FromMilliseconds(50)))
+            {
+                errorMessage = $"The value '{value}' is not a valid RG.";
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
+        }
+
+        private static string Clean(string value) => new([.. value.Where(c => char.IsDigit(c) || c == 'X' || c == 'x')]);
 
         /// <summary>
         /// Implicitly converts an <see cref="Rg"/> to its <see cref="string"/> representation.

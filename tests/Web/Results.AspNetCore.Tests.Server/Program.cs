@@ -5,7 +5,7 @@ using LightningArc.Json.Converters;
 using LightningArc.Results;
 using LightningArc.Results.AspNetCore;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -21,7 +21,7 @@ builder.Services.AddEndpointResults(
         errors.Map<Business.OrderRejectedError>(HttpStatusCode.UnprocessableEntity, "Pedido Rejeitado", "urn:api-errors:order-rejected");
     });
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseRouting();
 app.UseCorsPolicies();

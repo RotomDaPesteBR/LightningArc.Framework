@@ -1,4 +1,3 @@
-
 using LightningArc.Results;
 using System.Net;
 
@@ -12,7 +11,7 @@ public sealed class CustomErrorMapping
     /// <summary>
     /// The type of the error to be mapped.
     /// </summary>
-    public Type ErrorType { get; set; } = default!;
+    public Type ErrorType { get; set; } = null!;
 
     /// <summary>
     /// The HTTP status code to be returned for this error.
@@ -38,7 +37,7 @@ public sealed class CustomSuccessMapping
     /// <summary>
     /// The type of the success to be mapped.
     /// </summary>
-    public Type SuccessType { get; set; } = default!;
+    public Type SuccessType { get; set; } = null!;
 
     /// <summary>
     /// The HTTP status code to be returned for this success.

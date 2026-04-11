@@ -14,7 +14,7 @@ namespace LightningArc.Analyzers;
 public class SyncConnectionInAsyncMethodAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "LARC020";
-    private const string HelpLinkBase = "https://github.com/RotomDaPesteBR/Utils/blob/main/docs/analyzers/";
+    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -27,7 +27,7 @@ public class SyncConnectionInAsyncMethodAnalyzer : DiagnosticAnalyzer
         helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+        [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -40,53 +40,73 @@ public class SyncConnectionInAsyncMethodAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not InvocationExpressionSyntax invocation)
+        {
             return;
+        }
 
         // Get the method being called
-        var symbolInfo = context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken);
+        SymbolInfo symbolInfo = context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken);
         if (symbolInfo.Symbol is not IMethodSymbol methodSymbol)
+        {
             return;
+        }
 
         // Check if the method is named GetConnection (exactly, not GetConnectionAsync)
         if (methodSymbol.Name != "GetConnection")
+        {
             return;
+        }
 
         // Find the enclosing method declaration
-        var method = invocation.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault();
+        MethodDeclarationSyntax? method = invocation.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault();
         if (method == null)
+        {
             return;
+        }
 
         // Check if the enclosing method is async
         if (!method.Modifiers.Any(m => m.IsKind(SyntaxKind.AsyncKeyword)))
+        {
             return;
+        }
 
         // Check if the enclosing class derives from RepositoryBase
-        var classDeclaration = method.AncestorsAndSelf().OfType<ClassDeclarationSyntax>().FirstOrDefault();
+        ClassDeclarationSyntax? classDeclaration = method.AncestorsAndSelf().OfType<ClassDeclarationSyntax>().FirstOrDefault();
         if (classDeclaration == null)
+        {
             return;
+        }
 
         if (!DerivesFromRepositoryBase(classDeclaration, context.SemanticModel))
+        {
             return;
+        }
 
-        var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
+        Diagnostic diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
         context.ReportDiagnostic(diagnostic);
     }
 
     private static bool DerivesFromRepositoryBase(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
     {
-        var symbol = semanticModel.GetDeclaredSymbol(classDeclaration);
+        INamedTypeSymbol? symbol = semanticModel.GetDeclaredSymbol(classDeclaration);
         if (symbol == null)
+        {
             return false;
+        }
 
-        var current = symbol.BaseType;
+        INamedTypeSymbol? current = symbol.BaseType;
         while (current != null)
         {
-            var fullName = current.ToDisplayString();
+            string fullName = current.ToDisplayString();
             if (fullName.Contains("RepositoryBase"))
+            {
                 return true;
+            }
 
             if (current.Name.Contains("RepositoryBase"))
+            {
                 return true;
+            }
 
             current = current.BaseType;
         }

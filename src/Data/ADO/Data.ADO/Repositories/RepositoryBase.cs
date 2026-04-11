@@ -109,7 +109,9 @@ public abstract class RepositoryBase
         }
 
         if (ConnectionFactory == null)
+        {
             throw new InvalidOperationException("Repository not properly initialized.");
+        }
 
         DbConnection dbConnection = ConnectionFactory.GetConnection();
 
@@ -141,13 +143,15 @@ public abstract class RepositoryBase
         }
 
         if (ConnectionFactory == null)
+        {
             throw new InvalidOperationException("Repository not properly initialized.");
+        }
 
         DbConnection dbConnection = ConnectionFactory.GetConnection();
 
         if (dbConnection.State != ConnectionState.Open)
         {
-            await dbConnection.OpenAsync(cancellationToken);
+            await dbConnection.OpenAsync(cancellationToken).ConfigureAwait(false);
         }
 
         if (Logger.IsEnabled(LogLevel.Debug))
@@ -166,7 +170,9 @@ public abstract class RepositoryBase
     protected void ReleaseConnection(DbConnection? dbConnection)
     {
         if (Transaction != null || DbConnection != null)
+        {
             return;
+        }
 
         dbConnection?.Close();
         dbConnection?.Dispose();

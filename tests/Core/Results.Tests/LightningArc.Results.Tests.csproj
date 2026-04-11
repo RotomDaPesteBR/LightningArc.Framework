@@ -5,7 +5,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Core\Results\LightningArc.Results.csproj" />
-    <ProjectReference Include="..\..\..\src\Core\\Primitives\\LightningArc.Primitives.csproj" />
+    <ProjectReference Include="..\..\..\src\Core\Primitives\LightningArc.Primitives.csproj" />
   </ItemGroup>
 </Project>
 

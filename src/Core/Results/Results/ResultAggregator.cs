@@ -22,7 +22,7 @@ public sealed class ResultAggregator
     {
         try
         {
-            var result = action();
+            Result result = action();
             if (result.IsFailure)
             {
                 AppendError(result.Error);

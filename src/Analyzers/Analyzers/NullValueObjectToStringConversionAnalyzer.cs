@@ -14,11 +14,11 @@ namespace LightningArc.Analyzers;
 public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "LARC011";
-    private const string HelpLinkBase = "https://github.com/RotomDaPesteBR/Utils/blob/main/docs/analyzers/";
+    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
-    private static readonly string[] KnownValueObjectNames =
+    private static readonly string[] _knownValueObjectNames =
     [
-        "Email", "Cpf", "Cnpj", "PhoneNumber", "Url"
+        "Cep", "Cnpj", "Cpf", "Currency", "Email", "IpAddress", "Password", "PhoneNumber", "Rg", "Url"
     ];
 
     public static readonly DiagnosticDescriptor Rule = new(
@@ -32,7 +32,7 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
         helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+        [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -50,15 +50,18 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeVariableDeclarator(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not VariableDeclaratorSyntax declarator)
+        {
             return;
+        }
 
         if (declarator.Initializer == null)
+        {
             return;
+        }
 
         // Check if the variable is typed as string
-        var symbol = context.SemanticModel.GetDeclaredSymbol(declarator) as ILocalSymbol;
         ITypeSymbol? declaredType = null;
-        if (symbol != null)
+        if (context.SemanticModel.GetDeclaredSymbol(declarator) is ILocalSymbol symbol)
         {
             declaredType = symbol.Type;
         }
@@ -68,13 +71,15 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
         }
 
         if (declaredType?.SpecialType != SpecialType.System_String)
+        {
             return;
+        }
 
         // Check if the assigned value is a nullable ValueObject
-        var valueTypeInfo = context.SemanticModel.GetTypeInfo(declarator.Initializer.Value);
+        TypeInfo valueTypeInfo = context.SemanticModel.GetTypeInfo(declarator.Initializer.Value);
         if (valueTypeInfo.Type != null && IsNullableValueObject(valueTypeInfo.Type))
         {
-            var diagnostic = Diagnostic.Create(Rule, declarator.Initializer.Value.GetLocation());
+            Diagnostic diagnostic = Diagnostic.Create(Rule, declarator.Initializer.Value.GetLocation());
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -85,18 +90,22 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeAssignment(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not AssignmentExpressionSyntax assignment)
+        {
             return;
+        }
 
         // Check if the left side is typed as string
-        var leftTypeInfo = context.SemanticModel.GetTypeInfo(assignment.Left);
+        TypeInfo leftTypeInfo = context.SemanticModel.GetTypeInfo(assignment.Left);
         if (leftTypeInfo.Type?.SpecialType != SpecialType.System_String)
+        {
             return;
+        }
 
         // Check if the right side is a nullable ValueObject
-        var rightTypeInfo = context.SemanticModel.GetTypeInfo(assignment.Right);
+        TypeInfo rightTypeInfo = context.SemanticModel.GetTypeInfo(assignment.Right);
         if (rightTypeInfo.Type != null && IsNullableValueObject(rightTypeInfo.Type))
         {
-            var diagnostic = Diagnostic.Create(Rule, assignment.Right.GetLocation());
+            Diagnostic diagnostic = Diagnostic.Create(Rule, assignment.Right.GetLocation());
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -107,17 +116,21 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeArgument(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not ArgumentSyntax argument)
+        {
             return;
+        }
 
         // Get the expected parameter type from the invocation
-        var typeInfo = context.SemanticModel.GetTypeInfo(argument.Expression);
+        TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(argument.Expression);
         if (typeInfo.ConvertedType?.SpecialType != SpecialType.System_String)
+        {
             return;
+        }
 
         // Check if the expression type is a nullable ValueObject
         if (typeInfo.Type != null && IsNullableValueObject(typeInfo.Type))
         {
-            var diagnostic = Diagnostic.Create(Rule, argument.Expression.GetLocation());
+            Diagnostic diagnostic = Diagnostic.Create(Rule, argument.Expression.GetLocation());
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -125,9 +138,11 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
     private static bool IsNullableValueObject(ITypeSymbol type)
     {
         // Check known value object names
-        if (Array.IndexOf(KnownValueObjectNames, type.Name) < 0 &&
+        if (Array.IndexOf(_knownValueObjectNames, type.Name) < 0 &&
             !type.Name.EndsWith("ValueObject"))
+        {
             return false;
+        }
 
         // In #nullable enable context, NotAnnotated means non-nullable (e.g., Email)
         // Annotated means nullable (e.g., Email?)

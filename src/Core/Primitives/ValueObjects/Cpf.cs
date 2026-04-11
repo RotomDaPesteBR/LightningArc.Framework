@@ -1,5 +1,6 @@
-using System.Linq;
 using LightningArc.Primitives;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace LightningArc.Primitives.ValueObjects
 {
@@ -19,31 +20,19 @@ namespace LightningArc.Primitives.ValueObjects
         public string Value { get; }
 
         /// <summary>
-        /// Private constructor for the Cpf class.
+        /// Internal constructor for the Cpf class.
         /// This constructor performs the validation of the CPF string.
         /// </summary>
         /// <param name="value">The string representing the CPF.</param>
         /// <exception cref="ArgumentException">Thrown if 'value' is null, empty, or not a valid CPF.</exception>
-        private Cpf(string value)
+        internal Cpf(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (!IsValid(value, out string? errorMessage))
             {
-                throw new ArgumentException("The CPF cannot be null or empty.", nameof(value));
+                throw new ArgumentException(errorMessage, nameof(value));
             }
 
-            var cleanCpf = new string(value.Where(char.IsDigit).ToArray());
-
-            if (cleanCpf.Length != 11 || IsRepeatedDigits(cleanCpf))
-            {
-                throw new ArgumentException($"The value '{value}' is not a valid CPF.", nameof(value));
-            }
-
-            if (!IsValidCpf(cleanCpf))
-            {
-                throw new ArgumentException($"The value '{value}' is not a valid CPF.", nameof(value));
-            }
-
-            Value = cleanCpf;
+            Value = new string([.. value.Where(char.IsDigit)]);
         }
 
         /// <summary>
@@ -60,45 +49,63 @@ namespace LightningArc.Primitives.ValueObjects
         /// <param name="value">The string representing the CPF.</param>
         /// <param name="result">The resulting <see cref="Cpf"/> object, or null if validation fails.</param>
         /// <returns>True if the CPF was successfully created; otherwise, false.</returns>
-        public static bool TryCreate(string value, out Cpf? result)
+        public static bool TryCreate(string value, [NotNullWhen(true)] out Cpf? result)
         {
-            try
+            if (IsValid(value, out _))
             {
                 result = new Cpf(value);
                 return true;
             }
-            catch (ArgumentException)
+
+            result = null;
+            return false;
+        }
+
+        internal static bool IsValid(string value, [NotNullWhen(false)] out string? errorMessage)
+        {
+            if (string.IsNullOrWhiteSpace(value))
             {
-                result = null;
+                errorMessage = "The CPF cannot be null or empty.";
                 return false;
             }
+
+            string cleanCpf = new([.. value.Where(char.IsDigit)]);
+
+            if (cleanCpf.Length != 11 || IsRepeatedDigits(cleanCpf) || !IsValidCpf(cleanCpf))
+            {
+                errorMessage = $"The value '{value}' is not a valid CPF.";
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
         }
 
         private static bool IsRepeatedDigits(string value) => value.Distinct().Count() == 1;
 
         private static bool IsValidCpf(string cpf)
         {
-            var tempCpf = cpf.Substring(0, 9);
-            var sum = 0;
+            string tempCpf = cpf[..9];
+            int sum = 0;
 
-            for (var i = 0; i < 9; i++)
+            for (int i = 0; i < 9; i++)
             {
                 sum += (tempCpf[i] - '0') * (10 - i);
             }
 
-            var remainder = sum % 11;
-            var digit1 = remainder < 2 ? 0 : 11 - remainder;
+            int remainder = sum % 11;
+            int digit1 = remainder < 2 ? 0 : 11 - remainder;
 
             tempCpf += digit1;
             sum = 0;
 
-            for (var i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
                 sum += (tempCpf[i] - '0') * (11 - i);
             }
 
             remainder = sum % 11;
-            var digit2 = remainder < 2 ? 0 : 11 - remainder;
+            int digit2 = remainder < 2 ? 0 : 11 - remainder;
 
             return cpf.EndsWith(digit1.ToString() + digit2.ToString());
         }

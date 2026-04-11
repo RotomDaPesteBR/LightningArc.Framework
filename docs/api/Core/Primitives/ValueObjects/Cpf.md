@@ -59,6 +59,9 @@ if (Cpf.TryCreate("000.000.000-00", out var validCpf))
     // validCpf is guaranteed valid
 }
 
-// ToResult for fluent handling
-Result<Cpf> result = "invalid".CreateCpfResult();
+// AsCpf for fluent handling
+Result<Cpf> result = "invalid".AsCpf();
+
+// Implicit conversion to Result<Cpf>
+Result<Cpf> wrapped = cpf;
 ```

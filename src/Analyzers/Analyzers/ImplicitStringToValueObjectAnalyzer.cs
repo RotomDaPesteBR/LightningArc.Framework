@@ -14,11 +14,11 @@ namespace LightningArc.Analyzers;
 public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "LARC010";
-    private const string HelpLinkBase = "https://github.com/RotomDaPesteBR/Utils/blob/main/docs/analyzers/";
+    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
-    private static readonly string[] KnownValueObjectNames =
+    private static readonly string[] _knownValueObjectNames =
     [
-        "Email", "Cpf", "Cnpj", "PhoneNumber", "Url"
+        "Cep", "Cnpj", "Cpf", "Currency", "Email", "IpAddress", "Password", "PhoneNumber", "Rg", "Url"
     ];
 
     public static readonly DiagnosticDescriptor Rule = new(
@@ -32,7 +32,7 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
         helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+        [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -47,27 +47,34 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeVariableDeclarator(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not VariableDeclaratorSyntax declarator)
+        {
             return;
+        }
 
         if (declarator.Initializer?.Value is not LiteralExpressionSyntax literal ||
             !literal.IsKind(SyntaxKind.StringLiteralExpression))
+        {
             return;
+        }
 
         // Get the type the variable is declared as
-        var symbol = context.SemanticModel.GetDeclaredSymbol(declarator) as ILocalSymbol;
+        ILocalSymbol? symbol = context.SemanticModel.GetDeclaredSymbol(declarator) as ILocalSymbol;
         if (symbol?.Type is not INamedTypeSymbol destType)
         {
             // Could be a field
-            var fieldSymbol = context.SemanticModel.GetDeclaredSymbol(declarator) as IFieldSymbol;
+            IFieldSymbol? fieldSymbol = context.SemanticModel.GetDeclaredSymbol(declarator) as IFieldSymbol;
             if (fieldSymbol?.Type is not INamedTypeSymbol fieldType)
+            {
                 return;
+            }
+
             destType = fieldType;
         }
 
-        var typeName = destType.Name;
+        string typeName = destType.Name;
         if (IsKnownValueObjectTypeName(typeName))
         {
-            var diagnostic = Diagnostic.Create(Rule, declarator.Initializer.Value.GetLocation(), typeName);
+            Diagnostic diagnostic = Diagnostic.Create(Rule, declarator.Initializer.Value.GetLocation(), typeName);
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -75,18 +82,24 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeAssignment(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not AssignmentExpressionSyntax assignment)
+        {
             return;
+        }
 
         if (assignment.Right is not LiteralExpressionSyntax literal ||
             !literal.IsKind(SyntaxKind.StringLiteralExpression))
+        {
             return;
+        }
 
-        if (!TryGetTypeName(assignment.Left, context.SemanticModel, out var typeName))
+        if (!TryGetTypeName(assignment.Left, context.SemanticModel, out string? typeName))
+        {
             return;
+        }
 
         if (IsKnownValueObjectTypeName(typeName!))
         {
-            var diagnostic = Diagnostic.Create(Rule, assignment.Right.GetLocation(), typeName);
+            Diagnostic diagnostic = Diagnostic.Create(Rule, assignment.Right.GetLocation(), typeName);
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -94,25 +107,33 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeArgument(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not ArgumentSyntax argument)
+        {
             return;
+        }
 
         // Skip ref/out arguments
         if (argument.RefOrOutKeyword != default)
+        {
             return;
+        }
 
         if (argument.Expression is not LiteralExpressionSyntax literal ||
             literal.Kind() != SyntaxKind.StringLiteralExpression)
+        {
             return;
+        }
 
         // Get the type the argument is being converted to
-        var typeInfo = context.SemanticModel.GetTypeInfo(argument.Expression);
+        TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(argument.Expression);
         if (typeInfo.ConvertedType is not INamedTypeSymbol destType)
+        {
             return;
+        }
 
-        var typeName = destType.Name;
+        string typeName = destType.Name;
         if (IsKnownValueObjectTypeName(typeName))
         {
-            var diagnostic = Diagnostic.Create(Rule, argument.Expression.GetLocation(), typeName);
+            Diagnostic diagnostic = Diagnostic.Create(Rule, argument.Expression.GetLocation(), typeName);
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -121,9 +142,11 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
     {
         typeName = null;
 
-        var typeInfo = semanticModel.GetTypeInfo(expression);
+        TypeInfo typeInfo = semanticModel.GetTypeInfo(expression);
         if (typeInfo.ConvertedType is not INamedTypeSymbol destType)
+        {
             return false;
+        }
 
         // Check known value object names
         if (IsKnownValueObjectTypeName(destType.Name))
@@ -144,7 +167,7 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
 
     private static bool IsKnownValueObjectTypeName(string typeName)
     {
-        return Array.IndexOf(KnownValueObjectNames, typeName) >= 0 ||
+        return Array.IndexOf(_knownValueObjectNames, typeName) >= 0 ||
                typeName.EndsWith("ValueObject");
     }
 }

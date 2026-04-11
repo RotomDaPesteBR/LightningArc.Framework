@@ -15,7 +15,7 @@ namespace LightningArc.Analyzers;
 public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "LARC002";
-    private const string HelpLinkBase = "https://github.com/RotomDaPesteBR/Utils/blob/main/docs/analyzers/";
+    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -28,7 +28,7 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
         helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+        [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -41,47 +41,67 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not MemberAccessExpressionSyntax memberAccess)
+        {
             return;
+        }
 
         if (memberAccess.Name.Identifier.ValueText != "Error")
+        {
             return;
+        }
 
-        var typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken);
+        TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken);
         if (typeInfo.Type is not INamedTypeSymbol namedType)
+        {
             return;
+        }
 
         if (!IsResultType(namedType))
+        {
             return;
+        }
 
         // Suppress: access is inside a conversion operator (by design, these operators are intentionally unsafe).
         if (IsInsideConversionOperator(memberAccess))
+        {
             return;
+        }
 
         // Suppress: null-forgiving operator (!) applied to the Error access indicates the developer
         // has already acknowledged the risk and suppressed nullable analysis explicitly.
         if (HasNullForgivingOperator(memberAccess))
+        {
             return;
+        }
 
         if (ResultGuardHelper.IsGuardedByIsFailure(memberAccess, context.SemanticModel) ||
             ResultGuardHelper.IsGuardedByTryCall(memberAccess, context.SemanticModel, "TryGetError"))
+        {
             return;
+        }
 
-        var diagnostic = Diagnostic.Create(Rule, memberAccess.Name.GetLocation(), namedType.Name);
+        Diagnostic diagnostic = Diagnostic.Create(Rule, memberAccess.Name.GetLocation(), namedType.Name);
         context.ReportDiagnostic(diagnostic);
     }
 
     private static bool IsResultType(INamedTypeSymbol namedType)
     {
         if (namedType.Name == "Result")
+        {
             return true;
+        }
 
         if (namedType.BaseType != null && IsResultType(namedType.BaseType))
-            return true;
-
-        foreach (var iface in namedType.AllInterfaces)
         {
-            if (iface.Name.StartsWith("IResult"))
+            return true;
+        }
+
+        foreach (INamedTypeSymbol? namedTypeSymbol in namedType.AllInterfaces)
+        {
+            if (namedTypeSymbol.Name.StartsWith("IResult"))
+            {
                 return true;
+            }
         }
 
         return false;
@@ -89,16 +109,19 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
 
     private static bool IsInsideConversionOperator(MemberAccessExpressionSyntax memberAccess)
     {
-        var current = memberAccess.Parent;
+        SyntaxNode? current = memberAccess.Parent;
         while (current != null)
         {
-            if (current is ConversionOperatorDeclarationSyntax)
-                return true;
-
-            if (current is MethodDeclarationSyntax or LocalFunctionStatementSyntax)
-                return false;
-
-            current = current.Parent;
+            switch (current)
+            {
+                case ConversionOperatorDeclarationSyntax:
+                    return true;
+                case MethodDeclarationSyntax or LocalFunctionStatementSyntax:
+                    return false;
+                default:
+                    current = current.Parent;
+                    break;
+            }
         }
 
         return false;

@@ -68,7 +68,7 @@ Metalama-powered AOP factories.
 
 ### Value Objects
 - Use `TryCreate()` for non-throwing creation
-- Use `Create{Type}Result()` for Result-based validation
+- Use `As{Type}()` for Result-based validation (e.g., `input.AsEmail()`)
 - Avoid implicit string conversion (flagged by LARC010 analyzer)
 
 ### Result Pattern

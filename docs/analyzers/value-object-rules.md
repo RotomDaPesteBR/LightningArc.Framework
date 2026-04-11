@@ -23,7 +23,7 @@ Email email = "invalid-email"; // throws ArgumentException
 Email.TryCreate("user@example.com", out var email);
 
 // Option 2: Use Result extensions
-var result = "invalid-email".CreateEmailResult();
+var result = "invalid-email".AsEmail();
 if (result.IsFailure) { /* handle */ }
 
 // Option 3: Use Create explicitly (knowing it throws)

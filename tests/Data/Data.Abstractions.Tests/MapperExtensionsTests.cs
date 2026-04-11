@@ -30,11 +30,11 @@ public class MapperExtensionsTests
     public async Task Map_ShouldMapItem()
     {
         // Arrange
-        var mapper = new TestMapper();
-        var entity = new TestEntity { Id = 1 };
+        TestMapper mapper = new();
+        TestEntity entity = new() { Id = 1 };
 
         // Act
-        var dto = mapper.Map<TestDto>(entity);
+        TestDto dto = mapper.Map<TestDto>(entity);
 
         // Assert
         await Assert.That(dto).IsNotNull();

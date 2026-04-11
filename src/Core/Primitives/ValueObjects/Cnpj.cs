@@ -12,31 +12,14 @@ namespace LightningArc.Primitives.ValueObjects
         /// </summary>
         public string Value { get; }
 
-        private Cnpj(string value)
+        internal Cnpj(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (!IsValid(value, out string? errorMessage))
             {
-                throw new ArgumentException("The CNPJ cannot be null or empty.", nameof(value));
+                throw new ArgumentException(errorMessage, nameof(value));
             }
 
-            var numericCnpj = new string(value.Where(char.IsDigit).ToArray());
-
-            if (numericCnpj.Length != 14)
-            {
-                throw new ArgumentException($"The CNPJ '{value}' must have exactly 14 digits.", nameof(value));
-            }
-
-            if (HasAllSameDigits(numericCnpj))
-            {
-                throw new ArgumentException($"The CNPJ '{value}' is invalid.", nameof(value));
-            }
-
-            if (!IsValidChecksum(numericCnpj))
-            {
-                throw new ArgumentException($"The CNPJ '{value}' is invalid.", nameof(value));
-            }
-
-            Value = numericCnpj;
+            Value = new string([.. value.Where(char.IsDigit)]);
         }
 
         /// <summary>
@@ -54,50 +37,74 @@ namespace LightningArc.Primitives.ValueObjects
         /// <returns>True if created successfully; otherwise, false.</returns>
         public static bool TryCreate(string value, out Cnpj? result)
         {
-            try
+            if (IsValid(value, out _))
             {
                 result = new Cnpj(value);
                 return true;
             }
-            catch (ArgumentException)
+
+            result = null;
+            return false;
+        }
+
+        internal static bool IsValid(string value, out string? errorMessage)
+        {
+            if (string.IsNullOrWhiteSpace(value))
             {
-                result = null;
+                errorMessage = "The CNPJ cannot be null or empty.";
                 return false;
             }
+
+            string numericCnpj = new([.. value.Where(char.IsDigit)]);
+
+            if (numericCnpj.Length != 14)
+            {
+                errorMessage = $"The CNPJ '{value}' must have exactly 14 digits.";
+                return false;
+            }
+
+            if (HasAllSameDigits(numericCnpj) || !IsValidChecksum(numericCnpj))
+            {
+                errorMessage = $"The CNPJ '{value}' is invalid.";
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
         }
 
         private static bool HasAllSameDigits(string value)
         {
-            var firstDigit = value[0];
+            char firstDigit = value[0];
             return value.All(c => c == firstDigit);
         }
 
         private static bool IsValidChecksum(string numericCnpj)
         {
-            int[] multiplier1 = { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
-            int[] multiplier2 = { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
+            int[] multiplier1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+            int[] multiplier2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
-            var tempCnpj = numericCnpj.Substring(0, 12);
-            var sum = 0;
+            string tempCnpj = numericCnpj[..12];
+            int sum = 0;
 
-            for (var i = 0; i < 12; i++)
+            for (int i = 0; i < 12; i++)
             {
                 sum += (tempCnpj[i] - '0') * multiplier1[i];
             }
 
-            var remainder = sum % 11;
-            var digit1 = remainder < 2 ? 0 : 11 - remainder;
+            int remainder = sum % 11;
+            int digit1 = remainder < 2 ? 0 : 11 - remainder;
 
             tempCnpj += digit1;
             sum = 0;
 
-            for (var i = 0; i < 13; i++)
+            for (int i = 0; i < 13; i++)
             {
                 sum += (tempCnpj[i] - '0') * multiplier2[i];
             }
 
             remainder = sum % 11;
-            var digit2 = remainder < 2 ? 0 : 11 - remainder;
+            int digit2 = remainder < 2 ? 0 : 11 - remainder;
 
             return numericCnpj.EndsWith($"{digit1}{digit2}");
         }

@@ -59,6 +59,9 @@ if (PhoneNumber.TryCreate("+5511999999999", out var validPhone))
     // validPhone is guaranteed valid
 }
 
-// ToResult for fluent handling
-Result<PhoneNumber> result = "invalid".CreatePhoneNumberResult();
+// AsPhoneNumber for fluent handling
+Result<PhoneNumber> result = "invalid".AsPhoneNumber();
+
+// Implicit conversion to Result<PhoneNumber>
+Result<PhoneNumber> wrapped = phone;
 ```

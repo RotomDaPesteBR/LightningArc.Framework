@@ -14,7 +14,7 @@ namespace LightningArc.Analyzers;
 public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "LARC022";
-    private const string HelpLinkBase = "https://github.com/RotomDaPesteBR/Utils/blob/main/docs/analyzers/";
+    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -27,7 +27,7 @@ public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
         helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+        [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -40,39 +40,53 @@ public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeMethod(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not MethodDeclarationSyntax methodDeclaration)
+        {
             return;
+        }
 
         // Check if method is named StartAsync
-        var methodName = methodDeclaration.Identifier.ValueText;
+        string methodName = methodDeclaration.Identifier.ValueText;
         if (methodName != "StartAsync")
+        {
             return;
+        }
 
         // Check if we are inside a class that implements IHostedService
-        var classDeclaration = methodDeclaration.AncestorsAndSelf().OfType<ClassDeclarationSyntax>().FirstOrDefault();
+        ClassDeclarationSyntax? classDeclaration = methodDeclaration.AncestorsAndSelf().OfType<ClassDeclarationSyntax>().FirstOrDefault();
         if (classDeclaration == null)
+        {
             return;
+        }
 
         if (!ImplementsIHostedService(classDeclaration, context.SemanticModel))
+        {
             return;
+        }
 
         // Check if the method body only returns Task.CompletedTask with no other work
         if (!IsNoOpStartAsync(methodDeclaration))
+        {
             return;
+        }
 
-        var diagnostic = Diagnostic.Create(Rule, methodDeclaration.Identifier.GetLocation());
+        Diagnostic diagnostic = Diagnostic.Create(Rule, methodDeclaration.Identifier.GetLocation());
         context.ReportDiagnostic(diagnostic);
     }
 
     private static bool ImplementsIHostedService(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
     {
-        var symbol = semanticModel.GetDeclaredSymbol(classDeclaration);
+        INamedTypeSymbol? symbol = semanticModel.GetDeclaredSymbol(classDeclaration);
         if (symbol == null)
+        {
             return false;
+        }
 
-        foreach (var iface in symbol.AllInterfaces)
+        foreach (INamedTypeSymbol? iface in symbol.AllInterfaces)
         {
             if (iface.Name == "IHostedService")
+            {
                 return true;
+            }
         }
 
         return false;
@@ -82,17 +96,23 @@ public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
     {
         // Check for arrow-bodied: => Task.CompletedTask;
         if (method.ExpressionBody != null)
+        {
             return IsTaskCompletedTask(method.ExpressionBody.Expression);
+        }
 
         // Check block-bodied method
         if (method.Body == null)
+        {
             return false;
+        }
 
         var statements = method.Body.Statements;
 
         // A single return statement returning Task.CompletedTask
         if (statements.Count == 1 && statements[0] is ReturnStatementSyntax returnStatement)
+        {
             return IsTaskCompletedTask(returnStatement.Expression);
+        }
 
         return false;
     }
@@ -100,12 +120,14 @@ public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
     private static bool IsTaskCompletedTask(ExpressionSyntax? expression)
     {
         if (expression == null)
+        {
             return false;
+        }
 
         if (expression is MemberAccessExpressionSyntax memberAccess &&
             memberAccess.Name.Identifier.ValueText == "CompletedTask")
         {
-            var container = memberAccess.Expression.ToString();
+            string container = memberAccess.Expression.ToString();
             return container == "Task" ||
                    container == "System.Threading.Tasks.Task" ||
                    container == "ValueTask" ||

@@ -11,7 +11,8 @@
 
   <PropertyGroup>
     <AssemblyName>LightningArc.Mappers.Mapster</AssemblyName>
-    <PackageTags>Utils, Mappers, Mapster, Adapter</PackageTags>
+    <PackageTags>lightningarc dotnet clean-code repository-pattern mapster</PackageTags>
+    <Description>Mapster adapter for the LightningArc data layer.</Description>
   </PropertyGroup>
 
   <ItemGroup>

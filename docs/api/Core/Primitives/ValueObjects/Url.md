@@ -59,6 +59,9 @@ if (Url.TryCreate("https://example.com", out var validUrl))
     // validUrl is guaranteed valid
 }
 
-// ToResult for fluent handling
-Result<Url> result = "invalid-url".CreateUrlResult();
+// AsUrl for fluent handling
+Result<Url> result = "invalid-url".AsUrl();
+
+// Implicit conversion to Result<Url>
+Result<Url> wrapped = url;
 ```

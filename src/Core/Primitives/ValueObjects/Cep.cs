@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using LightningArc.Primitives;
 
@@ -19,21 +20,14 @@ public record Cep : IValueObject<string>
     /// </summary>
     public string Value { get; }
 
-    private Cep(string value)
+    internal Cep(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (!IsValid(value, out string? errorMessage))
         {
-            throw new ArgumentException("The CEP cannot be null or empty.", nameof(value));
+            throw new ArgumentException(errorMessage, nameof(value));
         }
 
-        var normalized = Normalize(value);
-
-        if (!Regex.IsMatch(normalized, CepRegexPattern, RegexOptions.None, TimeSpan.FromMilliseconds(50)))
-        {
-            throw new ArgumentException($"The value '{value}' is not a valid CEP.", nameof(value));
-        }
-
-        Value = normalized;
+        Value = Normalize(value);
     }
 
     /// <summary>
@@ -44,26 +38,44 @@ public record Cep : IValueObject<string>
     /// <summary>
     /// Tries to create a new instance of <see cref="Cep"/>.
     /// </summary>
-    public static bool TryCreate(string value, out Cep? result)
+    public static bool TryCreate(string value, [NotNullWhen(true)] out Cep? result)
     {
-        try
+        if (IsValid(value, out _))
         {
             result = new Cep(value);
             return true;
         }
-        catch (ArgumentException)
+
+        result = null;
+        return false;
+    }
+
+    internal static bool IsValid(string value, [NotNullWhen(false)] out string? errorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(value))
         {
-            result = null;
+            errorMessage = "The CEP cannot be null or empty.";
             return false;
         }
+
+        string normalized = Normalize(value);
+
+        if (!Regex.IsMatch(normalized, CepRegexPattern, RegexOptions.None, TimeSpan.FromMilliseconds(50)))
+        {
+            errorMessage = $"The value '{value}' is not a valid CEP.";
+            return false;
+        }
+
+        errorMessage = null;
+        return true;
     }
 
     private static string Normalize(string value)
     {
-        var digitsOnly = new string(value.Where(char.IsDigit).ToArray());
+        string digitsOnly = new([.. value.Where(char.IsDigit)]);
         if (digitsOnly.Length == 8)
         {
-            return $"{digitsOnly.Substring(0, 5)}-{digitsOnly.Substring(5)}";
+            return $"{digitsOnly[..5]}-{digitsOnly[5..]}";
         }
         return value.Trim();
     }

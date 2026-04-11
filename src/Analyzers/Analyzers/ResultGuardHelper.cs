@@ -77,7 +77,10 @@ internal static class ResultGuardHelper
                         : checkProperty;
 
                     if (ConditionChecks(ifStmt.Condition, access.Expression, semanticModel, effectiveProperty, isTryCall))
+                    {
                         return true;
+                    }
+
                     break;
                 }
 
@@ -87,14 +90,18 @@ internal static class ResultGuardHelper
                     {
                         // Expression is in the "true" branch — guard must check the property
                         if (ConditionChecks(conditional.Condition, access.Expression, semanticModel, checkProperty, isTryCall))
+                        {
                             return true;
+                        }
                     }
                     else if (conditional.WhenFalse == access || IsDescendantOf(access, conditional.WhenFalse))
                     {
                         // Expression is in the "false" branch — guard must check the negate
                         string negated = checkProperty == "IsSuccess" ? "IsFailure" : "IsSuccess";
                         if (ConditionChecks(conditional.Condition, access.Expression, semanticModel, negated, isTryCall))
+                        {
                             return true;
+                        }
                     }
                     break;
                 }
@@ -120,7 +127,9 @@ internal static class ResultGuardHelper
                                 : checkProperty;
 
                             if (ConditionChecks(binary.Left, access.Expression, semanticModel, guardProperty, isTryCall))
+                            {
                                 return true;
+                            }
                         }
                     }
                     break;
@@ -128,7 +137,9 @@ internal static class ResultGuardHelper
             }
 
             if (current is MethodDeclarationSyntax or LocalFunctionStatementSyntax)
+            {
                 break;
+            }
 
             current = current.Parent;
         }
@@ -144,7 +155,9 @@ internal static class ResultGuardHelper
         bool isTryCall)
     {
         if (isTryCall)
+        {
             return TryCallCheck(condition, resultExpression, semanticModel, checkProperty);
+        }
 
         return PropertyCheck(condition, resultExpression, semanticModel, checkProperty);
     }
@@ -155,26 +168,25 @@ internal static class ResultGuardHelper
         SemanticModel semanticModel,
         string checkProperty)
     {
-        // Direct check: result.IsFailure / result.IsSuccess
-        if (condition is MemberAccessExpressionSyntax member)
+        switch (condition)
         {
-            if (member.Name.Identifier.ValueText == checkProperty)
-            {
+            // Direct check: result.IsFailure / result.IsSuccess
+            case MemberAccessExpressionSyntax member when member.Name.Identifier.ValueText == checkProperty:
                 return ExpressionsAreEquivalent(member.Expression, resultExpression) ||
                        ExpressionReferencesSameResult(member.Expression, resultExpression, semanticModel);
-            }
-        }
-
-        // Negated check: !result.IsSuccess / !result.IsFailure
-        if (condition is PrefixUnaryExpressionSyntax prefix &&
-            prefix.OperatorToken.IsKind(SyntaxKind.ExclamationToken) &&
-            prefix.Operand is MemberAccessExpressionSyntax negated)
-        {
-            string negatedProp = checkProperty == "IsSuccess" ? "IsFailure" : "IsSuccess";
-            if (negated.Name.Identifier.ValueText == negatedProp)
+            // Negated check: !result.IsSuccess / !result.IsFailure
+            case PrefixUnaryExpressionSyntax prefix when
+                prefix.OperatorToken.IsKind(SyntaxKind.ExclamationToken) &&
+                prefix.Operand is MemberAccessExpressionSyntax negated:
             {
-                return ExpressionsAreEquivalent(negated.Expression, resultExpression) ||
-                       ExpressionReferencesSameResult(negated.Expression, resultExpression, semanticModel);
+                string negatedProp = checkProperty == "IsSuccess" ? "IsFailure" : "IsSuccess";
+                if (negated.Name.Identifier.ValueText == negatedProp)
+                {
+                    return ExpressionsAreEquivalent(negated.Expression, resultExpression) ||
+                           ExpressionReferencesSameResult(negated.Expression, resultExpression, semanticModel);
+                }
+
+                break;
             }
         }
 
@@ -187,15 +199,20 @@ internal static class ResultGuardHelper
         SemanticModel semanticModel,
         string tryMethodName)
     {
-        if (condition is not InvocationExpressionSyntax)
+        if (condition is not InvocationExpressionSyntax invocation)
+        {
             return false;
+        }
 
-        var invocation = (InvocationExpressionSyntax)condition;
         if (invocation.Expression is not MemberAccessExpressionSyntax member)
+        {
             return false;
+        }
 
         if (member.Name.Identifier.ValueText != tryMethodName)
+        {
             return false;
+        }
 
         return ExpressionsAreEquivalent(member.Expression, resultExpression) ||
                ExpressionReferencesSameResult(member.Expression, resultExpression, semanticModel);
@@ -203,11 +220,14 @@ internal static class ResultGuardHelper
 
     private static bool IsDescendantOf(SyntaxNode node, SyntaxNode? ancestor)
     {
-        var current = node.Parent;
+        SyntaxNode? current = node.Parent;
         while (current != null)
         {
             if (current == ancestor)
+            {
                 return true;
+            }
+
             current = current.Parent;
         }
         return false;
@@ -216,18 +236,29 @@ internal static class ResultGuardHelper
     private static bool IsInElseBlock(IfStatementSyntax ifStmt, MemberAccessExpressionSyntax access)
     {
         if (ifStmt.Else == null)
+        {
             return false;
+        }
 
-        var elseStatement = ifStmt.Else.Statement;
-        var current = access.Parent;
+        StatementSyntax elseStatement = ifStmt.Else.Statement;
+        SyntaxNode? current = access.Parent;
         while (current != null)
         {
             if (current == elseStatement)
+            {
                 return true;
+            }
+
             if (current == ifStmt)
+            {
                 return false;
+            }
+
             if (current is MethodDeclarationSyntax or LocalFunctionStatementSyntax)
+            {
                 return false;
+            }
+
             current = current.Parent;
         }
         return false;
@@ -243,11 +274,13 @@ internal static class ResultGuardHelper
         ExpressionSyntax b,
         SemanticModel semanticModel)
     {
-        var symbolA = GetSymbol(a, semanticModel);
-        var symbolB = GetSymbol(b, semanticModel);
+        ISymbol? symbolA = GetSymbol(a, semanticModel);
+        ISymbol? symbolB = GetSymbol(b, semanticModel);
 
         if (symbolA != null && symbolB != null)
+        {
             return SymbolEqualityComparer.Default.Equals(symbolA, symbolB);
+        }
 
         return false;
     }

@@ -11,10 +11,10 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Create_ValidPhoneNumber_ShouldCreateInstance(string phoneValue)
         {
             // Act
-            var phone = PhoneNumber.Create(phoneValue);
+            PhoneNumber phone = PhoneNumber.Create(phoneValue);
 
             // Assert
-            var expected = new string(phoneValue.Where(char.IsDigit).ToArray());
+            string expected = new([.. phoneValue.Where(char.IsDigit)]);
             await Assert.That(phone.Value).IsEqualTo(expected);
         }
 
@@ -37,7 +37,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             const string phoneValue = "11999999999";
 
             // Act
-            var success = PhoneNumber.TryCreate(phoneValue, out var result);
+            bool success = PhoneNumber.TryCreate(phoneValue, out PhoneNumber? result);
 
             // Assert
             await Assert.That(success).IsTrue();
@@ -52,7 +52,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             const string phoneValue = "123";
 
             // Act
-            var success = PhoneNumber.TryCreate(phoneValue, out var result);
+            bool success = PhoneNumber.TryCreate(phoneValue, out PhoneNumber? result);
 
             // Assert
             await Assert.That(success).IsFalse();
@@ -64,7 +64,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         {
             // Arrange
             const string phoneValue = "11999999999";
-            var phone = PhoneNumber.Create(phoneValue);
+            PhoneNumber phone = PhoneNumber.Create(phoneValue);
 
             // Act
             string result = phone;

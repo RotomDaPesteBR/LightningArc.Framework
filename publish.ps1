@@ -47,7 +47,7 @@ Write-Host "Output Directory: $output_dir" -ForegroundColor Green
     "src\Core\Primitives.Results\LightningArc.Primitives.Results.csproj",
     "src\Core\Results\LightningArc.Results.csproj",
     "src\Core\Json\LightningArc.Json.csproj",
-    "src\Core\Core\LightningArc.Core.csproj",
+    "src\Core\Framework\LightningArc.Framework.csproj",
 
     # Data
     "src\Data\Data.Abstractions\LightningArc.Data.Abstractions.csproj",

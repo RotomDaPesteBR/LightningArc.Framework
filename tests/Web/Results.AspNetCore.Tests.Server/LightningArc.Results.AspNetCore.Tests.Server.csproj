@@ -20,6 +20,6 @@
     <ProjectReference Include="..\..\..\src\Web\CORS.AspNetCore\LightningArc.CORS.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\src\Web\OpenAPI.AspNetCore\LightningArc.OpenAPI.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\src\Core\Json\LightningArc.Json.csproj" />
-    <ProjectReference Include="..\..\..\src\Core\Core\LightningArc.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\Core\Framework\LightningArc.Framework.csproj" />
   </ItemGroup>
 </Project>

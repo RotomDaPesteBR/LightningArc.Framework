@@ -8,7 +8,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Create_ValidRgFormatted_ShouldCreateInstance()
         {
             const string rgValue = "12.345.678-9";
-            var rg = Rg.Create(rgValue);
+            Rg rg = Rg.Create(rgValue);
 
             await Assert.That(rg.Value).IsNotEmpty();
         }
@@ -17,7 +17,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Create_ValidRgUnformatted_ShouldCreateInstance()
         {
             const string rgValue = "123456789";
-            var rg = Rg.Create(rgValue);
+            Rg rg = Rg.Create(rgValue);
 
             await Assert.That(rg.Value).IsNotEmpty();
         }
@@ -26,7 +26,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Create_ValidRgWithX_ShouldCreateInstance()
         {
             const string rgValue = "12.345.678-X";
-            var rg = Rg.Create(rgValue);
+            Rg rg = Rg.Create(rgValue);
 
             await Assert.That(rg.Value).Contains("X");
         }
@@ -44,7 +44,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task TryCreate_ValidRg_ShouldReturnTrue()
         {
-            var success = Rg.TryCreate("12.345.678-9", out var rg);
+            bool success = Rg.TryCreate("12.345.678-9", out Rg? rg);
 
             await Assert.That(success).IsTrue();
             await Assert.That(rg).IsNotNull();
@@ -54,7 +54,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task TryCreate_InvalidRg_ShouldReturnFalse()
         {
-            var success = Rg.TryCreate("invalid", out var rg);
+            bool success = Rg.TryCreate("invalid", out Rg? rg);
 
             await Assert.That(success).IsFalse();
             await Assert.That(rg is null).IsTrue();
@@ -63,7 +63,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task ImplicitConversion_ToString_ShouldReturnStringValue()
         {
-            var rg = Rg.Create("12.345.678-9");
+            Rg rg = Rg.Create("12.345.678-9");
             string result = rg;
 
             await Assert.That(result).IsEqualTo(rg.Value);
@@ -80,7 +80,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task ToString_ShouldReturnValue()
         {
-            var rg = Rg.Create("12.345.678-9");
+            Rg rg = Rg.Create("12.345.678-9");
 
             await Assert.That(rg.ToString()).IsEqualTo(rg.Value);
         }

@@ -61,8 +61,11 @@ if (Password.TryCreate("Secur3P@ss", out var validPassword))
     // validPassword is guaranteed strong enough
 }
 
-// ToResult for fluent handling
-Result<Password> result = "weak".CreatePasswordResult();
+// AsPassword for fluent handling
+Result<Password> result = "weak".AsPassword();
+
+// Implicit conversion to Result<Password>
+Result<Password> wrapped = password;
 ```
 
 ---

@@ -6,14 +6,13 @@
 	<RootNamespace>LightningArc.Metalama.Results</RootNamespace>
 	<NoWarn>IDE0130;NU5128;CA1865</NoWarn>
 
-	<!--<MetalamaEnabled>false</MetalamaEnabled>-->
-	<!--<MetalamaCompileTimeProject>true</MetalamaCompileTimeProject>-->
 	<MetalamaRemoveCompileTimeOnlyCode>false</MetalamaRemoveCompileTimeOnlyCode>
   </PropertyGroup>
 
   <PropertyGroup>
 	<AssemblyName>LightningArc.Metalama.Results</AssemblyName>
-	<PackageTags>Metalama, PostSharp, Aspect, Attribute, Results</PackageTags>
+	<PackageTags>lightningarc dotnet clean-code metalama aop aspects result-pattern</PackageTags>
+	<Description>Result-pattern specific aspects and utilities using Metalama.</Description>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -24,15 +23,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Metalama\LightningArc.Metalama.csproj" />
 		<ProjectReference Include="..\..\Core\Results\LightningArc.Results.csproj" />
-		<!--<MetalamaCompileTimeAssembly Include="..\Utils.Metalama\bin\$(Configuration)\netstandard2.0\LightningArc.Core.Metalama.dll" />-->
-	</ItemGroup>
-
-	<!--
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="PolySharp" PrivateAssets="All" />
-		<MetalamaCompileTimePackage Include="PolySharp" />
-	</ItemGroup>
-	-->
+   </ItemGroup>
 </Project>
 
 

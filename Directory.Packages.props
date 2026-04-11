@@ -102,7 +102,7 @@
   
   <!-- Self -->
   <ItemGroup> 
-    <PackageVersion Include="LightningArc.Utils" Version="$(PackageVersion)" />
-    <PackageVersion Include="LightningArc.Utils.Metalama" Version="$(PackageVersion)" />
+    <PackageVersion Include="LightningArc.Framework" Version="$(PackageVersion)" />
+    <PackageVersion Include="LightningArc.Metalama" Version="$(PackageVersion)" />
   </ItemGroup>
 </Project>

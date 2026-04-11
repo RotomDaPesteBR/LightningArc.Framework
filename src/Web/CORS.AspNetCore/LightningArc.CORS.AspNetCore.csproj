@@ -9,7 +9,8 @@
 
   <PropertyGroup>
 	<AssemblyName>LightningArc.CORS.AspNetCore</AssemblyName>
-	<PackageTags>Metalama, PostSharp, Aspect, Attribute</PackageTags>
+	<PackageTags>lightningarc dotnet clean-code aspnetcore api middleware problem-details cors</PackageTags>
+	<Description>Standardized CORS policy configurations for ASP.NET Core.</Description>
   </PropertyGroup>
 
   <ItemGroup>

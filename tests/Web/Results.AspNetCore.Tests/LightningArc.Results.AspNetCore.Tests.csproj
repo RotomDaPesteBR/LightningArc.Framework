@@ -13,7 +13,7 @@
 
     <ProjectReference Include="..\..\..\src\Web\Results.AspNetCore\LightningArc.Results.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\src\Core\Json\LightningArc.Json.csproj" />
-    <ProjectReference Include="..\..\..\src\Core\Core\LightningArc.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\Core\Framework\LightningArc.Framework.csproj" />
     <ProjectReference Include="..\Results.AspNetCore.Tests.Server\LightningArc.Results.AspNetCore.Tests.Server.csproj" />
   </ItemGroup>
 </Project>

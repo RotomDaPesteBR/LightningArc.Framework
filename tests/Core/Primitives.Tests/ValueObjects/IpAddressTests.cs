@@ -7,7 +7,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task Create_ValidIPv4_ShouldCreateInstance()
         {
-            var ip = IpAddress.Create("192.168.1.1");
+            IpAddress ip = IpAddress.Create("192.168.1.1");
 
             await Assert.That(ip.Value).IsEqualTo("192.168.1.1");
             await Assert.That(ip.Version).IsEqualTo(4);
@@ -16,7 +16,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task Create_ValidIPv6_ShouldCreateInstance()
         {
-            var ip = IpAddress.Create("::1");
+            IpAddress ip = IpAddress.Create("::1");
 
             await Assert.That(ip.Value).IsNotEmpty();
             await Assert.That(ip.Version).IsEqualTo(6);
@@ -41,7 +41,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task TryCreate_ValidIPv4_ShouldReturnTrue()
         {
-            var success = IpAddress.TryCreate("10.0.0.1", out var ip);
+            bool success = IpAddress.TryCreate("10.0.0.1", out IpAddress? ip);
 
             await Assert.That(success).IsTrue();
             await Assert.That(ip).IsNotNull();
@@ -51,7 +51,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task TryCreate_ValidIPv6_ShouldReturnTrue()
         {
-            var success = IpAddress.TryCreate("2001:db8::1", out var ip);
+            bool success = IpAddress.TryCreate("2001:db8::1", out IpAddress? ip);
 
             await Assert.That(success).IsTrue();
             await Assert.That(ip).IsNotNull();
@@ -61,7 +61,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task TryCreate_InvalidIp_ShouldReturnFalse()
         {
-            var success = IpAddress.TryCreate("invalid", out var ip);
+            bool success = IpAddress.TryCreate("invalid", out IpAddress? ip);
 
             await Assert.That(success).IsFalse();
             await Assert.That(ip is null).IsTrue();
@@ -70,7 +70,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task ImplicitConversion_ToString_ShouldReturnValue()
         {
-            var ip = IpAddress.Create("192.168.1.1");
+            IpAddress ip = IpAddress.Create("192.168.1.1");
             string result = ip;
 
             await Assert.That(result).IsEqualTo("192.168.1.1");
@@ -79,7 +79,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task Create_FromString_ShouldCreateIp()
         {
-            var ip = IpAddress.Create("192.168.1.1");
+            IpAddress ip = IpAddress.Create("192.168.1.1");
 
             await Assert.That(ip.Value).IsEqualTo("192.168.1.1");
             await Assert.That(ip.Version).IsEqualTo(4);
@@ -88,7 +88,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task ToString_ShouldReturnValue()
         {
-            var ip = IpAddress.Create("192.168.1.1");
+            IpAddress ip = IpAddress.Create("192.168.1.1");
 
             await Assert.That(ip.ToString()).IsEqualTo("192.168.1.1");
         }

@@ -8,7 +8,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Create_ValidPassword_ShouldCreateInstance()
         {
             // 12 chars (>=10), has $ (symbol) -> score=2 -> Moderate
-            var password = Password.Create("Test$123Pass");
+            Password password = Password.Create("Test$123Pass");
 
             await Assert.That(password.Value).IsEqualTo("Test$123Pass");
         }
@@ -17,7 +17,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Create_PasswordWithMinimumStrength_ShouldCreateInstance()
         {
             // 9 chars has upper,lower,digit but no symbol -> score=0 -> Weak, allowed when min=Weak
-            var password = Password.Create("Str0ngPass", minimumStrength: PasswordStrength.Weak);
+            Password password = Password.Create("Str0ngPass", minimumStrength: PasswordStrength.Weak);
 
             await Assert.That(password.Value).IsEqualTo("Str0ngPass");
         }
@@ -43,7 +43,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task TryCreate_ValidPassword_ShouldReturnTrue()
         {
-            var success = Password.TryCreate("Test$123Pass", out var password);
+            bool success = Password.TryCreate("Test$123Pass", out Password? password);
 
             await Assert.That(success).IsTrue();
             await Assert.That(password).IsNotNull();
@@ -53,7 +53,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task TryCreate_WeakPassword_ShouldReturnFalse()
         {
-            var success = Password.TryCreate("short", out var password);
+            bool success = Password.TryCreate("short", out Password? password);
 
             await Assert.That(success).IsFalse();
             await Assert.That(password is null).IsTrue();
@@ -62,7 +62,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task ToString_ShouldReturnMaskedPassword()
         {
-            var password = Password.Create("Test$123Pass");
+            Password password = Password.Create("Test$123Pass");
 
             await Assert.That(password.ToString()).IsEqualTo("************");
         }
@@ -71,7 +71,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Strength_WeakPassword_WhenAllowed_ShouldCreateInstance()
         {
             // 8 chars, has upper,lower,digit but no symbol -> score=0 -> Weak, allowed
-            var password = Password.Create("Pass1abc", minimumStrength: PasswordStrength.Weak);
+            Password password = Password.Create("Pass1abc", minimumStrength: PasswordStrength.Weak);
 
             await Assert.That(password.Value).IsEqualTo("Pass1abc");
         }
@@ -83,7 +83,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             // "Test$12Password!9a" - 18 chars (>=10, >=14, >=18), no actual symbol character
             // Let me use: "Pass$word12345678" - 17 chars, has $ -> score=3 -> not strong
             // Need 20 chars with $: "Test$12PassWordAb890"
-            var password = Password.Create("Test$12PassWordAb890");
+            Password password = Password.Create("Test$12PassWordAb890");
 
             await Assert.That(password.Strength).IsEqualTo(PasswordStrength.Strong);
         }

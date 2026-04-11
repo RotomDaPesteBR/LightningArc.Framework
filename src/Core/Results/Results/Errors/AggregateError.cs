@@ -1,5 +1,5 @@
-using LightningArc.Results.Messages;
 using System.Collections.ObjectModel;
+using LightningArc.Results.Messages;
 
 namespace LightningArc.Results
 {
@@ -17,16 +17,36 @@ namespace LightningArc.Results
         /// </summary>
         public ReadOnlyCollection<Error> Errors { get; }
 
-        internal AggregateError(int codePrefix, int codeSuffix, IMessageProvider messageProvider, IEnumerable<Error> errors)
-            : base(codePrefix, codeSuffix, messageProvider, FlattenErrors(errors).SelectMany(e => e.Details))
+        internal AggregateError(
+            int codePrefix,
+            int codeSuffix,
+            IMessageProvider messageProvider,
+            IEnumerable<Error> errors
+        )
+            : base(
+                codePrefix,
+                codeSuffix,
+                messageProvider,
+                FlattenErrors(errors).SelectMany(e => e.Details)
+            )
         {
-            Errors = new ReadOnlyCollection<Error>(errors.ToList());
+            Errors = new ReadOnlyCollection<Error>([.. errors]);
         }
 
-        internal AggregateError(int codePrefix, int codeSuffix, string message, IEnumerable<Error> errors)
-            : base(codePrefix, codeSuffix, message, FlattenErrors(errors).SelectMany(e => e.Details))
+        internal AggregateError(
+            int codePrefix,
+            int codeSuffix,
+            string message,
+            IEnumerable<Error> errors
+        )
+            : base(
+                codePrefix,
+                codeSuffix,
+                message,
+                FlattenErrors(errors).SelectMany(e => e.Details)
+            )
         {
-            Errors = new ReadOnlyCollection<Error>(errors.ToList());
+            Errors = new ReadOnlyCollection<Error>([.. errors]);
         }
 
         /// <summary>
@@ -41,11 +61,11 @@ namespace LightningArc.Results
 
         private static IEnumerable<Error> FlattenErrors(IEnumerable<Error> errors)
         {
-            foreach (var error in errors)
+            foreach (Error error in errors)
             {
                 if (error is AggregateError aggregate)
                 {
-                    foreach (var inner in FlattenErrors(aggregate.Errors))
+                    foreach (Error inner in FlattenErrors(aggregate.Errors))
                     {
                         yield return inner;
                     }

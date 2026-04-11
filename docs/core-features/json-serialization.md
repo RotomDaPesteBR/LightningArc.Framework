@@ -19,7 +19,7 @@ using LightningArc.Json.Converters;
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        // Extension method to add all Utils converters
+        // Extension method to add all Primitives converters
         options.JsonSerializerOptions.Converters.AddJsonConverters();
     });
 ```

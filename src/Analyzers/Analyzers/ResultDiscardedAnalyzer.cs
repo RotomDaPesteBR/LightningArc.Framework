@@ -14,7 +14,7 @@ namespace LightningArc.Analyzers;
 public class ResultDiscardedAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "LARC003";
-    private const string HelpLinkBase = "https://github.com/RotomDaPesteBR/Utils/blob/main/docs/analyzers/";
+    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -27,7 +27,7 @@ public class ResultDiscardedAnalyzer : DiagnosticAnalyzer
         helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+        [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -40,19 +40,27 @@ public class ResultDiscardedAnalyzer : DiagnosticAnalyzer
     private static void AnalyzeExpressionStatement(SyntaxNodeAnalysisContext context)
     {
         if (context.Node is not ExpressionStatementSyntax expressionStatement)
+        {
             return;
+        }
 
         if (expressionStatement.Expression is not InvocationExpressionSyntax invocation)
+        {
             return;
+        }
 
-        var typeInfo = context.SemanticModel.GetTypeInfo(invocation, context.CancellationToken);
+        TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(invocation, context.CancellationToken);
         if (typeInfo.Type is not INamedTypeSymbol returnType)
+        {
             return;
+        }
 
         if (!returnType.Name.Contains("Result", StringComparison.OrdinalIgnoreCase))
+        {
             return;
+        }
 
-        var diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
+        Diagnostic diagnostic = Diagnostic.Create(Rule, invocation.GetLocation());
         context.ReportDiagnostic(diagnostic);
     }
 }

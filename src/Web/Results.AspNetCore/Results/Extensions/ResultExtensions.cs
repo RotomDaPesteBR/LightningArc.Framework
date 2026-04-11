@@ -1,6 +1,6 @@
-
 using LightningArc.Results;
-namespace LightningArc.Results.AspNetCore.Extensions
+
+namespace LightningArc.Results.AspNetCore
 {
     /// <summary>
     /// Provides extension methods for the <see cref="Result{TValue}"/> class,
