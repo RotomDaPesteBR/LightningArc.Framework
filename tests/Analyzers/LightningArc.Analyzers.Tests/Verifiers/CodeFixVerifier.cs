@@ -2,6 +2,8 @@ using LightningArc.Data.Abstractions.Mappers;
 using LightningArc.Data.ADO.Repositories;
 using LightningArc.Primitives.ValueObjects;
 using LightningArc.Results;
+using LightningArc.Results.AspNetCore;
+using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
@@ -51,10 +53,24 @@ public static class CodeFixVerifier<TAnalyzer, TCodeFix>
             ReferenceAssemblies = ReferenceAssemblies.Net.Net100;
 
             // Add references to the actual project assemblies
-            TestState.AdditionalReferences.Add(typeof(Result).Assembly);
-            TestState.AdditionalReferences.Add(typeof(Email).Assembly);
-            TestState.AdditionalReferences.Add(typeof(RepositoryBase).Assembly);
-            TestState.AdditionalReferences.Add(typeof(IMapper).Assembly);
+            var assemblies = new HashSet<System.Reflection.Assembly>
+            {
+                typeof(Result).Assembly,
+                typeof(Email).Assembly,
+                typeof(RepositoryBase).Assembly,
+                typeof(IMapper).Assembly,
+                typeof(EndpointResult).Assembly,
+                typeof(HttpContext).Assembly,
+                typeof(Microsoft.AspNetCore.Builder.IApplicationBuilder).Assembly,
+                typeof(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder).Assembly,
+                typeof(Microsoft.AspNetCore.Routing.RouteData).Assembly,
+                typeof(Microsoft.AspNetCore.Mvc.ControllerBase).Assembly
+            };
+
+            foreach (var assembly in assemblies)
+            {
+                TestState.AdditionalReferences.Add(assembly);
+            }
 
             // Show compiler warnings/errors so we know if our stubs/test code is broken
             CompilerDiagnostics = CompilerDiagnostics.Warnings;

@@ -50,6 +50,7 @@
     <Project Path="src/Meta/Metalama.Results/LightningArc.Metalama.Results.csproj" />
     <Project Path="src/Meta/Metalama/LightningArc.Metalama.csproj" />
   </Folder>
+  <Folder Name="/src/Meta/Aspects/" />
   <Folder Name="/src/Web/">
     <Project Path="src/Web/CORS.AspNetCore/LightningArc.CORS.AspNetCore.csproj" />
     <Project Path="src/Web/OpenAPI.AspNetCore/LightningArc.OpenAPI.AspNetCore.csproj" />

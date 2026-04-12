@@ -1,8 +1,14 @@
 using System.Data.Common;
+using Dapper;
 using LightningArc.Data.Abstractions.Mappers;
 using LightningArc.Data.ADO.Repositories;
 using LightningArc.Primitives.ValueObjects;
 using LightningArc.Results;
+using LightningArc.Results.AspNetCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -37,10 +43,26 @@ public static class AnalyzerVerifier<TAnalyzer>
             ReferenceAssemblies = ReferenceAssemblies.Net.Net100;
 
             // Add references to the actual project assemblies
-            TestState.AdditionalReferences.Add(typeof(Result).Assembly);
-            TestState.AdditionalReferences.Add(typeof(Email).Assembly);
-            TestState.AdditionalReferences.Add(typeof(RepositoryBase).Assembly);
-            TestState.AdditionalReferences.Add(typeof(IMapper).Assembly);
+            var assemblies = new HashSet<System.Reflection.Assembly>
+            {
+                typeof(Result).Assembly,
+                typeof(Email).Assembly,
+                typeof(RepositoryBase).Assembly,
+                typeof(IMapper).Assembly,
+                typeof(EndpointResult).Assembly,
+                typeof(HttpContext).Assembly,
+                typeof(IApplicationBuilder).Assembly,
+                typeof(IEndpointRouteBuilder).Assembly,
+                typeof(EndpointRouteBuilderExtensions).Assembly,
+                typeof(RouteData).Assembly,
+                typeof(ControllerBase).Assembly,
+                typeof(SqlMapper).Assembly,
+            };
+
+            foreach (var assembly in assemblies)
+            {
+                TestState.AdditionalReferences.Add(assembly);
+            }
 
             // Ignore compiler errors to focus on analyzer results
             CompilerDiagnostics = CompilerDiagnostics.Warnings;
@@ -48,6 +70,8 @@ public static class AnalyzerVerifier<TAnalyzer>
             // Suppress XML documentation warnings which are irrelevant for tests
             DisabledDiagnostics.Add("CS1591");
             DisabledDiagnostics.Add("CS8604");
+            DisabledDiagnostics.Add("CS1701");
+            DisabledDiagnostics.Add("CS8019");
         }
 
         protected override IEnumerable<DiagnosticAnalyzer> GetDiagnosticAnalyzers()

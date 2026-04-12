@@ -7,19 +7,26 @@ using LightningArc.Results.AspNetCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-    options.JsonSerializerOptions.Converters.AddJsonConverters();
-});
+builder
+    .Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.Converters.AddJsonConverters();
+    });
 
 builder.Services.AddCorsPolicies();
 builder.Services.AddEndpointResults(
     wrapSuccessResponses: true,
     configureMappings: (successes, errors) =>
     {
-        errors.Map<Business.OrderRejectedError>(HttpStatusCode.UnprocessableEntity, "Pedido Rejeitado", "urn:api-errors:order-rejected");
-    });
+        errors.Map<Business.OrderRejectedError>(
+            HttpStatusCode.UnprocessableEntity,
+            "Pedido Rejeitado",
+            "urn:api-errors:order-rejected"
+        );
+    }
+);
 
 WebApplication app = builder.Build();
 

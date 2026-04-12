@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageVersion>1.5.0</PackageVersion> 
+    <PackageVersion>1.0.0</PackageVersion> 
   </PropertyGroup>
   
   <!-- Microsoft -->
@@ -90,8 +90,8 @@
   
   <!-- Tests -->
   <ItemGroup> 
-    <PackageVersion Include="TUnit" Version="1.30.0" />
-    <PackageVersion Include="TUnit.AspNetCore" Version="1.30.0" />
+    <PackageVersion Include="TUnit" Version="1.31.0" />
+    <PackageVersion Include="TUnit.AspNetCore" Version="1.31.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="coverlet.collector" Version="8.0.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />

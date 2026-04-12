@@ -1,4 +1,3 @@
-
 using LightningArc.Results;
 using System.Net;
 

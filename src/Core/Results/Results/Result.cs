@@ -18,10 +18,7 @@ public class Result : IEquatable<Result>
     /// <summary>
     /// Gets a value indicating whether the operation failed.
     /// </summary>
-    public bool IsFailure
-    {
-        get { return !IsSuccess; }
-    }
+    public bool IsFailure => !IsSuccess;
 
     /// <summary>
     /// Gets the generic status code associated with the result.

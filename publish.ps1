@@ -42,6 +42,7 @@ Write-Host "Package Version: $current_version" -ForegroundColor Green
 Write-Host "Output Directory: $output_dir" -ForegroundColor Green
 
 # List of projects you want to pack (adjust these paths according to your libraries)
+$projects_to_pack = @(
     # Core
     "src\Core\Primitives\LightningArc.Primitives.csproj",
     "src\Core\Primitives.Results\LightningArc.Primitives.Results.csproj",

@@ -9,6 +9,17 @@ namespace LightningArc.Results.AspNetCore
     public static class ResultExtensions
     {
         /// <summary>
+        /// Creates an <see cref="EndpointResult"/> from a <see cref="Result"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="Result"/> instance to be converted.</param>
+        /// <returns>
+        /// An <see cref="EndpointResult"/> that encapsulates the original result.
+        /// </returns>
+        public static EndpointResult ToEndpointResult(
+            this Result result
+        ) => result;
+
+        /// <summary>
         /// Creates an <see cref="EndpointResult{TValue}"/> from a <see cref="Result{TValue}"/>.
         /// </summary>
         /// <typeparam name="TValue">The type of the success value contained in the result.</typeparam>
