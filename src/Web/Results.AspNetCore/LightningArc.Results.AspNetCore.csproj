@@ -7,7 +7,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>LightningArc.Results.AspNetCore</AssemblyName>
-    <PackageTags>Utils</PackageTags>
+    <PackageTags>lightningarc dotnet clean-code aspnetcore api middleware problem-details result-pattern</PackageTags>
+    <Description>Bridges LightningArc.Results with ASP.NET Core, mapping functional results to standardized RFC 7807 Problem Details responses.</Description>
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />

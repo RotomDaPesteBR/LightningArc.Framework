@@ -10,10 +10,10 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Create_ValidCnpj_ShouldCreateInstance(string cnpjValue)
         {
             // Act
-            var cnpj = Cnpj.Create(cnpjValue);
+            Cnpj cnpj = Cnpj.Create(cnpjValue);
 
             // Assert
-            var expected = cnpjValue.Replace(".", "").Replace("-", "").Replace("/", "");
+            string expected = cnpjValue.Replace(".", "").Replace("-", "").Replace("/", "");
             await Assert.That(cnpj.Value).IsEqualTo(expected);
         }
 
@@ -36,7 +36,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             const string cnpjValue = "00000000000191";
 
             // Act
-            var success = Cnpj.TryCreate(cnpjValue, out var result);
+            bool success = Cnpj.TryCreate(cnpjValue, out Cnpj? result);
 
             // Assert
             await Assert.That(success).IsTrue();
@@ -51,7 +51,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             const string cnpjValue = "00000000000100";
 
             // Act
-            var success = Cnpj.TryCreate(cnpjValue, out var result);
+            bool success = Cnpj.TryCreate(cnpjValue, out Cnpj? result);
 
             // Assert
             await Assert.That(success).IsFalse();
@@ -63,7 +63,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         {
             // Arrange
             const string cnpjValue = "00000000000191";
-            var cnpj = Cnpj.Create(cnpjValue);
+            Cnpj cnpj = Cnpj.Create(cnpjValue);
 
             // Act
             string result = cnpj;

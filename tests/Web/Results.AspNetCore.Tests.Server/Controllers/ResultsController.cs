@@ -1,6 +1,5 @@
 using LightningArc.Results;
 using LightningArc.Results.AspNetCore;
-using LightningArc.Results.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
@@ -65,12 +64,12 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
             }
             else if (id >= 2)
             {
-                result = Error.Database.ConnectionFailed("Falha na conex�o do banco de dados");
+                result = Error.Database.ConnectionFailed("Falha na conexão do banco de dados");
             }
             else if (id == -1)
             {
                 result = Error.Application.InvalidParameter(
-                    "Id inv�lido",
+                    "Id inválido",
                     new ErrorDetail("Id", id.ToString()),
                     new ErrorDetail("Code", (id + 1).ToString())
                 );
@@ -88,6 +87,26 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
         public EndpointResult<string> Example() =>
             Result.Success("teste").WithContentType("text/plain");
         //Result.Success("{\"teste\": \"teste\"}").WithContentType("application/json"); //, "Exemplo bem sucedido"
+
+        public class Product {}
+
+        private Result<Product> GetProductById(int id)
+        {
+            return new Product();
+        }
+
+        [HttpGet("Products/{id:int}")]
+        public EndpointResult<Product> GetProduct([FromRoute] int id)
+        {
+            if (id <= 0)
+            {
+                return Error.Validation.InvalidParameter(details: [new(nameof(id),"Must be bigger than 0")]);
+            }
+
+            Result<Product> result = GetProductById(id);
+
+            return result;
+        }
     }
 }
 

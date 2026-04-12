@@ -68,9 +68,12 @@ if (Currency.TryCreate(50.00m, "EUR", out var validCurrency))
     // validCurrency is guaranteed valid
 }
 
-// ToResult for fluent handling
-Result<Currency> result = (100.00m, "BRL").CreateCurrencyResult();
+// AsCurrency for fluent handling
+Result<Currency> result = 100.00m.AsCurrency();
 
+// Implicit conversion to Result<Currency>
+Result<Currency> wrapped = currency;
+```
 // Implicit conversion to decimal
 decimal amount = price; // 99.90
 ```

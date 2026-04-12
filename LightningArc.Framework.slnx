@@ -28,7 +28,7 @@
     <Project Path="src/Core/Primitives.Results/LightningArc.Primitives.Results.csproj" />
     <Project Path="src/Core/Json/LightningArc.Json.csproj" />
     <Project Path="src/Core/Results/LightningArc.Results.csproj" />
-    <Project Path="src/Core/Core/LightningArc.Core.csproj" />
+    <Project Path="src/Core/Framework/LightningArc.Framework.csproj" />
   </Folder>
   <Folder Name="/src/Data/">
     <Project Path="src/Data/Data.Abstractions/LightningArc.Data.Abstractions.csproj" />
@@ -50,6 +50,7 @@
     <Project Path="src/Meta/Metalama.Results/LightningArc.Metalama.Results.csproj" />
     <Project Path="src/Meta/Metalama/LightningArc.Metalama.csproj" />
   </Folder>
+  <Folder Name="/src/Meta/Aspects/" />
   <Folder Name="/src/Web/">
     <Project Path="src/Web/CORS.AspNetCore/LightningArc.CORS.AspNetCore.csproj" />
     <Project Path="src/Web/OpenAPI.AspNetCore/LightningArc.OpenAPI.AspNetCore.csproj" />
@@ -58,6 +59,9 @@
   </Folder>
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />
+  </Folder>
+  <Folder Name="/tests/Analyzers/">
+    <Project Path="tests/Analyzers/LightningArc.Analyzers.Tests/LightningArc.Analyzers.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/Core/">
     <Project Path="tests/Core/Primitives.Tests/LightningArc.Primitives.Tests.csproj">

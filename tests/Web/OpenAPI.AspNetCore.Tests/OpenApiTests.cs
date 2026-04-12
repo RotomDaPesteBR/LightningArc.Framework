@@ -14,18 +14,18 @@ public class OpenApiTests
     public async Task EmailSchemaTransformer_ShouldTransformEmailType()
     {
         // Arrange
-        var transformer = new EmailSchemaTransformer();
-        var schema = new OpenApiSchema();
+        EmailSchemaTransformer transformer = new();
+        OpenApiSchema schema = new();
         
-        var options = new JsonSerializerOptions
+        JsonSerializerOptions options = new()
         {
             TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         };
-        var typeInfo = options.GetTypeInfo(typeof(Email));
+        JsonTypeInfo typeInfo = options.GetTypeInfo(typeof(Email));
         
-        var services = new ServiceCollection().BuildServiceProvider();
+        ServiceProvider services = new ServiceCollection().BuildServiceProvider();
 
-        var context = new OpenApiSchemaTransformerContext
+        OpenApiSchemaTransformerContext context = new()
         {
             JsonTypeInfo = typeInfo,
             DocumentName = "v1",

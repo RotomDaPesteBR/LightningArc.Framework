@@ -10,11 +10,11 @@ public class CorsTests
     public async Task AddCorsPolicies_ShouldRegisterCorsOptions()
     {
         // Arrange
-        var services = new ServiceCollection();
+        ServiceCollection services = [];
 
         // Act
         services.AddCorsPolicies();
-        var serviceProvider = services.BuildServiceProvider();
+        ServiceProvider serviceProvider = services.BuildServiceProvider();
         var options = serviceProvider.GetService<IOptions<CorsOptions>>();
 
         // Assert

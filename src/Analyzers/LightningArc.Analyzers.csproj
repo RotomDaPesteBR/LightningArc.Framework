@@ -11,6 +11,8 @@
 
   <PropertyGroup>
     <NoWarn>$(NoWarn);RS1038;CS1591</NoWarn>
+    <PackageTags>lightningarc dotnet clean-code roslyn-analyzers static-analysis code-quality</PackageTags>
+    <Description>Roslyn static analyzers and code fixes to enforce LightningArc best practices and prevent common errors.</Description>
   </PropertyGroup>
 
   <ItemGroup>

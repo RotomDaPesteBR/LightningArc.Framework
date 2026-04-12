@@ -8,8 +8,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-	<AssemblyName>LightningArc.Data.ADO.SqlBuilder</AssemblyName>
-	<PackageTags>Utils, Data, ADO</PackageTags>
+    <AssemblyName>LightningArc.Data.ADO.SqlBuilder</AssemblyName>
+    <PackageTags>lightningarc dotnet clean-code repository-pattern dapper ado-net sql-builder</PackageTags>
+    <Description>Metadata-driven SQL statement builder for dynamic and clean query generation.</Description>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

@@ -1,4 +1,5 @@
 using LightningArc.Primitives;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LightningArc.Primitives.ValueObjects
 {
@@ -12,22 +13,14 @@ namespace LightningArc.Primitives.ValueObjects
         /// </summary>
         public string Value { get; }
 
-        private PhoneNumber(string value)
+        internal PhoneNumber(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (!IsValid(value, out string? errorMessage))
             {
-                throw new ArgumentException("The phone number cannot be null or empty.", nameof(value));
+                throw new ArgumentException(errorMessage, nameof(value));
             }
 
-            var numericPhone = new string(value.Where(char.IsDigit).ToArray());
-
-            // Basic validation: length between 7 and 15 digits (E.164 standard)
-            if (numericPhone.Length < 7 || numericPhone.Length > 15)
-            {
-                throw new ArgumentException($"The phone number '{value}' is invalid.", nameof(value));
-            }
-
-            Value = numericPhone;
+            Value = new string([.. value.Where(char.IsDigit)]);
         }
 
         /// <summary>
@@ -43,18 +36,37 @@ namespace LightningArc.Primitives.ValueObjects
         /// <param name="value">The phone number string.</param>
         /// <param name="result">The resulting <see cref="PhoneNumber"/> object, or null.</param>
         /// <returns>True if created successfully; otherwise, false.</returns>
-        public static bool TryCreate(string value, out PhoneNumber? result)
+        public static bool TryCreate(string value, [NotNullWhen(true)] out PhoneNumber? result)
         {
-            try
+            if (IsValid(value, out _))
             {
                 result = new PhoneNumber(value);
                 return true;
             }
-            catch (ArgumentException)
+
+            result = null;
+            return false;
+        }
+
+        internal static bool IsValid(string value, [NotNullWhen(false)] out string? errorMessage)
+        {
+            if (string.IsNullOrWhiteSpace(value))
             {
-                result = null;
+                errorMessage = "The phone number cannot be null or empty.";
                 return false;
             }
+
+            string numericPhone = new([.. value.Where(char.IsDigit)]);
+
+            // Basic validation: length between 7 and 15 digits (E.164 standard)
+            if (numericPhone.Length is < 7 or > 15)
+            {
+                errorMessage = $"The phone number '{value}' is invalid.";
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
-using System.Text.RegularExpressions;
 using LightningArc.Primitives;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace LightningArc.Primitives.ValueObjects
 {
@@ -25,21 +26,16 @@ namespace LightningArc.Primitives.ValueObjects
         public string Value { get; }
 
         /// <summary>
-        /// Private constructor for the Email class.
+        /// Internal constructor for the Email class.
         /// This constructor performs the format validation of the email string.
         /// </summary>
         /// <param name="value">The string representing the email address.</param>
         /// <exception cref="ArgumentException">Thrown if 'value' is null, empty, or not a valid email format.</exception>
-        private Email(string value)
+        internal Email(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (!IsValid(value, out string? errorMessage))
             {
-                throw new ArgumentException("The email address cannot be null or empty.", nameof(value));
-            }
-
-            if (!Regex.IsMatch(value, EmailRegexPattern, RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250)))
-            {
-                throw new ArgumentException($"The value '{value}' is not a valid email address.", nameof(value));
+                throw new ArgumentException(errorMessage, nameof(value));
             }
 
             Value = value;
@@ -60,18 +56,34 @@ namespace LightningArc.Primitives.ValueObjects
         /// <param name="value">The string representing the email address.</param>
         /// <param name="result">The resulting <see cref="Email"/> object, or null if validation fails.</param>
         /// <returns>True if the email was successfully created; otherwise, false.</returns>
-        public static bool TryCreate(string value, out Email? result)
+        public static bool TryCreate(string value, [NotNullWhen(true)] out Email? result)
         {
-            try
+            if (IsValid(value, out _))
             {
                 result = new Email(value);
                 return true;
             }
-            catch (ArgumentException)
+
+            result = null;
+            return false;
+        }
+
+        internal static bool IsValid(string value, [NotNullWhen(false)] out string? errorMessage)
+        {
+            if (string.IsNullOrWhiteSpace(value))
             {
-                result = null;
+                errorMessage = "The email address cannot be null or empty.";
                 return false;
             }
+
+            if (!Regex.IsMatch(value, EmailRegexPattern, RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250)))
+            {
+                errorMessage = $"The value '{value}' is not a valid email address.";
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
         }
 
         /// <summary>

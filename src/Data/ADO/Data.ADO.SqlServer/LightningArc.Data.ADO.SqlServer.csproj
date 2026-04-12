@@ -9,10 +9,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-	<AssemblyName>LightningArc.Data.ADO.SqlServer</AssemblyName>
-	<PackageTags>Utils, Data, ADO, SqlServer</PackageTags>
+    <AssemblyName>LightningArc.Data.ADO.SqlServer</AssemblyName>
+    <PackageTags>lightningarc dotnet clean-code repository-pattern dapper ado-net sqlserver</PackageTags>
+    <Description>SQL Server implementation of the LightningArc ADO.NET connection factory.</Description>
   </PropertyGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
 	<PackageReference Include="PolySharp" PrivateAssets="All" />
   </ItemGroup>

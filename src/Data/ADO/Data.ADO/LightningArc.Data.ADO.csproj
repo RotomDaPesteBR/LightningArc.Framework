@@ -9,10 +9,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-	<AssemblyName>LightningArc.Data.ADO</AssemblyName>
-	<PackageTags>Utils, Data, ADO</PackageTags>
+    <AssemblyName>LightningArc.Data.ADO</AssemblyName>
+    <PackageTags>lightningarc dotnet clean-code repository-pattern dapper ado-net</PackageTags>
+    <Description>Base repository implementation and helpers for ADO.NET and Dapper integration.</Description>
   </PropertyGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
 	<PackageReference Include="PolySharp" PrivateAssets="All" />
   </ItemGroup>

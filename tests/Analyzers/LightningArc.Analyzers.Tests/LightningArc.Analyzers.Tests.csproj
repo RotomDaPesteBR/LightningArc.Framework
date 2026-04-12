@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <NoWarn>$(NoWarn);TUnitAssertions0002</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Analyzers\LightningArc.Analyzers.csproj" />
+    <ProjectReference Include="..\..\..\src\Core\Results\LightningArc.Results.csproj" />
+    <ProjectReference Include="..\..\..\src\Core\Primitives\LightningArc.Primitives.csproj" />
+    <ProjectReference Include="..\..\..\src\Web\Results.AspNetCore\LightningArc.Results.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\ADO\Data.ADO\LightningArc.Data.ADO.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\Data.Abstractions\LightningArc.Data.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" />
+  </ItemGroup>
+</Project>

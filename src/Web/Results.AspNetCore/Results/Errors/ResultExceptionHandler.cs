@@ -31,7 +31,7 @@ public sealed class ResultExceptionHandler(
         
         // We use the internal ErrorResult which handles status code, problem details and logging
         // according to the configuration in ErrorMappingService.
-        var result = new ErrorResult(error);
+        ErrorResult result = new(error);
         
         await result.ExecuteAsync(httpContext);
 

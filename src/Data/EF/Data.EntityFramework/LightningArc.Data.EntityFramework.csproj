@@ -9,8 +9,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-	<AssemblyName>LightningArc.Data.EntityFramework</AssemblyName>
-	<PackageTags>Utils, Data, EntityFramework</PackageTags>
+    <AssemblyName>LightningArc.Data.EntityFramework</AssemblyName>
+    <PackageTags>lightningarc dotnet clean-code repository-pattern entity-framework efcore</PackageTags>
+    <Description>Entity Framework Core implementation of LightningArc repository abstractions.</Description>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

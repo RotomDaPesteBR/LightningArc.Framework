@@ -65,6 +65,9 @@ if (Rg.TryCreate("12.345.678-0", out var validRg))
     // validRg is guaranteed valid
 }
 
-// ToResult for fluent handling
-Result<Rg> result = "invalid".CreateRgResult();
+// AsRg for fluent handling
+Result<Rg> result = "invalid".AsRg();
+
+// Implicit conversion to Result<Rg>
+Result<Rg> wrapped = rg;
 ```

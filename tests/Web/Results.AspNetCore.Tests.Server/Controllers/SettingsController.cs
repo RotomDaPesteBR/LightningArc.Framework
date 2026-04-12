@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
-using LightningArc.Results.AspNetCore.Extensions;
 using LightningArc.Results;
 using LightningArc.Results.AspNetCore;
 
@@ -22,7 +21,7 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
             {
                 await _cache.EvictByTagAsync("All", CancellationToken.None);
 
-                return Result.Success("Cache de toda aplicação limpo com sucesso.");
+                return Result.Success("Cache de toda aplicaÃ§Ã£o limpo com sucesso.");
             }
             catch (Exception exception)
             {
@@ -40,7 +39,7 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
             {
                 await _cache.EvictByTagAsync("All", CancellationToken.None);
 
-                return Result.Created("Cache de toda aplicação limpo com sucesso.").WithContentType("text/plain");
+                return Result.Created("Cache de toda aplicaÃ§Ã£o limpo com sucesso.").WithContentType("text/plain");
             }
             catch (Exception exception)
             {

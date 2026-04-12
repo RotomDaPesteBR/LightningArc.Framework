@@ -1,5 +1,6 @@
-using System.Net;
 using LightningArc.Primitives;
+using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 namespace LightningArc.Primitives.ValueObjects;
 
@@ -20,14 +21,14 @@ public record IpAddress : IValueObject<string>
 
     private IPAddress? Address { get; }
 
-    private IpAddress(string value)
+    internal IpAddress(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (!IsValid(value, out string? errorMessage))
         {
-            throw new ArgumentException("The IP address cannot be null or empty.", nameof(value));
+            throw new ArgumentException(errorMessage, nameof(value));
         }
 
-        if (!IPAddress.TryParse(value, out var address))
+        if (!IPAddress.TryParse(value, out IPAddress? address))
         {
             throw new ArgumentException($"The value '{value}' is not a valid IP address.", nameof(value));
         }
@@ -50,18 +51,34 @@ public record IpAddress : IValueObject<string>
     /// <summary>
     /// Tries to create a new <see cref="IpAddress"/> from the specified string value.
     /// </summary>
-    public static bool TryCreate(string value, out IpAddress? result)
+    public static bool TryCreate(string value, [NotNullWhen(true)] out IpAddress? result)
     {
-        try
+        if (IsValid(value, out _))
         {
             result = new IpAddress(value);
             return true;
         }
-        catch (ArgumentException)
+
+        result = null;
+        return false;
+    }
+
+    internal static bool IsValid(string value, [NotNullWhen(false)] out string? errorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(value))
         {
-            result = null;
+            errorMessage = "The IP address cannot be null or empty.";
             return false;
         }
+
+        if (!IPAddress.TryParse(value, out _))
+        {
+            errorMessage = $"The value '{value}' is not a valid IP address.";
+            return false;
+        }
+
+        errorMessage = null;
+        return true;
     }
 
     /// <summary>

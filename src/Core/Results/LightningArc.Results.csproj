@@ -10,7 +10,8 @@
 
   <PropertyGroup>
 	<AssemblyName>LightningArc.Results</AssemblyName>
-	<PackageTags>Utils</PackageTags>
+	<PackageTags>lightningarc dotnet clean-code result-pattern error-handling functional-programming</PackageTags>
+	<Description>Complete Result pattern implementation for functional error handling and clean code in .NET.</Description>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

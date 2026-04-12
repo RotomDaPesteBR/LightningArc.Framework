@@ -9,10 +9,10 @@ public class ExceptionMapperTests
     public async Task Map_ArgumentNullException_WithParam_ShouldMapToSpecificMessage()
     {
         // Arrange
-        var ex = new ArgumentNullException("testParam");
+        ArgumentNullException ex = new("testParam");
 
         // Act
-        var error = ExceptionMapper.Map(ex);
+        Error error = ExceptionMapper.Map(ex);
 
         // Assert
         await Assert.That(error.Code).IsEqualTo(Error.Validation.CodePrefix * 1000 + (int)Error.Validation.Codes.MissingField);
@@ -23,17 +23,17 @@ public class ExceptionMapperTests
     public async Task Map_AggregateException_ShouldReturnAggregateError()
     {
         // Arrange
-        var ex = new AggregateException(
+        AggregateException ex = new(
             new ArgumentNullException("param1"),
             new UnauthorizedAccessException()
         );
 
         // Act
-        var error = ExceptionMapper.Map(ex);
+        Error error = ExceptionMapper.Map(ex);
 
         // Assert
         await Assert.That(error is AggregateError).IsTrue();
-        var aggregate = (AggregateError)error;
+        AggregateError aggregate = (AggregateError)error;
         await Assert.That(aggregate.Errors).Count().IsEqualTo(2);
     }
 
@@ -41,10 +41,10 @@ public class ExceptionMapperTests
     public async Task Map_FormatException_ShouldMapToValidationInvalidFormat()
     {
         // Arrange
-        var ex = new FormatException();
+        FormatException ex = new();
 
         // Act
-        var error = ExceptionMapper.Map(ex);
+        Error error = ExceptionMapper.Map(ex);
 
         // Assert
         await Assert.That(error.Code).IsEqualTo(Error.Validation.CodePrefix * 1000 + (int)Error.Validation.Codes.InvalidFormat);
@@ -54,10 +54,10 @@ public class ExceptionMapperTests
     public async Task Map_DivideByZeroException_ShouldMapToApplicationInvalidOperation()
     {
         // Arrange
-        var ex = new DivideByZeroException();
+        DivideByZeroException ex = new();
 
         // Act
-        var error = ExceptionMapper.Map(ex);
+        Error error = ExceptionMapper.Map(ex);
 
         // Assert
         await Assert.That(error.Code).IsEqualTo(Error.Application.CodePrefix * 1000 + (int)Error.Application.Codes.InvalidOperation);
@@ -67,10 +67,10 @@ public class ExceptionMapperTests
     public async Task Map_KeyNotFoundException_ShouldMapToResourceNotFound()
     {
         // Arrange
-        var ex = new KeyNotFoundException();
+        KeyNotFoundException ex = new();
 
         // Act
-        var error = ExceptionMapper.Map(ex);
+        Error error = ExceptionMapper.Map(ex);
 
         // Assert
         await Assert.That(error.Code).IsEqualTo(Error.Resource.CodePrefix * 1000 + (int)Error.Resource.Codes.NotFound);
@@ -80,11 +80,11 @@ public class ExceptionMapperTests
     public async Task Register_CustomMapper_ShouldOverrideDefault()
     {
         // Arrange
-        var ex = new InvalidOperationException("Custom message");
+        InvalidOperationException ex = new("Custom message");
         ExceptionMapper.Register<InvalidOperationException>(_ => Error.Application.Internal("Custom Error"));
 
         // Act
-        var error = ExceptionMapper.Map(ex);
+        Error error = ExceptionMapper.Map(ex);
 
         // Assert
         await Assert.That(error.Message).IsEqualTo("Custom Error");

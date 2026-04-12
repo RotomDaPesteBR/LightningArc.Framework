@@ -18,16 +18,24 @@ namespace LightningArc.Json.Converters
         }
 
         /// <inheritdoc />
-        public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+        public override JsonConverter CreateConverter(
+            Type typeToConvert,
+            JsonSerializerOptions options
+        )
         {
-            var interfaceType = GetValueObjectInterface(typeToConvert);
+            Type? interfaceType = GetValueObjectInterface(typeToConvert);
             if (interfaceType == null)
             {
-                throw new InvalidOperationException($"The type {typeToConvert.Name} does not implement IValueObject<T>.");
+                throw new InvalidOperationException(
+                    $"The type {typeToConvert.Name} does not implement IValueObject<T>."
+                );
             }
 
-            var valueType = interfaceType.GetGenericArguments()[0];
-            var converterType = typeof(ValueObjectJsonConverter<,>).MakeGenericType(typeToConvert, valueType);
+            Type valueType = interfaceType.GetGenericArguments()[0];
+            Type converterType = typeof(ValueObjectJsonConverter<,>).MakeGenericType(
+                typeToConvert,
+                valueType
+            );
 
             return (JsonConverter)Activator.CreateInstance(converterType)!;
         }
@@ -39,8 +47,10 @@ namespace LightningArc.Json.Converters
                 return type;
             }
 
-            return type.GetInterfaces().FirstOrDefault(i =>
-                i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValueObject<>));
+            return type.GetInterfaces()
+                .FirstOrDefault(i =>
+                    i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValueObject<>)
+                );
         }
 
         private class ValueObjectJsonConverter<TValueObject, TValue> : JsonConverter<TValueObject>
@@ -51,11 +61,24 @@ namespace LightningArc.Json.Converters
             public ValueObjectJsonConverter()
             {
                 // Looking for the static 'Create' method that takes the underlying value type as parameter.
-                _createMethod = typeof(TValueObject).GetMethod("Create", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(TValue) }, null)
-                                ?? throw new InvalidOperationException($"Type {typeof(TValueObject).Name} must have a static method 'Create({typeof(TValue).Name})'.");
+                _createMethod =
+                    typeof(TValueObject).GetMethod(
+                        "Create",
+                        BindingFlags.Public | BindingFlags.Static,
+                        null,
+                        [typeof(TValue)],
+                        null
+                    )
+                    ?? throw new InvalidOperationException(
+                        $"Type {typeof(TValueObject).Name} must have a static method 'Create({typeof(TValue).Name})'."
+                    );
             }
 
-            public override TValueObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            public override TValueObject? Read(
+                ref Utf8JsonReader reader,
+                Type typeToConvert,
+                JsonSerializerOptions options
+            )
             {
                 if (reader.TokenType == JsonTokenType.Null)
                 {
@@ -64,7 +87,7 @@ namespace LightningArc.Json.Converters
 
                 // Deserialize the underlying value.
                 TValue? value = JsonSerializer.Deserialize<TValue>(ref reader, options);
-                
+
                 if (value == null)
                 {
                     return default;
@@ -73,20 +96,28 @@ namespace LightningArc.Json.Converters
                 try
                 {
                     // Invoke the static Create method to build the Value Object.
-                    return (TValueObject)_createMethod.Invoke(null, new object[] { value })!;
+                    return (TValueObject)_createMethod.Invoke(null, [value])!;
                 }
-                catch (TargetInvocationException ex) when (ex.InnerException is ArgumentException argEx)
+                catch (TargetInvocationException ex)
+                    when (ex.InnerException is ArgumentException argEx)
                 {
                     // Propagate validation exceptions from the Value Object as JsonException.
                     throw new JsonException(argEx.Message, argEx);
                 }
                 catch (Exception ex)
                 {
-                    throw new JsonException($"Error creating Value Object {typeof(TValueObject).Name}: {ex.Message}", ex);
+                    throw new JsonException(
+                        $"Error creating Value Object {typeof(TValueObject).Name}: {ex.Message}",
+                        ex
+                    );
                 }
             }
 
-            public override void Write(Utf8JsonWriter writer, TValueObject value, JsonSerializerOptions options)
+            public override void Write(
+                Utf8JsonWriter writer,
+                TValueObject value,
+                JsonSerializerOptions options
+            )
             {
                 if (value == null)
                 {

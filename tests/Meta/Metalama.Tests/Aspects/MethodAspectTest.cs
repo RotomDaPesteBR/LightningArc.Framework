@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using LightningArc.Metalama.Tests.Aspects;
 
-namespace Utils.Metalama.Tests.Aspects;
+namespace LightningArc.Metalama.Tests.Aspects;
 
 public partial class MethodAspectTest
 {

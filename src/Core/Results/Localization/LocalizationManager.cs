@@ -10,7 +10,6 @@ namespace LightningArc.Results.Localization;
 /// </summary>
 public static class LocalizationManager
 {
-    private static CultureInfo _currentCulture = CultureInfo.InvariantCulture;
     private static ResourceManager _errorResourceManager = new(
         "LightningArc.Results.Resources.ErrorMessages",
         typeof(LocalizationManager).Assembly
@@ -24,7 +23,7 @@ public static class LocalizationManager
     /// Gets the currently configured culture for messages.
     /// Defaults to <see cref="CultureInfo.InvariantCulture"/> if not explicitly configured.
     /// </summary>
-    public static CultureInfo CurrentCulture => _currentCulture;
+    public static CultureInfo CurrentCulture { get; private set; } = CultureInfo.InvariantCulture;
 
     /// <summary>
     /// Configures the localization settings for messages.
@@ -41,7 +40,7 @@ public static class LocalizationManager
         ResourceManager? successResourceManager = null
     )
     {
-        _currentCulture = new CultureInfo(cultureName);
+        CurrentCulture = new CultureInfo(cultureName);
         if (errorResourceManager != null)
         {
             _errorResourceManager = errorResourceManager;
@@ -59,7 +58,7 @@ public static class LocalizationManager
     /// <returns>The localized string, or the key itself if the resource is not found.</returns>
     internal static string GetErrorString(string key)
     {
-        return _errorResourceManager.GetString(key, _currentCulture) ?? key;
+        return _errorResourceManager.GetString(key, CurrentCulture) ?? key;
     }
 
     /// <summary>
@@ -69,7 +68,6 @@ public static class LocalizationManager
     /// <returns>The localized string, or the key itself if the resource is not found.</returns>
     internal static string GetSuccessString(string key)
     {
-        return _successResourceManager.GetString(key, _currentCulture) ?? key;
+        return _successResourceManager.GetString(key, CurrentCulture) ?? key;
     }
 }
-

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
+
+    <RootNamespace>LightningArc.Framework</RootNamespace>
+
+    <NoWarn>$(NoWarn);IDE0130</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>LightningArc.Framework</AssemblyName>
+    <PackageTags>lightningarc dotnet clean-code metapackage bundle</PackageTags>
+    <Description>Metapackage bundle containing the core LightningArc library ecosystem.</Description>
+
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Primitives\LightningArc.Primitives.csproj" />
+    <ProjectReference Include="..\..\Core\Primitives.Results\LightningArc.Primitives.Results.csproj" />
+    <ProjectReference Include="..\..\Core\Results\LightningArc.Results.csproj" />
+    <ProjectReference Include="..\..\Core\Json\LightningArc.Json.csproj" />
+  </ItemGroup>
+</Project>

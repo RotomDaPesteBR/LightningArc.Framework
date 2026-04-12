@@ -59,6 +59,9 @@ if (Cnpj.TryCreate("00.000.000/0001-91", out var validCnpj))
     // validCnpj is guaranteed valid
 }
 
-// ToResult for fluent handling
-Result<Cnpj> result = "invalid".CreateCnpjResult();
+// AsCnpj for fluent handling
+Result<Cnpj> result = "invalid".AsCnpj();
+
+// Implicit conversion to Result<Cnpj>
+Result<Cnpj> wrapped = cnpj;
 ```

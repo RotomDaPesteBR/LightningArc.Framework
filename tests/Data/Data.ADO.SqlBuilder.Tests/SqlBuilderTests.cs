@@ -16,10 +16,10 @@ public class SqlBuilderTests
     public async Task Select_All_ShouldGenerateCorrectSql()
     {
         // Arrange
-        var builder = new SqlBuilder("Users", DefaultColumns, SqlDialect.SqlServer);
+        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer);
 
         // Act
-        var sql = builder.Select.Build();
+        string sql = builder.Select.Build();
 
         // Assert
         await Assert.That(sql).IsEqualTo("SELECT Id, Name, Age FROM Users");
@@ -29,10 +29,10 @@ public class SqlBuilderTests
     public async Task Insert_All_ShouldGenerateCorrectSql()
     {
         // Arrange
-        var builder = new SqlBuilder("Users", DefaultColumns, SqlDialect.SqlServer);
+        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer);
 
         // Act
-        var sql = builder.Insert.Build();
+        string sql = builder.Insert.Build();
 
         // Assert
         await Assert.That(sql).IsEqualTo("INSERT INTO Users (Id, Name, Age) VALUES (@Id, @Name, @Age)");
@@ -42,10 +42,10 @@ public class SqlBuilderTests
     public async Task Update_ById_ShouldGenerateCorrectSql()
     {
         // Arrange
-        var builder = new SqlBuilder("Users", DefaultColumns, SqlDialect.SqlServer);
+        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer);
 
         // Act
-        var sql = builder.Update.Build();
+        string sql = builder.Update.Build();
 
         // Assert
         await Assert.That(sql).IsEqualTo("UPDATE Users SET Name = @Name, Age = @Age WHERE Id = @Id");
@@ -55,10 +55,10 @@ public class SqlBuilderTests
     public async Task Delete_ById_ShouldGenerateCorrectSql()
     {
         // Arrange
-        var builder = new SqlBuilder("Users", DefaultColumns, SqlDialect.SqlServer);
+        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer);
 
         // Act
-        var sql = builder.Delete.Build();
+        string sql = builder.Delete.Build();
 
         // Assert
         await Assert.That(sql).IsEqualTo("DELETE FROM Users WHERE Id = @Id");
@@ -68,10 +68,10 @@ public class SqlBuilderTests
     public async Task Select_PostgreSql_ShouldUseCorrectQuotes()
     {
         // Arrange
-        var builder = new SqlBuilder("Users", DefaultColumns, SqlDialect.PostgreSQL);
+        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.PostgreSQL);
 
         // Act
-        var sql = builder.Select.Build();
+        string sql = builder.Select.Build();
 
         // Assert
         // Current implementation seems to NOT be adding quotes by default for PostgreSQL either 

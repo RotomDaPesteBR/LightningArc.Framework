@@ -8,7 +8,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Create_ValidCepWithHyphen_ShouldCreateInstance()
         {
             const string cepValue = "01001-000";
-            var cep = Cep.Create(cepValue);
+            Cep cep = Cep.Create(cepValue);
 
             await Assert.That(cep.Value).IsEqualTo("01001-000");
         }
@@ -17,7 +17,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Create_ValidCepWithoutHyphen_ShouldNormalizeAndCreate()
         {
             const string cepValue = "01001000";
-            var cep = Cep.Create(cepValue);
+            Cep cep = Cep.Create(cepValue);
 
             await Assert.That(cep.Value).IsEqualTo("01001-000");
         }
@@ -38,7 +38,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         {
             const string cepValue = "01001-000";
 
-            var success = Cep.TryCreate(cepValue, out var cep);
+            bool success = Cep.TryCreate(cepValue, out Cep? cep);
 
             await Assert.That(success).IsTrue();
             await Assert.That(cep).IsNotNull();
@@ -48,7 +48,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task TryCreate_InvalidCep_ShouldReturnFalse()
         {
-            var success = Cep.TryCreate("invalid", out var cep);
+            bool success = Cep.TryCreate("invalid", out Cep? cep);
 
             await Assert.That(success).IsFalse();
             await Assert.That(cep is null).IsTrue();
@@ -57,7 +57,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task ImplicitConversion_ToString_ShouldReturnStringValue()
         {
-            var cep = Cep.Create("01001-000");
+            Cep cep = Cep.Create("01001-000");
             string result = cep;
 
             await Assert.That(result).IsEqualTo("01001-000");
@@ -74,7 +74,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         [Test]
         public async Task ToString_ShouldReturnFormattedCep()
         {
-            var cep = Cep.Create("01001000");
+            Cep cep = Cep.Create("01001000");
 
             await Assert.That(cep.ToString()).IsEqualTo("01001-000");
         }

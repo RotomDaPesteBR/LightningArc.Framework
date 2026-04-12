@@ -11,7 +11,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             const string emailValue = "test@example.com";
 
             // Act
-            var email = Email.Create(emailValue);
+            Email email = Email.Create(emailValue);
 
             // Assert
             await Assert.That(email.Value).IsEqualTo(emailValue);
@@ -33,7 +33,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         {
             // Arrange
             const string emailValue = "test@example.com";
-            var email = Email.Create(emailValue);
+            Email email = Email.Create(emailValue);
 
             // Act
             string result = email;
@@ -59,8 +59,8 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Equality_SameValue_ShouldBeEqual()
         {
             // Arrange
-            var email1 = Email.Create("test@example.com");
-            var email2 = Email.Create("test@example.com");
+            Email email1 = Email.Create("test@example.com");
+            Email email2 = Email.Create("test@example.com");
 
             // Assert
             await Assert.That(email1).IsEqualTo(email2);

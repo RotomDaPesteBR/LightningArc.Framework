@@ -11,7 +11,8 @@
 
   <PropertyGroup>
 	<AssemblyName>LightningArc.Metalama</AssemblyName>
-	<PackageTags>Metalama, PostSharp, Aspect, Attribute</PackageTags>
+	<PackageTags>lightningarc dotnet clean-code metalama aop aspects</PackageTags>
+	<Description>Metalama-powered AOP (Aspect Oriented Programming) factories and utilities.</Description>
   </PropertyGroup>
 	
 	<ItemGroup>

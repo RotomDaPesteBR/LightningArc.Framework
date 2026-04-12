@@ -72,6 +72,9 @@ if (IpAddress.TryCreate("10.0.0.1", out var validIp))
     // validIp is guaranteed valid
 }
 
-// ToResult for fluent handling
-Result<IpAddress> result = "invalid".CreateIpAddressResult();
+// AsIpAddress for fluent handling
+Result<IpAddress> result = "invalid".AsIpAddress();
+
+// Implicit conversion to Result<IpAddress>
+Result<IpAddress> wrapped = ip;
 ```

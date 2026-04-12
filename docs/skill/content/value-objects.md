@@ -32,31 +32,31 @@ Email email = Email.Create("user@example.com");
 using LightningArc.Primitives.Results;
 
 // String → Result<Email> (returns Failure instead of throwing)
-Result<Email> result = "bad-email".CreateEmailResult();
+Result<Email> result = "bad-email".AsEmail();
 
-// ValueObject → Result<Email> (for composition)
-Result<Email> wrapped = email.ToResult();
+// ValueObject → Result<Email> (implicit conversion)
+Result<Email> wrapped = email;
 ```
 
-> LARC010 warns on implicit string → ValueObject conversion. LARC011 warns on nullable ValueObject → string. Prefer `TryCreate` or `CreateXxxResult` extensions in critical paths.
+> LARC010 warns on implicit string → ValueObject conversion. LARC011 warns on nullable ValueObject → string. Prefer `TryCreate` or `As{Type}` extensions in critical paths.
 ```csharp
 // Preferred: returns Failure instead of throwing
-Result<Email> result = "bad-email".CreateEmailResult();
+Result<Email> result = "bad-email".AsEmail();
 if (result.IsFailure) { /* reason in result.Error */ }
 
 Email email = Email.Create("user@example.com");
-Result<Email> wrapped = email.ToResult();
+Result<Email> wrapped = email;
 ```
 
 Each ValueObject has its own extensions:
 
 | Extension | Purpose |
 |---|---|
-| `Create{Type}Result(this string)` | Validates and returns `Result<{Type}>` |
-| `ToResult(this {Type})` | Wraps ValueObject as `Result<{Type}>` |
+| `As{Type}(this string)` | Validates and returns `Result<{Type}>` |
+| `Result<{Type}> result = value` | Implicit conversion from ValueObject |
 
 ### All Value Objects
 
 The full list is: `Email`, `Cpf`, `Cnpj`, `PhoneNumber`, `Url`.
 
-⚠️ **Analyzer note**: LARC010 warns on implicit string → ValueObject conversion and LARC011 warns on nullable ValueObject → string. Prefer `TryCreate` or `Create{Type}Result` extensions.
+⚠️ **Analyzer note**: LARC010 warns on implicit string → ValueObject conversion and LARC011 warns on nullable ValueObject → string. Prefer `TryCreate` or `As{Type}` extensions.

@@ -1,4 +1,5 @@
 using LightningArc.Primitives;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LightningArc.Primitives.ValueObjects
 {
@@ -12,16 +13,11 @@ namespace LightningArc.Primitives.ValueObjects
         /// </summary>
         public string Value { get; }
 
-        private Url(string value)
+        internal Url(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            if (!IsValid(value, out string? errorMessage))
             {
-                throw new ArgumentException("The URL cannot be null or empty.", nameof(value));
-            }
-
-            if (!Uri.TryCreate(value, UriKind.Absolute, out _))
-            {
-                throw new ArgumentException($"The value '{value}' is not a valid absolute URL.", nameof(value));
+                throw new ArgumentException(errorMessage, nameof(value));
             }
 
             Value = value;
@@ -40,18 +36,34 @@ namespace LightningArc.Primitives.ValueObjects
         /// <param name="value">The URL string.</param>
         /// <param name="result">The resulting <see cref="Url"/> object, or null.</param>
         /// <returns>True if created successfully; otherwise, false.</returns>
-        public static bool TryCreate(string value, out Url? result)
+        public static bool TryCreate(string value, [NotNullWhen(true)] out Url? result)
         {
-            try
+            if (IsValid(value, out _))
             {
                 result = new Url(value);
                 return true;
             }
-            catch (ArgumentException)
+
+            result = null;
+            return false;
+        }
+
+        internal static bool IsValid(string value, [NotNullWhen(false)] out string? errorMessage)
+        {
+            if (string.IsNullOrWhiteSpace(value))
             {
-                result = null;
+                errorMessage = "The URL cannot be null or empty.";
                 return false;
             }
+
+            if (!Uri.TryCreate(value, UriKind.Absolute, out _))
+            {
+                errorMessage = $"The value '{value}' is not a valid absolute URL.";
+                return false;
+            }
+
+            errorMessage = null;
+            return true;
         }
 
         /// <summary>

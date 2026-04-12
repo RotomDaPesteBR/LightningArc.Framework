@@ -11,7 +11,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             const string cpfValue = "12345678909";
 
             // Act
-            var cpf = Cpf.Create(cpfValue);
+            Cpf cpf = Cpf.Create(cpfValue);
 
             // Assert
             await Assert.That(cpf.Value).IsEqualTo(cpfValue);
@@ -36,7 +36,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             const string cpfValue = "12345678909";
 
             // Act
-            var success = Cpf.TryCreate(cpfValue, out var cpf);
+            bool success = Cpf.TryCreate(cpfValue, out Cpf? cpf);
 
             // Assert
             await Assert.That(success).IsTrue();
@@ -51,7 +51,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             const string cpfValue = "12345678900";
 
             // Act
-            var success = Cpf.TryCreate(cpfValue, out var cpf);
+            bool success = Cpf.TryCreate(cpfValue, out Cpf? cpf);
 
             // Assert
             await Assert.That(success).IsFalse();
@@ -63,7 +63,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         {
             // Arrange
             const string cpfValue = "12345678909";
-            var cpf = Cpf.Create(cpfValue);
+            Cpf cpf = Cpf.Create(cpfValue);
 
             // Act
             string result = cpf;

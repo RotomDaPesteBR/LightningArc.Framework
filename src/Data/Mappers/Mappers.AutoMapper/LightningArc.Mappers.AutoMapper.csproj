@@ -9,8 +9,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-	<AssemblyName>LightningArc.Mappers.AutoMapper</AssemblyName>
-	<PackageTags>Utils, Mappers, AutoMapper, Adapter</PackageTags>
+    <AssemblyName>LightningArc.Mappers.AutoMapper</AssemblyName>
+    <PackageTags>lightningarc dotnet clean-code repository-pattern automapper</PackageTags>
+    <Description>AutoMapper adapter for the LightningArc data layer.</Description>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

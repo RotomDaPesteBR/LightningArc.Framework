@@ -10,7 +10,8 @@
 
   <PropertyGroup>
     <AssemblyName>LightningArc.Data.Abstractions</AssemblyName>
-    <PackageTags>Utils, Data, Abstractions</PackageTags>
+    <PackageTags>lightningarc dotnet clean-code repository-pattern dapper ado-net</PackageTags>
+    <Description>Core abstractions and interfaces for Repository and Unit of Work patterns in the LightningArc framework.</Description>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

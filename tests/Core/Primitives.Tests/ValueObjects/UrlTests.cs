@@ -11,7 +11,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         public async Task Create_ValidUrl_ShouldCreateInstance(string urlValue)
         {
             // Act
-            var url = Url.Create(urlValue);
+            Url url = Url.Create(urlValue);
 
             // Assert
             await Assert.That(url.Value).IsEqualTo(urlValue);
@@ -35,7 +35,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             const string urlValue = "https://lightningarc.com";
 
             // Act
-            var success = Url.TryCreate(urlValue, out var result);
+            bool success = Url.TryCreate(urlValue, out Url? result);
 
             // Assert
             await Assert.That(success).IsTrue();
@@ -50,7 +50,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
             const string urlValue = "invalid-url";
 
             // Act
-            var success = Url.TryCreate(urlValue, out var result);
+            bool success = Url.TryCreate(urlValue, out Url? result);
 
             // Assert
             await Assert.That(success).IsFalse();
@@ -62,7 +62,7 @@ namespace LightningArc.Primitives.Tests.ValueObjects
         {
             // Arrange
             const string urlValue = "https://google.com";
-            var url = Url.Create(urlValue);
+            Url url = Url.Create(urlValue);
 
             // Act
             string result = url;

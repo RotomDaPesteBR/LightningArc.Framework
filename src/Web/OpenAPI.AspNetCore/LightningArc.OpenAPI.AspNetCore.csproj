@@ -9,11 +9,12 @@
 	
   <PropertyGroup>
 	<AssemblyName>LightningArc.OpenAPI.AspNetCore</AssemblyName>
-	<PackageTags>Utils</PackageTags>
+	<PackageTags>lightningarc dotnet clean-code aspnetcore api middleware problem-details openapi swagger</PackageTags>
+	<Description>OpenAPI and Swagger transformers for LightningArc Value Objects and Types.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-	<ProjectReference Include="..\..\Core\\Primitives\\LightningArc.Primitives.csproj" />
+	<ProjectReference Include="..\..\Core\Primitives\LightningArc.Primitives.csproj" />
   </ItemGroup>
 	
   <ItemGroup>

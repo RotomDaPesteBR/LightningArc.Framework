@@ -75,7 +75,7 @@ public class UnitOfWorkTests
         // Arrange
         TestDbConnection mockConn = new();
         ConnectionFactoryStub factory = new(mockConn);
-        var uow = new LightningArc.Data.ADO.UnitOfWork.UnitOfWork(factory);
+        ADO.UnitOfWork.UnitOfWork uow = new(factory);
 
         // Act
         uow.Begin();
@@ -92,7 +92,7 @@ public class UnitOfWorkTests
         // Arrange
         TestDbConnection mockConn = new();
         ConnectionFactoryStub factory = new(mockConn);
-        var uow = new LightningArc.Data.ADO.UnitOfWork.UnitOfWork(factory);
+        ADO.UnitOfWork.UnitOfWork uow = new(factory);
         uow.Begin();
 
         // Act & Assert
@@ -105,9 +105,9 @@ public class UnitOfWorkTests
         // Arrange
         TestDbConnection mockConn = new();
         ConnectionFactoryStub factory = new(mockConn);
-        var uow = new LightningArc.Data.ADO.UnitOfWork.UnitOfWork(factory);
+        ADO.UnitOfWork.UnitOfWork uow = new(factory);
         uow.Begin();
-        var trans = (TestDbTransaction)uow.Transaction!;
+        TestDbTransaction trans = (TestDbTransaction)uow.Transaction!;
 
         // Act
         uow.Commit();
@@ -125,7 +125,7 @@ public class UnitOfWorkTests
         // Arrange
         TestDbConnection mockConn = new();
         ConnectionFactoryStub factory = new(mockConn);
-        var uow = new LightningArc.Data.ADO.UnitOfWork.UnitOfWork(factory);
+        ADO.UnitOfWork.UnitOfWork uow = new(factory);
 
         // Act & Assert
         await Assert.That(() => uow.Commit()).Throws<InvalidOperationException>();
@@ -137,9 +137,9 @@ public class UnitOfWorkTests
         // Arrange
         TestDbConnection mockConn = new();
         ConnectionFactoryStub factory = new(mockConn);
-        var uow = new LightningArc.Data.ADO.UnitOfWork.UnitOfWork(factory);
+        ADO.UnitOfWork.UnitOfWork uow = new(factory);
         uow.Begin();
-        var trans = (TestDbTransaction)uow.Transaction!;
+        TestDbTransaction trans = (TestDbTransaction)uow.Transaction!;
 
         // Act
         uow.Rollback();
@@ -157,7 +157,7 @@ public class UnitOfWorkTests
         // Arrange
         TestDbConnection mockConn = new();
         ConnectionFactoryStub factory = new(mockConn);
-        var uow = new LightningArc.Data.ADO.UnitOfWork.UnitOfWork(factory);
+        ADO.UnitOfWork.UnitOfWork uow = new(factory);
 
         // Act
         uow.Rollback();
@@ -171,7 +171,7 @@ public class UnitOfWorkTests
         // Arrange
         TestDbConnection mockConn = new();
         ConnectionFactoryStub factory = new(mockConn);
-        var uow = new LightningArc.Data.ADO.UnitOfWork.UnitOfWork(factory);
+        ADO.UnitOfWork.UnitOfWork uow = new(factory);
 
         // Act & Assert
         await Assert.That(() => uow.Connection).Throws<InvalidOperationException>();
@@ -183,7 +183,7 @@ public class UnitOfWorkTests
         // Arrange
         TestDbConnection mockConn = new();
         ConnectionFactoryStub factory = new(mockConn);
-        var uow = new LightningArc.Data.ADO.UnitOfWork.UnitOfWork(factory);
+        ADO.UnitOfWork.UnitOfWork uow = new(factory);
 
         // Act & Assert
         await Assert.That(() => uow.Transaction).Throws<InvalidOperationException>();

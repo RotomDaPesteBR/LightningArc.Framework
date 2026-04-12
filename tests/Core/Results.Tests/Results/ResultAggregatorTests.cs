@@ -8,7 +8,7 @@ public class ResultAggregatorTests
     public async Task Build_NoChecks_ShouldReturnSuccess()
     {
         // Act
-        var result = Result.Aggregate().Build();
+        Result result = Result.Aggregate().Build();
 
         // Assert
         await Assert.That(result.IsSuccess).IsTrue();
@@ -18,7 +18,7 @@ public class ResultAggregatorTests
     public async Task Build_AllSuccessfulChecks_ShouldReturnSuccess()
     {
         // Act
-        var result = Result.Aggregate()
+        Result result = Result.Aggregate()
             .Check(() => Result.Success())
             .Check(() => Result.Success())
             .Build();
@@ -31,7 +31,7 @@ public class ResultAggregatorTests
     public async Task Build_SingleFailure_ShouldReturnFailure()
     {
         // Act
-        var result = Result.Aggregate()
+        Result result = Result.Aggregate()
             .Check(() => Result.Failure(Error.Validation.MissingField("field1")))
             .Build();
 
@@ -44,7 +44,7 @@ public class ResultAggregatorTests
     public async Task Build_MultipleFailures_ShouldReturnAggregateError()
     {
         // Act
-        var result = Result.Aggregate()
+        Result result = Result.Aggregate()
             .Check(() => Result.Failure(Error.Validation.MissingField("field1")))
             .Check(() => Result.Failure(Error.Validation.InvalidParameter("field2")))
             .Build();
@@ -52,7 +52,7 @@ public class ResultAggregatorTests
         // Assert
         await Assert.That(result.IsFailure).IsTrue();
         // The error system combines errors using AggregateError
-        var aggregateError = (AggregateError)result.Error;
+        AggregateError aggregateError = (AggregateError)result.Error;
         await Assert.That(aggregateError.Errors).Count().IsEqualTo(2);
     }
 
@@ -60,7 +60,7 @@ public class ResultAggregatorTests
     public async Task Check_WithException_ShouldMapToError()
     {
         // Act
-        var result = Result.Aggregate()
+        Result result = Result.Aggregate()
             .Check(() => throw new ArgumentNullException("testParam"))
             .Build();
 
@@ -73,10 +73,10 @@ public class ResultAggregatorTests
     public async Task CheckWithValue_ShouldCaptureValueOnSuccess()
     {
         // Act
-        var aggregator = Result.Aggregate()
-            .Check(() => Email.Create("test@example.com"), out var email);
+        ResultAggregator aggregator = Result.Aggregate()
+            .Check(() => Email.Create("test@example.com"), out Email? email);
         
-        var result = aggregator.Build();
+        Result result = aggregator.Build();
 
         // Assert
         await Assert.That(result.IsSuccess).IsTrue();
@@ -88,10 +88,10 @@ public class ResultAggregatorTests
     public async Task CheckWithValue_ShouldHandleExceptionAndSetNull()
     {
         // Act
-        var aggregator = Result.Aggregate()
-            .Check(() => Email.Create("invalid"), out var email);
+        ResultAggregator aggregator = Result.Aggregate()
+            .Check(() => Email.Create("invalid"), out Email? email);
         
-        var result = aggregator.Build();
+        Result result = aggregator.Build();
 
         // Assert
         await Assert.That(result.IsFailure).IsTrue();

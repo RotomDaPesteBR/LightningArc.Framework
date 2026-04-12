@@ -1,4 +1,3 @@
-
 using LightningArc.Results;
 using LightningArc.Results.AspNetCore.Localization;
 using System.Net;

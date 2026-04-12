@@ -9,7 +9,8 @@
 
     <PropertyGroup>
         <AssemblyName>LightningArc.AspNetCore</AssemblyName>
-        <PackageTags>Utils</PackageTags>
+        <PackageTags>lightningarc dotnet clean-code aspnetcore api middleware problem-details</PackageTags>
+        <Description>Core ASP.NET Core utilities and helpers for LightningArc applications.</Description>
         <IncludeBuildOutput>false</IncludeBuildOutput>
     </PropertyGroup>
 

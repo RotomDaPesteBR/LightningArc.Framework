@@ -65,6 +65,9 @@ if (Cep.TryCreate("01001-000", out var validCep))
     // validCep is guaranteed valid
 }
 
-// ToResult for fluent handling
-Result<Cep> result = "invalid".CreateCepResult();
+// AsCep for fluent handling
+Result<Cep> result = "invalid".AsCep();
+
+// Implicit conversion to Result<Cep>
+Result<Cep> wrapped = cep;
 ```

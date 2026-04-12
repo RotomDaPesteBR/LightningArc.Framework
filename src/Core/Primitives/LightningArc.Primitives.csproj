@@ -10,8 +10,13 @@
 
   <PropertyGroup>
 	<AssemblyName>LightningArc.Primitives</AssemblyName>
-	<PackageTags>Utils</PackageTags>
+	<PackageTags>lightningarc dotnet clean-code value-objects domain-driven-design validation email cpf cnpj</PackageTags>
+	<Description>A collection of immutable Value Objects (Email, Cpf, Cnpj, etc.) with built-in validation for Domain-Driven Design.</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+	<InternalsVisibleTo Include="LightningArc.Primitives.Results" />
+  </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
 	<PackageReference Include="PolySharp" PrivateAssets="All" />

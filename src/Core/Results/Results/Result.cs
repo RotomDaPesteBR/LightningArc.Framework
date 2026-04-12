@@ -18,10 +18,7 @@ public class Result : IEquatable<Result>
     /// <summary>
     /// Gets a value indicating whether the operation failed.
     /// </summary>
-    public bool IsFailure
-    {
-        get { return !IsSuccess; }
-    }
+    public bool IsFailure => !IsSuccess;
 
     /// <summary>
     /// Gets the generic status code associated with the result.
@@ -71,7 +68,7 @@ public class Result : IEquatable<Result>
     protected Result(Success success)
     {
 #if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(success, nameof(success));
+        ArgumentNullException.ThrowIfNull(success);
 #else
         if (success is null)
         {
@@ -91,7 +88,7 @@ public class Result : IEquatable<Result>
     protected Result(Error error)
     {
 #if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(error, nameof(error));
+        ArgumentNullException.ThrowIfNull(error);
 #else
         if (error is null)
         {
@@ -119,23 +116,31 @@ public class Result : IEquatable<Result>
     public bool Equals(Result? other)
     {
         if (other is null)
+        {
             return false;
+        }
+
         if (ReferenceEquals(this, other))
+        {
             return true;
+        }
 
         if (IsSuccess != other.IsSuccess)
+        {
             return false;
+        }
 
-        return IsSuccess
-            ? Equals(_success, other._success)
-            : Equals(_error, other._error);
+        return IsSuccess ? Equals(_success, other._success) : Equals(_error, other._error);
     }
 
     /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         if (obj is Result other)
+        {
             return Equals(other);
+        }
+
         return false;
     }
 
@@ -148,9 +153,13 @@ public class Result : IEquatable<Result>
             int hash = 17;
             hash = hash * 23 + IsSuccess.GetHashCode();
             if (IsSuccess)
+            {
                 hash = hash * 23 + (_success?.GetHashCode() ?? 0);
+            }
             else
+            {
                 hash = hash * 23 + (_error?.GetHashCode() ?? 0);
+            }
             return hash;
         }
 #else
@@ -217,7 +226,10 @@ public class Result : IEquatable<Result>
     public static bool operator ==(Result? left, Result? right)
     {
         if (left is null)
+        {
             return right is null;
+        }
+
         return left.Equals(right);
     }
 
@@ -283,8 +295,7 @@ public class Result : IEquatable<Result>
     /// <typeparam name="TValue">The type of the success value.</typeparam>
     /// <param name="value">The value to be encapsulated in the result.</param>
     /// <returns>A new instance of <see cref="Result{TValue}"/> indicating success.</returns>
-    public static Result<TValue> Success<TValue>(TValue value) =>
-        new(Results.Success<TValue>.Ok(value));
+    public static Result<TValue> Success<TValue>(TValue value) => new(Results.Success.Ok(value));
 
     /// <summary>
     /// Creates a success result with a value and a generic code (Ok), with a custom message.
@@ -294,7 +305,7 @@ public class Result : IEquatable<Result>
     /// <param name="message">The custom success message.</param>
     /// <returns>A new instance of <see cref="Result{TValue}"/> indicating success.</returns>
     public static Result<TValue> Success<TValue>(TValue value, string message) =>
-        new(Results.Success<TValue>.Ok(value, message));
+        new(Results.Success.Ok(value, message));
 
     /// <summary>
     /// Creates a success result with a value and a generic code (Ok), with a custom message.
@@ -323,7 +334,7 @@ public class Result : IEquatable<Result>
     /// <param name="value">The value to be encapsulated in the result.</param>
     /// <returns>A new instance of <see cref="Result{TValue}"/> indicating success and creation.</returns>
     public static Result<TValue> Created<TValue>(TValue value) =>
-        new(Results.Success<TValue>.Created(value));
+        new(Results.Success.Created(value));
 
     /// <summary>
     /// Creates a success result with a value and a generic code (Created), with a custom message.
@@ -333,7 +344,7 @@ public class Result : IEquatable<Result>
     /// <param name="message">The custom success message.</param>
     /// <returns>A new instance of <see cref="Result{TValue}"/> indicating success and creation.</returns>
     public static Result<TValue> Created<TValue>(TValue value, string message) =>
-        new(Results.Success<TValue>.Created(value, message));
+        new(Results.Success.Created(value, message));
 
     // --- Accepted ---
 
@@ -344,7 +355,7 @@ public class Result : IEquatable<Result>
     /// <param name="value">The value to be encapsulated in the result.</param>
     /// <returns>A new instance of <see cref="Result{TValue}"/> indicating success and acceptance.</returns>
     public static Result<TValue> Accepted<TValue>(TValue value) =>
-        new(Results.Success<TValue>.Accepted(value));
+        new(Results.Success.Accepted(value));
 
     /// <summary>
     /// Creates a success result with a value and a generic code (Accepted), with a custom message.
@@ -354,7 +365,7 @@ public class Result : IEquatable<Result>
     /// <param name="message">The custom success message.</param>
     /// <returns>A new instance of <see cref="Result{TValue}"/> indicating success and acceptance.</returns>
     public static Result<TValue> Accepted<TValue>(TValue value, string message) =>
-        new(Results.Success<TValue>.Accepted(value, message));
+        new(Results.Success.Accepted(value, message));
 
     // --- NoContent ---
 
@@ -365,7 +376,7 @@ public class Result : IEquatable<Result>
     /// <param name="value">The value to be encapsulated in the result.</param>
     /// <returns>A new instance of <see cref="Result{TValue}"/> indicating success and no content.</returns>
     public static Result<TValue> NoContent<TValue>(TValue value) =>
-        new(Results.Success<TValue>.NoContent(value));
+        new(Results.Success.NoContent(value));
 
     /// <summary>
     /// Creates a success result with a value and a generic code (No Content).
@@ -375,7 +386,7 @@ public class Result : IEquatable<Result>
     /// <param name="message">The custom success message.</param>
     /// <returns>A new instance of <see cref="Result{TValue}"/> indicating success and no content.</returns>
     public static Result<TValue> NoContent<TValue>(TValue value, string message) =>
-        new(Results.Success<TValue>.NoContent(value, message));
+        new(Results.Success.NoContent(value, message));
 
     /// <summary>
     /// Creates a failure result.
@@ -449,7 +460,7 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
         : base(success)
     {
 #if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(success, nameof(success));
+        ArgumentNullException.ThrowIfNull(success);
 #else
         if (success is null)
         {
@@ -485,12 +496,19 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     public bool Equals(Result<TValue>? other)
     {
         if (other is null)
+        {
             return false;
+        }
+
         if (ReferenceEquals(this, other))
+        {
             return true;
+        }
 
         if (!base.Equals(other))
+        {
             return false;
+        }
 
         if (IsSuccess)
         {
@@ -504,7 +522,10 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     public override bool Equals(object? obj)
     {
         if (obj is Result<TValue> other)
+        {
             return Equals(other);
+        }
+
         return false;
     }
 
@@ -550,7 +571,10 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     public static bool operator ==(Result<TValue>? left, Result<TValue>? right)
     {
         if (left is null)
+        {
             return right is null;
+        }
+
         return left.Equals(right);
     }
 
@@ -614,4 +638,3 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     /// <returns>A success <see cref="Result{TValue}"/>.</returns>
     public static implicit operator Result<TValue>(Success<TValue> success) => new(success);
 }
-
