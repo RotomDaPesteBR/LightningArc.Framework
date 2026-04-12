@@ -53,8 +53,9 @@ jobs:
         id: version
         run: |
           $tag = "${{ github.ref_name }}"
-          Write-Host "version=$tag"
-          Write-Host "version=$tag" >> $env:GITHUB_OUTPUT
+          $version = $tag.TrimStart('v')
+          Write-Host "Tag: $tag -> Version: $version"
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Build & Pack
         run: dotnet build -c Release -p:PackageVersion=${{ steps.version.outputs.version }} -p:ContinuousIntegrationBuild=true

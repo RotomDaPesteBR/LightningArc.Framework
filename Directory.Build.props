@@ -17,10 +17,13 @@
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts</ArtifactsPath>
     <VSTestResultsDirectory>$(ArtifactsPath)\TestResults</VSTestResultsDirectory>
+
+    <!-- Versioning -->
+    <PackageVersion Condition="'$(PackageVersion)' == ''">1.0.0</PackageVersion>
+    <Version>$(PackageVersion)</Version>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>$(PackageVersion)</Version>
     <Authors>João Pedro S. Souza</Authors>
     <Company>LightningArc</Company>
     <Copyright>Copyright © $([System.DateTime]::Now.Year) João Pedro S. Souza</Copyright>

@@ -5,7 +5,7 @@ $config = "Release"
 # --- 1. FUNCTION TO GET VERSION ---
 function Get-PackageVersionFromProps {
     param(
-        [string]$PropsFile = "Directory.Packages.props"
+        [string]$PropsFile = "Directory.Build.props"
     )
 
     if (-not (Test-Path -Path $PropsFile -PathType Leaf)) {
@@ -34,7 +34,7 @@ function Get-PackageVersionFromProps {
 }
 
 # --- 2. DEFINE VARIABLES WITH THE VERSION ---
-$current_version = Get-PackageVersionFromProps -PropsFile "Directory.Packages.props" 
+$current_version = Get-PackageVersionFromProps -PropsFile "Directory.Build.props" 
 $base_output_dir = "publish\packages"
 $output_dir = Join-Path -Path $base_output_dir -ChildPath $current_version 
 

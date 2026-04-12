@@ -6,10 +6,6 @@
     <CentralPackageVersionOverrideEnabled>true</CentralPackageVersionOverrideEnabled>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <PackageVersion>1.0.0</PackageVersion> 
-  </PropertyGroup>
-  
   <!-- Microsoft -->
   <PropertyGroup>
       <MicrosoftPackagesVersion>10.0.5</MicrosoftPackagesVersion> 
