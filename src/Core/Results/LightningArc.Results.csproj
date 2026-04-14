@@ -1,28 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-	<TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
 
-	<RootNamespace>LightningArc.Results</RootNamespace>
+    <NoWarn>$(NoWarn);IDE0130</NoWarn>
 
-	<NoWarn>$(NoWarn);IDE0130</NoWarn>
+    <RootNamespace>LightningArc.Results</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup>
-	<AssemblyName>LightningArc.Results</AssemblyName>
-	<PackageTags>lightningarc dotnet clean-code result-pattern error-handling functional-programming</PackageTags>
-	<Description>Complete Result pattern implementation for functional error handling and clean code in .NET.</Description>
+    <AssemblyName>LightningArc.Results</AssemblyName>
+    <PackageTags>lightningarc dotnet clean-code result-pattern error-handling functional-programming</PackageTags>
+    <Description>Complete Result pattern implementation for functional error handling and clean code in .NET.</Description>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-	<PackageReference Include="PolySharp" PrivateAssets="All" />
-	<PackageReference Include="System.Text.Json" PrivateAssets="All" />
+    <PackageReference Include="PolySharp" PrivateAssets="All" />
+    <PackageReference Include="System.Text.Json" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-	<InternalsVisibleTo Include="LightningArc.Results.AspNetCore" />
-
-	<InternalsVisibleTo Include="LightningArc.Results.Tests" />
+    <InternalsVisibleTo Include="LightningArc.Results.AspNetCore" />
+    <InternalsVisibleTo Include="LightningArc.Results.Tests" />
   </ItemGroup>
 </Project>
 
