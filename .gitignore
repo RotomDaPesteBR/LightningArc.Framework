@@ -24,6 +24,7 @@ Generated\ Files/
 .cr/personal
 conductor/
 docs/superpowers/
+.worktrees/
 
 ## OS specific
 [Tt]humbs.db
