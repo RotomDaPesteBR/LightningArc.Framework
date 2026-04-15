@@ -18,8 +18,8 @@
     <ProjectReference Include="..\..\..\src\Core\Results\LightningArc.Results.csproj" />
     <ProjectReference Include="..\..\..\src\Core\Primitives\LightningArc.Primitives.csproj" />
     <ProjectReference Include="..\..\..\src\Web\Results.AspNetCore\LightningArc.Results.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\..\src\Data\ADO\Data.ADO\LightningArc.Data.ADO.csproj" />
-    <ProjectReference Include="..\..\..\src\Data\Data.Abstractions\LightningArc.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\ADO\ADO\LightningArc.Data.ADO.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\Abstractions\LightningArc.Data.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

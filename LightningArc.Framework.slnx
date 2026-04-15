@@ -31,16 +31,16 @@
     <Project Path="src/Core/Framework/LightningArc.Framework.csproj" />
   </Folder>
   <Folder Name="/src/Data/">
-    <Project Path="src/Data/Data.Abstractions/LightningArc.Data.Abstractions.csproj" />
+    <Project Path="src/Data/Abstractions/LightningArc.Data.Abstractions.csproj" />
   </Folder>
   <Folder Name="/src/Data/ADO/">
-    <Project Path="src/Data/ADO/Data.ADO.SqlBuilder/LightningArc.Data.ADO.SqlBuilder.csproj" />
-    <Project Path="src/Data/ADO/Data.ADO.Oracle/LightningArc.Data.ADO.Oracle.csproj" />
-    <Project Path="src/Data/ADO/Data.ADO.SqlServer/LightningArc.Data.ADO.SqlServer.csproj" />
-    <Project Path="src/Data/ADO/Data.ADO/LightningArc.Data.ADO.csproj" />
+    <Project Path="src/Data/ADO/ADO.SqlBuilder/LightningArc.Data.ADO.SqlBuilder.csproj" />
+    <Project Path="src/Data/ADO/ADO.Oracle/LightningArc.Data.ADO.Oracle.csproj" />
+    <Project Path="src/Data/ADO/ADO.SqlServer/LightningArc.Data.ADO.SqlServer.csproj" />
+    <Project Path="src/Data/ADO/ADO/LightningArc.Data.ADO.csproj" />
   </Folder>
   <Folder Name="/src/Data/EF/">
-    <Project Path="src/Data/EF/Data.EntityFramework/LightningArc.Data.EntityFramework.csproj" />
+    <Project Path="src/Data/EF/EntityFramework/LightningArc.Data.EntityFramework.csproj" />
   </Folder>
   <Folder Name="/src/Data/Mappers/">
     <Project Path="src/Data/Mappers/Mappers.AutoMapper/LightningArc.Mappers.AutoMapper.csproj" />

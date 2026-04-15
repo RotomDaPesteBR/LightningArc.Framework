@@ -1,4 +1,5 @@
 using LightningArc.Results;
+
 namespace LightningArc.Results.AspNetCore;
 
 /// <summary>
@@ -37,14 +38,7 @@ public sealed class EndpointResult : IResult
     /// <returns>An <see cref="EndpointResult"/> that encapsulates the corresponding HTTP response.</returns>
     public static implicit operator EndpointResult(Result result)
     {
-        if (result.IsSuccess)
-        {
-            return new EndpointResult(new SuccessResult(result.SuccessDetails!));
-        }
-        else
-        {
-            return new EndpointResult(new ErrorResult(result.Error!));
-        }
+        return result.IsSuccess ? new EndpointResult(new SuccessResult(result.SuccessDetails)) : new EndpointResult(new ErrorResult(result.Error));
     }
 }
 
@@ -86,16 +80,11 @@ public sealed class EndpointResult<TValue> : IResult
     /// <returns>A new EndpointResult instance.</returns>
     public static EndpointResult<TValue> FromResult(Result<TValue> result, string? contentType)
     {
-        if (result.IsSuccess)
-        {
-            return new EndpointResult<TValue>(
+        return result.IsSuccess
+            ? new EndpointResult<TValue>(
                 new SuccessResult<TValue>(result.SuccessDetails, contentType)
-            );
-        }
-        else
-        {
-            return new EndpointResult<TValue>(new ErrorResult(result.Error!));
-        }
+            )
+            : new EndpointResult<TValue>(new ErrorResult(result.Error!));
     }
 
     /// <summary>
@@ -105,14 +94,7 @@ public sealed class EndpointResult<TValue> : IResult
     /// <returns>An <see cref="EndpointResult{TValue}"/> that encapsulates the corresponding HTTP response.</returns>
     public static implicit operator EndpointResult<TValue>(Result<TValue> result)
     {
-        if (result.IsSuccess)
-        {
-            return new EndpointResult<TValue>(new SuccessResult<TValue>(result.SuccessDetails));
-        }
-        else
-        {
-            return new EndpointResult<TValue>(new ErrorResult(result.Error!));
-        }
+        return result.IsSuccess ? new EndpointResult<TValue>(new SuccessResult<TValue>(result.SuccessDetails)) : new EndpointResult<TValue>(new ErrorResult(result.Error));
     }
 
     /// <summary>

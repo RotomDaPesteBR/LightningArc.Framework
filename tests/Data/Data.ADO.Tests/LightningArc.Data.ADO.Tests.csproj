@@ -4,9 +4,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Data\ADO\Data.ADO\LightningArc.Data.ADO.csproj" />
-    <ProjectReference Include="..\..\..\src\Data\Data.Abstractions\LightningArc.Data.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\src\Data\ADO\Data.ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\ADO\ADO\LightningArc.Data.ADO.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\Abstractions\LightningArc.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\ADO\ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj" />
   </ItemGroup>
 </Project>
 

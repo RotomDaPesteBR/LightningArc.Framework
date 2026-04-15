@@ -51,13 +51,13 @@ $projects_to_pack = @(
     "src\Core\Framework\LightningArc.Framework.csproj",
 
     # Data
-    "src\Data\Data.Abstractions\LightningArc.Data.Abstractions.csproj",
+    "src\Data\Abstractions\LightningArc.Data.Abstractions.csproj",
     "src\Data\Mappers\Mappers.AutoMapper\LightningArc.Mappers.AutoMapper.csproj",
     "src\Data\Mappers\Mappers.Mapster\LightningArc.Mappers.Mapster.csproj",
-    "src\Data\ADO\Data.ADO\LightningArc.Data.ADO.csproj",
-    "src\Data\ADO\Data.ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj",
-    "src\Data\ADO\Data.ADO.Oracle\LightningArc.Data.ADO.Oracle.csproj",
-    "src\Data\ADO\Data.ADO.SqlServer\LightningArc.Data.ADO.SqlServer.csproj",
+    "src\Data\ADO\ADO\LightningArc.Data.ADO.csproj",
+    "src\Data\ADO\ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj",
+    "src\Data\ADO\ADO.Oracle\LightningArc.Data.ADO.Oracle.csproj",
+    "src\Data\ADO\ADO.SqlServer\LightningArc.Data.ADO.SqlServer.csproj",
     "src\Data\EF\Data.EntityFramework\LightningArc.Data.EntityFramework.csproj",
 
     # AspNetCore
