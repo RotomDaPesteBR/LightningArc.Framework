@@ -30,8 +30,12 @@
     <Project Path="src/Core/Results/LightningArc.Results.csproj" />
     <Project Path="src/Core/Framework/LightningArc.Framework.csproj" />
   </Folder>
+  <Folder Name="/src/Validations/">
+    <Project Path="src/Validations/Validations/LightningArc.Validations.csproj" />
+    <Project Path="src/Validations/DependencyInjection/LightningArc.Validations.DependencyInjection.csproj" />
+  </Folder>
   <Folder Name="/src/Data/">
-    <Project Path="src/Data/Data.Abstractions/LightningArc.Data.Abstractions.csproj" />
+    <Project Path="src/Data/Abstractions/LightningArc.Data.Abstractions.csproj" />
   </Folder>
   <Folder Name="/src/Data/ADO/">
     <Project Path="src/Data/ADO/Data.ADO.SqlBuilder/LightningArc.Data.ADO.SqlBuilder.csproj" />
@@ -68,7 +72,7 @@
       <Configuration Solution="Debug|*" Project="Test" />
       <Configuration Solution="Release|*" Project="Test" />
       <Configuration Solution="LamaDebug|*" Project="Test" />
-      
+
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
@@ -77,7 +81,7 @@
       <Configuration Solution="Debug|*" Project="Test" />
       <Configuration Solution="Release|*" Project="Test" />
       <Configuration Solution="LamaDebug|*" Project="Test" />
-      
+
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />
@@ -86,7 +90,27 @@
       <Configuration Solution="Debug|*" Project="Test" />
       <Configuration Solution="Release|*" Project="Test" />
       <Configuration Solution="LamaDebug|*" Project="Test" />
-      
+
+      <Build Solution="Debug|*" Project="false" />
+      <Build Solution="LamaDebug|*" Project="false" />
+      <Build Solution="Release|*" Project="false" />
+    </Project>
+  </Folder>
+  <Folder Name="/tests/Validations/">
+    <Project Path="tests/Validations/Validations.Tests/LightningArc.Validations.Tests.csproj">
+      <Configuration Solution="Debug|*" Project="Test" />
+      <Configuration Solution="Release|*" Project="Test" />
+      <Configuration Solution="LamaDebug|*" Project="Test" />
+
+      <Build Solution="Debug|*" Project="false" />
+      <Build Solution="LamaDebug|*" Project="false" />
+      <Build Solution="Release|*" Project="false" />
+    </Project>
+    <Project Path="tests/Validations/DependencyInjection/LightningArc.Validations.DependencyInjection.Tests.csproj">
+      <Configuration Solution="Debug|*" Project="Test" />
+      <Configuration Solution="Release|*" Project="Test" />
+      <Configuration Solution="LamaDebug|*" Project="Test" />
+
       <Build Solution="Debug|*" Project="false" />
       <Build Solution="LamaDebug|*" Project="false" />
       <Build Solution="Release|*" Project="false" />

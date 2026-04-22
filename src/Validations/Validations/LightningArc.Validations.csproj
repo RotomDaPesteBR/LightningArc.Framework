@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net9.0;net10.0</TargetFrameworks>
+
+    <RootNamespace>LightningArc.Validations</RootNamespace>
+
+    <NoWarn>$(NoWarn);IDE0130</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>LightningArc.Validations</AssemblyName>
+    <PackageTags>lightningarc dotnet clean-code validation fluent-validation result-pattern</PackageTags>
+    <Description>Fluent validation library for LightningArc with native Result and Error integration.</Description>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="PolySharp" PrivateAssets="All" />
+    <PackageReference Include="System.Text.Json" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\Results\LightningArc.Results.csproj" />
+  </ItemGroup>
+</Project>

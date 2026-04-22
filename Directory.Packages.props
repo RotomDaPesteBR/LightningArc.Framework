@@ -14,6 +14,7 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftPackagesVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftPackagesVersion)" />

@@ -20,5 +20,6 @@
     <ProjectReference Include="..\..\Core\Primitives.Results\LightningArc.Primitives.Results.csproj" />
     <ProjectReference Include="..\..\Core\Results\LightningArc.Results.csproj" />
     <ProjectReference Include="..\..\Core\Json\LightningArc.Json.csproj" />
+    <ProjectReference Include="..\..\Validations\Validations\LightningArc.Validations.csproj" />
   </ItemGroup>
 </Project>
