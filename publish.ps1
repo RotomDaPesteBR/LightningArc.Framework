@@ -18,11 +18,22 @@ function Get-PackageVersionFromProps {
         [xml]$xmlContent = Get-Content $PropsFile -Raw
         
         # Look for <PackageVersion> directly inside a <PropertyGroup>
-        $versionNode = $xmlContent.Project.PropertyGroup | Where-Object { $_.PackageVersion }
-        $version = $versionNode.PackageVersion
+        $versionNode = $xmlContent.Project.PropertyGroup.PackageVersion | Select-Object -First 1
 
-        if ([string]::IsNullOrEmpty($version)) {
+        if ($null -eq $versionNode) {
             Write-Host "WARNING: The <PackageVersion> property was not found in '$PropsFile'. Using default version '1.0.0'." -ForegroundColor Yellow
+            return "1.0.0"
+        }
+        
+        $version = ""
+        if ($versionNode -is [System.Xml.XmlElement]) {
+            $version = $versionNode.InnerText
+        } else {
+            $version = [string]$versionNode
+        }
+
+        if ([string]::IsNullOrWhiteSpace($version)) {
+            Write-Host "WARNING: The <PackageVersion> property is empty in '$PropsFile'. Using default version '1.0.0'." -ForegroundColor Yellow
             return "1.0.0"
         }
         
@@ -58,7 +69,7 @@ $projects_to_pack = @(
     "src\Data\ADO\ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj",
     "src\Data\ADO\ADO.Oracle\LightningArc.Data.ADO.Oracle.csproj",
     "src\Data\ADO\ADO.SqlServer\LightningArc.Data.ADO.SqlServer.csproj",
-    "src\Data\EF\Data.EntityFramework\LightningArc.Data.EntityFramework.csproj",
+    "src\Data\EF\EntityFramework\LightningArc.Data.EntityFramework.csproj",
 
     # AspNetCore
     "src\Web\Results.AspNetCore\LightningArc.Results.AspNetCore.csproj",

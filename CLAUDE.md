@@ -62,6 +62,28 @@ Working conventions for AI assistants operating in this repository.
 - **Artifacts** — Output to `.artifacts/` folder
 - **Pack on build** — `GeneratePackageOnBuild=true` for all projects
 
+## Test Running Rules
+- Use `dotnet test -c Test` for all tests.
+- Use `dotnet test --project "tests/<Path>/<Project>.csproj" -c Test` for a specific project.
+- Never use VSTest `--filter` in this repo.
+- Use TUnit `--treenode-filter` syntax when filtering is needed. Examples:
+    All tests in a class: `dotnet run -- --treenode-filter "/*/*/MyTestClass/*"`
+    A specific test method: `dotnet run -- --treenode-filter "/*/*/MyTestClass/MyTestMethod"`
+    By category: `dotnet run -- --treenode-filter "/*/*/*/*[Category=Integration]"`
+    Exclude a category: `dotnet run -- --treenode-filter "/*/*/*/*[Category!=Performance]"`
+    Multiple filters (OR): `dotnet run -- --treenode-filter "/*/*/ClassA/*|/*/*/ClassB/*"`
+    Combine filters (AND): `dotnet run -- --treenode-filter "/*/*/*/*[Category=Integration][Priority=High]"`
+
+---
+
+Most effective for subagents: say it in the dispatch prompt
+
+When you launch the implementer/reviewer agent, include a line like:
+
+▎ Repository-specific rule: every dotnet test command must use --project when targeting a project file. In this repo, dotnet test "<path>.csproj" is considered wrong. Do not use --filter; use TUnit
+tree-node filters only.
+
+
 ### Coding Style
 - `ImplicitUsings: enable`, `Nullable: enable`
 - XML documentation required (`GenerateDocumentationFile: true`)
@@ -85,11 +107,6 @@ if (invalid) errors += Error.Validation.MissingField("field");
 return errors != null ? errors : Result.Success();
 ```
 
-### Deleted Projects (DO NOT reference)
-- `CORS.AspNetCore` (deleted in commit 7d4ec95)
-- `Utils.AspNetCore` metapackage (deleted)
-- `Metalama` main project (deleted)
-
 ---
 
 ## Key Files
@@ -108,5 +125,5 @@ return errors != null ? errors : Result.Success();
 1. Always read the file before editing
 2. Present a detailed plan before implementing changes
 3. Do not create files unless necessary — prefer editing existing files
-4. Commits should be atomic and focused
+4. Commits should follow conventional commits and be atomic and focused
 5. Never auto-commit without user request
