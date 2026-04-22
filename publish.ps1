@@ -76,10 +76,17 @@ $projects_to_pack = @(
     "src\Web\CORS.AspNetCore\LightningArc.CORS.AspNetCore.csproj",
     "src\Web\OpenAPI.AspNetCore\LightningArc.OpenAPI.AspNetCore.csproj",
     "src\Web\AspNetCore\LightningArc.AspNetCore.csproj",
+    
+    # Validations
+    "src\Validations\Validations\LightningArc.Validations.csproj",
+    "src\Validations\DependencyInjection\LightningArc.Validations.DependencyInjection.csproj",
 
     # Meta
     "src\Meta\Metalama\LightningArc.Metalama.csproj",
-    "src\Meta\Metalama.Results\LightningArc.Metalama.Results.csproj"
+    "src\Meta\Metalama.Results\LightningArc.Metalama.Results.csproj",
+    
+    # Analyzers
+    "src\Analyzers\LightningArc.Analyzers.csproj"
 )
 
 # --- General Clean and Build ---
