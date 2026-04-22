@@ -8,12 +8,13 @@
 
   <!-- Microsoft -->
   <PropertyGroup>
-      <MicrosoftPackagesVersion>10.0.5</MicrosoftPackagesVersion> 
+      <MicrosoftPackagesVersion>10.0.7</MicrosoftPackagesVersion> 
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftPackagesVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftPackagesVersion)" />
@@ -45,7 +46,7 @@
   
   <!-- ORMs -->
   <ItemGroup>
-    <PackageVersion Include="Dapper" Version="2.1.66" />
+    <PackageVersion Include="Dapper" Version="2.1.72" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'netstandard2.0'" Version="3.1.32" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.11" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net10.0'" Version="$(MicrosoftPackagesVersion)" />
@@ -66,7 +67,7 @@
 
   <!-- Metalama -->
   <PropertyGroup>
-      <MetalamaPackagesVersion>2026.0.20</MetalamaPackagesVersion>
+      <MetalamaPackagesVersion>2026.0.21</MetalamaPackagesVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Metalama.Framework" Version="$(MetalamaPackagesVersion)" />
@@ -86,8 +87,8 @@
   
   <!-- Tests -->
   <ItemGroup> 
-    <PackageVersion Include="TUnit" Version="1.31.0" />
-    <PackageVersion Include="TUnit.AspNetCore" Version="1.31.0" />
+    <PackageVersion Include="TUnit" Version="1.37.35" />
+    <PackageVersion Include="TUnit.AspNetCore" Version="1.37.35" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="coverlet.collector" Version="8.0.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
