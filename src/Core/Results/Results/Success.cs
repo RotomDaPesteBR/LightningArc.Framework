@@ -269,27 +269,27 @@ public abstract class Success<TValue> : Success, IEquatable<Success<TValue>>
     public TValue Value { get; }
 
     /// <remarks>
-    /// Internal constructor to initialize the <see cref="Success{TValue}"/> instance.
+    /// Protected constructor to initialize the <see cref="Success{TValue}"/> instance.
     /// </remarks>
     /// <param name="code">The numeric code of the success.</param>
     /// <param name="messageProvider">The message provider for this success.</param>
     /// <param name="value">The success value to be encapsulated.</param>
-    internal Success(int code, IMessageProvider? messageProvider, TValue value)
+    protected Success(int code, IMessageProvider? messageProvider, TValue value)
         : base(code, messageProvider)
     {
         Value = value;
     }
 
     /// <remarks>
-    /// Internal constructor to initialize the <see cref="Success{TValue}"/> instance
+    /// Protected constructor to initialize the <see cref="Success{TValue}"/> instance
     /// from a non-generic <see cref="Success"/>.
     /// </remarks>
     /// <param name="existingSuccess">The existing <see cref="Success"/> object.</param>
     /// <param name="value">The success value to be encapsulated.</param>
-    internal Success(Success existingSuccess, TValue value)
+    protected Success(Success existingSuccess, TValue value)
         : base(existingSuccess.Code, existingSuccess.MessageProvider)
     {
-        // Este construtor é chamado pelas subclasses internas (OkSuccess, CreatedSuccess, etc.)
+        // Este construtor ï¿½ chamado pelas subclasses internas (OkSuccess, CreatedSuccess, etc.)
         Value = value;
     }
 
@@ -354,7 +354,7 @@ public abstract class Success<TValue> : Success, IEquatable<Success<TValue>>
         internal OkSuccess(TValue value, IMessageProvider? messageProvider)
             : base(100, messageProvider, value) { }
 
-        internal OkSuccess(int code, IMessageProvider? messageProvider, TValue value) // Para códigos customizados
+        internal OkSuccess(int code, IMessageProvider? messageProvider, TValue value) // Para cï¿½digos customizados
             : base(code, messageProvider, value) { }
 
         internal OkSuccess(Success existingSuccess, TValue value)
