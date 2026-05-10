@@ -48,6 +48,15 @@ public class Result : IEquatable<Result>
             : throw new ResultAccessFailedException("Result is successful, no error to access.");
 
     /// <summary>
+    /// Provides a fluent entry point to create custom success
+    /// through the <see cref="Success.Hook"/> mechanism.
+    /// </summary>
+    /// <value>
+    /// A new instance of the <see cref="Success.Hook"/> class.
+    /// </value>
+    public static Success.Hook Of => Results.Success.Of;
+
+    /// <summary>
     /// Gets the <see cref="Results.Success"/> object associated with this result.
     /// </summary>
     /// <exception cref="ResultAccessFailedException">Thrown if the result is a failure (there are no success details to access).</exception>

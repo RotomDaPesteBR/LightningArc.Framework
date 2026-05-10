@@ -26,9 +26,7 @@ namespace LightningArc.Results
             /// <remarks>
             /// This constructor is protected to ensure that the class can only be instantiated through inheritance.
             /// </remarks>
-            protected ErrorModule()
-            {
-            }
+            protected ErrorModule() { }
         }
 
         /// <summary>
@@ -36,13 +34,13 @@ namespace LightningArc.Results
         /// </summary>
         /// <typeparam name="TModule">The type of the error module, which must inherit from <see cref="ErrorModule"/>.</typeparam>
         /// <remarks>
-        /// This class is used to allow for the creation of extension methods that build 
+        /// This class is used to allow for the creation of extension methods that build
         /// specific errors for a module in a fluent manner (e.g., <c>Error.Custom.OrderRejected(...)</c>).
         /// </remarks>
         public class ErrorModule<TModule>
             where TModule : ErrorModule
         {
-            internal ErrorModule() {}
+            internal ErrorModule() { }
         }
 
         /// <summary>
@@ -52,10 +50,9 @@ namespace LightningArc.Results
         /// <returns>A new instance of <see cref="ErrorModule{TModule}"/>, which serves as an error factory for the specified module.</returns>
         /// <remarks>
         /// Use this method in conjunction with extension methods to create specific errors for a module,
-        /// for example: <c>Error.Custom&lt;BusinessErrors&gt;().OrderRejected(...)</c>.
+        /// for example: <c>Error.Of&lt;Business&gt;().OrderRejected(...)</c>.
         /// </remarks>
-        public static ErrorModule<TModule> Custom<TModule>()
+        public static ErrorModule<TModule> Of<TModule>()
             where TModule : ErrorModule => new();
     }
 }
-

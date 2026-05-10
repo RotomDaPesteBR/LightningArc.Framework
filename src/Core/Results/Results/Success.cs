@@ -26,6 +26,15 @@ public abstract class Success : IEquatable<Success>
     public string? Message => MessageProvider?.GetMessage(CultureInfo.CurrentCulture);
 
     /// <summary>
+    /// Provides a fluent entry point to create custom success
+    /// through the <see cref="Hook"/> mechanism.
+    /// </summary>
+    /// <value>
+    /// A new instance of the <see cref="Hook"/> class.
+    /// </value>
+    public static Hook Of => new();
+
+    /// <summary>
     /// Protected constructor to initialize the base <see cref="Success"/> instance with a message provider.
     /// </summary>
     /// <param name="code">The numeric code of the success.</param>
@@ -140,10 +149,7 @@ public abstract class Success : IEquatable<Success>
     /// <param name="value">The value to be encapsulated in the success.</param>
     /// <param name="message">The optional success message. If not provided, the default localized message will be used.</param>
     /// <returns>A new <see cref="Success{TValue}"/> instance.</returns>
-    public static Success<TValue> Ok<TValue>(
-        TValue value,
-        string? message = null
-    ) =>
+    public static Success<TValue> Ok<TValue>(TValue value, string? message = null) =>
         new Success<TValue>.OkSuccess(
             value,
             SuccessMessageFactory.CreateProvider(message, "Success_Ok")
@@ -156,10 +162,7 @@ public abstract class Success : IEquatable<Success>
     /// <param name="value">The value to be encapsulated in the success.</param>
     /// <param name="message">The optional success message. If not provided, the default localized message will be used.</param>
     /// <returns>A new <see cref="Success{TValue}"/> instance.</returns>
-    public static Success<TValue> Created<TValue>(
-        TValue value,
-        string? message = null
-    ) =>
+    public static Success<TValue> Created<TValue>(TValue value, string? message = null) =>
         new Success<TValue>.CreatedSuccess(
             value,
             SuccessMessageFactory.CreateProvider(message, "Success_Created")
@@ -172,10 +175,7 @@ public abstract class Success : IEquatable<Success>
     /// <param name="value">The value to be encapsulated in the success.</param>
     /// <param name="message">The optional success message. If not provided, the default localized message will be used.</param>
     /// <returns>A new <see cref="Success{TValue}"/> instance.</returns>
-    public static Success<TValue> Accepted<TValue>(
-        TValue value,
-        string? message = null
-    ) =>
+    public static Success<TValue> Accepted<TValue>(TValue value, string? message = null) =>
         new Success<TValue>.AcceptedSuccess(
             value,
             SuccessMessageFactory.CreateProvider(message, "Success_Accepted")
@@ -253,6 +253,18 @@ public abstract class Success : IEquatable<Success>
         /// <inheritdoc/>
         public override Success<TValue> WithValue<TValue>(TValue value) =>
             new Success<TValue>.NoContentSuccess(value, MessageProvider);
+    }
+
+    /// <summary>
+    /// Represents a fluent hook used to attach domain-specific result extensions.
+    /// </summary>
+    /// <remarks>
+    /// This class is instantiated via <see cref="Result.Of"/> and serves as the
+    /// target for extension methods to avoid polluting the core Result API.
+    /// </remarks>
+    public sealed class Hook
+    {
+        internal Hook() { }
     }
 }
 
@@ -420,4 +432,3 @@ public abstract class Success<TValue> : Success, IEquatable<Success<TValue>>
             new Success<TMappedValue>.NoContentSuccess(value, MessageProvider);
     }
 }
-

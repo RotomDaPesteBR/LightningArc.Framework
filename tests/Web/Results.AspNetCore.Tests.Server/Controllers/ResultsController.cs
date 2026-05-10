@@ -11,18 +11,27 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
     public class ResultsController(ILogger<ResultsController> logger) : Controller
     {
         private readonly ILogger<ResultsController> _logger = logger;
-
+            
         [HttpGet]
         public EndpointResult<string> GetResult()
         {
             try
             {
+                //Result.OrderProcessed(); 
+                //Result.Success();
+
+                //Result.Of.OrderProcessed();
+                //Success.Of.OrderProcessed();
+
+                //Error.Resource.NotFound(); 
+                //Error.Business.OrderRejected();
+
                 //var t = typeof(Success<string>.CreatedSuccess);
 
                 //return Error.Application.Internal("Erro de teste", [ new ("Teste", "Erro de teste") ]);
                 //return Error.Database.ConstraintViolation("Erro de teste", [ new ("Teste", "Erro de teste") ]);
                 return Error
-                    .Custom<Business>()
+                    .Of<Business>()
                     .OrderRejected("Erro de teste", [new("Teste", "Erro de teste")]);
                 //return Result.Success("Resultado", Success.Created("Criado com sucesso"));
             }
@@ -49,7 +58,7 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
             });
         }
 
-        [HttpGet("Test/{id:int}")]
+        [HttpGet("Custom/{id:int}")]
         public EndpointResult<string> GetTestResultById(int id)
         {
             Result<string> result;
