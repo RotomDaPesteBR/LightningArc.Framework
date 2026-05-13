@@ -9,10 +9,10 @@ namespace LightningArc.Primitives.ValueObjects
     /// ensuring its validity at the time of creation through a factory method.
     /// </summary>
     /// <remarks>
-    /// This 'record' is an immutable value type. Email validation is enforced 
+    /// This 'record' is an immutable value type. Email validation is enforced
     /// in the private constructor, accessible through the <see cref="Create(string)"/> static factory method.
     /// </remarks>
-    public record Email : IValueObject<string>
+    public sealed record Email : IValueObject<string>
     {
         /// <summary>
         /// Regular expression for email format validation.

@@ -10,7 +10,7 @@
         <Description>System.Text.Json converters and serialization helpers for LightningArc types and Value Objects.</Description>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\Core\Primitives\LightningArc.Primitives.csproj" />
+        <ProjectReference Include="..\Primitives\LightningArc.Primitives.csproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
         <PackageReference Include="PolySharp" PrivateAssets="All" />

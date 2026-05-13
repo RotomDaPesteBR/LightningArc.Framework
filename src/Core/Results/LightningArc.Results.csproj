@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="LightningArc.Results.AspNetCore" />
     <InternalsVisibleTo Include="LightningArc.Results.Tests" />
   </ItemGroup>
 </Project>

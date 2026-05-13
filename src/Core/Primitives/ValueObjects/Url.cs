@@ -6,7 +6,7 @@ namespace LightningArc.Primitives.ValueObjects
     /// <summary>
     /// Represents a valid URL.
     /// </summary>
-    public record Url : IValueObject<string>
+    public sealed record Url : IValueObject<string>
     {
         /// <summary>
         /// Gets the URL string value.

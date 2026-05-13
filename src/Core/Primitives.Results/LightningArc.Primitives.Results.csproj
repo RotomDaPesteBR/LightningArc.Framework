@@ -10,7 +10,7 @@
 
   <PropertyGroup>
 	<AssemblyName>LightningArc.Primitives.Results</AssemblyName>
-	<PackageTags>lightningarc dotnet clean-code value-objects domain-driven-design validation email cpf cnpj</PackageTags>
+	<PackageTags>lightningarc dotnet clean-code value-objects domain-driven-design validation email cpf cnpj result-pattern functional-validation railway-oriented-programming</PackageTags>
 	<Description>Functional extensions that integrate LightningArc Primitives with the Result pattern for fluent validation.</Description>
   </PropertyGroup>
 

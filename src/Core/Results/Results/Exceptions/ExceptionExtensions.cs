@@ -10,7 +10,7 @@ public static class ExceptionExtensions
     /// </summary>
     /// <param name="exception">The exception to transform.</param>
     /// <returns>The resulting <see cref="Error"/> object.</returns>
-    public static Error FromException(this Exception exception)
+    public static Error ToError(this Exception exception)
     {
         return ExceptionMapper.Map(exception);
     }

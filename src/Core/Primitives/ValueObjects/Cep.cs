@@ -11,7 +11,7 @@ namespace LightningArc.Primitives.ValueObjects;
 /// This 'record' is an immutable value type. CEP format validation (XXXXX-XXX or 8 digits)
 /// is enforced in the private constructor.
 /// </remarks>
-public record Cep : IValueObject<string>
+public sealed record Cep : IValueObject<string>
 {
     private const string CepRegexPattern = @"^\d{5}-?\d{3}$";
 

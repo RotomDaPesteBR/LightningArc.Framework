@@ -1,5 +1,5 @@
-
 using LightningArc.Results;
+using LightningArc.Results.Successes;
 
 namespace LightningArc.Results.Tests
 {
@@ -46,7 +46,7 @@ namespace LightningArc.Results.Tests
             Result result = Result.Failure(TestError);
 
             // Act & Assert
-            await Assert.That(() => result.SuccessDetails).Throws<ResultAccessFailedException>();
+            await Assert.That(() => result.SuccessState).Throws<ResultAccessFailedException>();
         }
 
         [Test]
@@ -86,10 +86,10 @@ namespace LightningArc.Results.Tests
         public async Task Success_FactoryMethods_ShouldCreateSuccessResults()
         {
             // Assert
-            await Assert.That(Result.Success().SuccessDetails).IsTypeOf<Success.OkSuccess>();
-            await Assert.That(Result.Created().SuccessDetails).IsTypeOf<Success.CreatedSuccess>();
-            await Assert.That(Result.Accepted().SuccessDetails).IsTypeOf<Success.AcceptedSuccess>();
-            await Assert.That(Result.NoContent().SuccessDetails).IsTypeOf<Success.NoContentSuccess>();
+            await Assert.That(Result.Success().SuccessState).IsTypeOf<OkSuccess>();
+            await Assert.That(Result.Created().SuccessState).IsTypeOf<CreatedSuccess>();
+            await Assert.That(Result.Accepted().SuccessState).IsTypeOf<AcceptedSuccess>();
+            await Assert.That(Result.NoContent().SuccessState).IsTypeOf<NoContentSuccess>();
         }
 
         [Test]
@@ -99,10 +99,13 @@ namespace LightningArc.Results.Tests
             const string value = "test";
 
             // Assert
-            await Assert.That(Result.Success(value).SuccessDetails).IsTypeOf<Success<string>.OkSuccess>();
-            await Assert.That(Result.Created(value).SuccessDetails).IsTypeOf<Success<string>.CreatedSuccess>();
-            await Assert.That(Result.Accepted(value).SuccessDetails).IsTypeOf<Success<string>.AcceptedSuccess>();
-            await Assert.That(Result.NoContent(value).SuccessDetails).IsTypeOf<Success<string>.NoContentSuccess>();
+            await Assert.That(Result.Success(value).SuccessState).IsTypeOf<OkSuccess<string>>();
+            await Assert
+                .That(Result.Created(value).SuccessState)
+                .IsTypeOf<CreatedSuccess<string>>();
+            await Assert
+                .That(Result.Accepted(value).SuccessState)
+                .IsTypeOf<AcceptedSuccess<string>>();
         }
 
         [Test]
@@ -139,5 +142,3 @@ namespace LightningArc.Results.Tests
         }
     }
 }
-
-

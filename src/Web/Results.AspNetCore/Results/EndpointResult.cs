@@ -38,7 +38,9 @@ public sealed class EndpointResult : IResult
     /// <returns>An <see cref="EndpointResult"/> that encapsulates the corresponding HTTP response.</returns>
     public static implicit operator EndpointResult(Result result)
     {
-        return result.IsSuccess ? new EndpointResult(new SuccessResult(result.SuccessDetails)) : new EndpointResult(new ErrorResult(result.Error));
+        return result.IsSuccess
+            ? new EndpointResult(new SuccessResult(result.SuccessState))
+            : new EndpointResult(new ErrorResult(result.Error));
     }
 }
 
@@ -82,7 +84,7 @@ public sealed class EndpointResult<TValue> : IResult
     {
         return result.IsSuccess
             ? new EndpointResult<TValue>(
-                new SuccessResult<TValue>(result.SuccessDetails, contentType)
+                new SuccessResult<TValue>(result.SuccessState, contentType)
             )
             : new EndpointResult<TValue>(new ErrorResult(result.Error!));
     }
@@ -94,7 +96,9 @@ public sealed class EndpointResult<TValue> : IResult
     /// <returns>An <see cref="EndpointResult{TValue}"/> that encapsulates the corresponding HTTP response.</returns>
     public static implicit operator EndpointResult<TValue>(Result<TValue> result)
     {
-        return result.IsSuccess ? new EndpointResult<TValue>(new SuccessResult<TValue>(result.SuccessDetails)) : new EndpointResult<TValue>(new ErrorResult(result.Error));
+        return result.IsSuccess
+            ? new EndpointResult<TValue>(new SuccessResult<TValue>(result.SuccessState))
+            : new EndpointResult<TValue>(new ErrorResult(result.Error));
     }
 
     /// <summary>
@@ -113,7 +117,3 @@ public sealed class EndpointResult<TValue> : IResult
     public static implicit operator EndpointResult<TValue>(Error error) =>
         new(new ErrorResult(error));
 }
-
-
-
-

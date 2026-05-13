@@ -30,7 +30,7 @@ public static partial class ResultExtensions
     /// </returns>
     [OverloadResolutionPriority(0)]
     public static Result<TOut> Map<TOut>(this Result result, Func<TOut> mapper) =>
-        result.IsSuccess ? result.SuccessDetails.Map(mapper) : result.Error;
+        result.IsSuccess ? result.SuccessState.Map(mapper) : result.Error;
     #endregion
 
     #region Result => Success<TOut>
@@ -80,10 +80,8 @@ public static partial class ResultExtensions
     /// If the input <paramref name="result"/> is a failure, the original error is propagated.
     /// </returns>
     [OverloadResolutionPriority(0)]
-    public static Result<TOut> Map<TIn, TOut>(
-        this Result<TIn> result,
-        Func<TIn, TOut> mapper
-    ) => result.IsSuccess ? result.SuccessDetails.Map(mapper) : result.Error;
+    public static Result<TOut> Map<TIn, TOut>(this Result<TIn> result, Func<TIn, TOut> mapper) =>
+        result.IsSuccess ? result.SuccessState.Map(mapper) : result.Error;
     #endregion
 
     #region TIn => Success<TOut>
@@ -114,4 +112,3 @@ public static partial class ResultExtensions
 
     #endregion
 }
-

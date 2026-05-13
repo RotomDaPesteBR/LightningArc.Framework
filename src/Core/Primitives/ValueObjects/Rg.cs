@@ -7,7 +7,7 @@ namespace LightningArc.Primitives.ValueObjects
     /// <summary>
     /// Represents a Brazilian RG (Registro Geral) — the national identity document number.
     /// </summary>
-    public record Rg : IValueObject<string>
+    public sealed record Rg : IValueObject<string>
     {
         private const string RgRegexPattern = @"^\d{1,2}\.?\d{3}\.?\d{3}-?[0-9Xx]?$";
 

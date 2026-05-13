@@ -27,7 +27,7 @@ public class Result : IEquatable<Result>
     /// This is a convenience value that returns the code from the <see cref="Results.Success"/> object on success
     /// or from the <see cref="Error"/> object on failure.
     /// </remarks>
-    public int Code => IsSuccess ? SuccessDetails.Code : Error.Code;
+    public int Code => IsSuccess ? SuccessState.Code : Error.Code;
 
     /// <summary>
     /// Gets the message associated with the result.
@@ -36,7 +36,7 @@ public class Result : IEquatable<Result>
     /// This property returns the message from the <see cref="Results.Success"/> object if the operation was successful,
     /// or the message from the <see cref="Error"/> object if the operation failed.
     /// </remarks>
-    public string? Message => IsSuccess ? SuccessDetails.Message : Error.Message;
+    public string? Message => IsSuccess ? SuccessState.Message : Error.Message;
 
     /// <summary>
     /// Gets the <see cref="Error"/> object associated with this result.
@@ -48,6 +48,17 @@ public class Result : IEquatable<Result>
             : throw new ResultAccessFailedException("Result is successful, no error to access.");
 
     /// <summary>
+    /// Gets the <see cref="Results.Success"/> object associated with this result.
+    /// </summary>
+    /// <exception cref="ResultAccessFailedException">Thrown if the result is a failure (there are no success details to access).</exception>
+    public Success SuccessState =>
+        IsSuccess
+            ? _success!
+            : throw new ResultAccessFailedException(
+                "Result is not successful, no success to access."
+            );
+
+    /// <summary>
     /// Provides a fluent entry point to create custom success
     /// through the <see cref="Success.Hook"/> mechanism.
     /// </summary>
@@ -56,65 +67,36 @@ public class Result : IEquatable<Result>
     /// </value>
     public static Success.Hook Of => Results.Success.Of;
 
-    /// <summary>
-    /// Gets the <see cref="Results.Success"/> object associated with this result.
-    /// </summary>
-    /// <exception cref="ResultAccessFailedException">Thrown if the result is a failure (there are no success details to access).</exception>
-    public Success SuccessDetails =>
-        IsSuccess
-            ? _success!
-            : throw new ResultAccessFailedException(
-                "Result is not successful, no success details to access."
-            );
-
     private readonly Error? _error;
     private readonly Success? _success;
 
     /// <summary>
-    /// Protected constructor for a success result.
+    /// Internal constructor for a success result.
     /// </summary>
     /// <param name="success">The <see cref="Results.Success"/> object containing the code and message.</param>
-    protected Result(Success success)
+    internal Result(Success success)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(success);
-#else
-        if (success is null)
-        {
-            throw new ArgumentNullException(nameof(success));
-        }
-#endif
-
         IsSuccess = true;
-        _success = success;
+        _success = success ?? throw new ArgumentNullException(nameof(success));
         _error = null;
     }
 
     /// <summary>
-    /// Protected constructor for a failure result.
+    /// Internal constructor for a failure result.
     /// </summary>
     /// <param name="error">The <see cref="Error"/> object describing the failure.</param>
-    protected Result(Error error)
+    internal Result(Error error)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(error);
-#else
-        if (error is null)
-        {
-            throw new ArgumentNullException(nameof(error));
-        }
-#endif
-
         IsSuccess = false;
-        _error = error;
+        _error = error ?? throw new ArgumentNullException(nameof(error));
         _success = null;
     }
 
     /// <summary>
-    /// Protected copy constructor.
+    /// Internal copy constructor.
     /// </summary>
     /// <param name="result">The <see cref="Result"/> object to be copied.</param>
-    protected Result(Result result)
+    internal Result(Result result)
     {
         IsSuccess = result.IsSuccess;
         _success = result._success;
@@ -251,7 +233,7 @@ public class Result : IEquatable<Result>
     }
 
     /// <summary>
-    /// Creates a success result with a generic code (Ok) and an optional message.
+    /// Creates a success result with a generic code (Ok).
     /// </summary>
     /// <returns>A new instance of <see cref="Result"/> indicating success.</returns>
     public static Result Success() => new(Results.Success.Ok());
@@ -264,13 +246,13 @@ public class Result : IEquatable<Result>
     public static Result Success(Success success) => new(success);
 
     /// <summary>
-    /// Creates a success result with a generic code (Created) and an optional message.
+    /// Creates a success result with a generic code (Created).
     /// </summary>
     /// <returns>A new instance of <see cref="Result"/> indicating success.</returns>
     public static Result Created() => new(Results.Success.Created());
 
     /// <summary>
-    /// Creates a success result with a generic code (Accepted) and an optional message.
+    /// Creates a success result with a generic code (Accepted).
     /// </summary>
     /// <returns>A new instance of <see cref="Result"/> indicating success.</returns>
     public static Result Accepted() => new(Results.Success.Accepted());
@@ -376,27 +358,6 @@ public class Result : IEquatable<Result>
     public static Result<TValue> Accepted<TValue>(TValue value, string message) =>
         new(Results.Success.Accepted(value, message));
 
-    // --- NoContent ---
-
-    /// <summary>
-    /// Creates a success result with a value and a generic code (No Content).
-    /// </summary>
-    /// <typeparam name="TValue">The type of the success value.</typeparam>
-    /// <param name="value">The value to be encapsulated in the result.</param>
-    /// <returns>A new instance of <see cref="Result{TValue}"/> indicating success and no content.</returns>
-    public static Result<TValue> NoContent<TValue>(TValue value) =>
-        new(Results.Success.NoContent(value));
-
-    /// <summary>
-    /// Creates a success result with a value and a generic code (No Content).
-    /// </summary>
-    /// <typeparam name="TValue">The type of the success value.</typeparam>
-    /// <param name="value">The value to be encapsulated in the result.</param>
-    /// <param name="message">The custom success message.</param>
-    /// <returns>A new instance of <see cref="Result{TValue}"/> indicating success and no content.</returns>
-    public static Result<TValue> NoContent<TValue>(TValue value, string message) =>
-        new(Results.Success.NoContent(value, message));
-
     /// <summary>
     /// Creates a failure result.
     /// </summary>
@@ -432,12 +393,12 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     /// <summary>
     /// Gets the <see cref="Success"/> object associated with this result.
     /// </summary>
-    /// <exception cref="ResultAccessFailedException">Thrown if the result is a failure (there are no success details to access).</exception>
-    public new Success<TValue> SuccessDetails =>
+    /// <exception cref="ResultAccessFailedException">Thrown if the result is a failure (there are no success to access).</exception>
+    public new Success<TValue> SuccessState =>
         IsSuccess
             ? _success!
             : throw new ResultAccessFailedException(
-                "Result is not successful, no success details to access."
+                "Result is not successful, no success to access."
             );
 
     /// <summary>
@@ -448,6 +409,16 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
         IsSuccess
             ? _success!.Value
             : throw new ResultAccessFailedException("Result is not successful.");
+
+    /// <summary>
+    /// Provides a fluent entry point to create custom success
+    /// through the <see cref="Success.Hook"/> mechanism.
+    /// </summary>
+    /// <value>
+    /// A new instance of the <see cref="Success.Hook"/> class.
+    /// </value>
+    public static new Success<TValue>.Hook Of => Results.Success<TValue>.Of;
+
     private readonly Success<TValue>? _success;
 
     /// <summary>
@@ -468,16 +439,7 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     internal Result(Success<TValue> success)
         : base(success)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(success);
-#else
-        if (success is null)
-        {
-            throw new ArgumentNullException(nameof(success));
-        }
-#endif
-
-        _success = success;
+        _success = success ?? throw new ArgumentNullException(nameof(success));
     }
 
     /// <summary>
@@ -490,7 +452,7 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     {
         if (result.IsSuccess)
         {
-            _success = result.SuccessDetails.WithValue(value);
+            _success = result.SuccessState.WithValue(value);
         }
     }
 
@@ -524,7 +486,7 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
             return Equals(_success, other._success);
         }
 
-        return true; // Se ambos falharam e o base.Equals passou, os erros são iguais
+        return true; // If both failed and base.Equals passed, errors are equal
     }
 
     /// <inheritdoc />
@@ -541,7 +503,19 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return base.GetHashCode();
+#if NETSTANDARD2_0
+        unchecked
+        {
+            int hash = base.GetHashCode();
+            if (IsSuccess)
+            {
+                hash = hash * 23 + Value!.GetHashCode();
+            }
+            return hash;
+        }
+#else
+        return IsSuccess ? HashCode.Combine(base.GetHashCode(), Value!) : base.GetHashCode();
+#endif
     }
 
     /// <summary>
@@ -603,12 +577,12 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     public static new Result<TValue> Failure(Error error) => new(error);
 
     /// <summary>
-    /// Allows the conversion of a generic result to a non-generic result.
+    /// Converts a generic result to a non-generic result.
     /// </summary>
-    /// <param name="result">The value to be converted.</param>
-    /// <returns>A success <see cref="Result{TValue}"/> encapsulating the value.</returns>
+    /// <param name="result">The generic result to convert.</param>
+    /// <returns>A non-generic <see cref="Result"/> representing the same outcome (success or failure) as the input.</returns>
     public static Result ToResult(Result<TValue> result) =>
-        result.IsSuccess ? Result.Success(result.SuccessDetails) : Result.Failure(result.Error);
+        result.IsSuccess ? Result.Success(result.SuccessState) : Result.Failure(result.Error);
 
     /// <summary>
     /// Explicitly converts a <see cref="Result{TValue}"/> to its encapsulated value.

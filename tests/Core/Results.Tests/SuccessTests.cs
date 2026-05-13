@@ -1,6 +1,7 @@
 
 using LightningArc.Results;
 using LightningArc.Results.Localization;
+using LightningArc.Results.Successes;
 using System;
 
 namespace LightningArc.Results.Tests
@@ -16,7 +17,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.Ok();
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.OkSuccess>();
+            await Assert.That(success).IsTypeOf<OkSuccess>();
             await Assert.That(success.Code).IsEqualTo(100);
             await Assert.That(success.Message).IsEqualTo("Operação concluída com sucesso.");
         }
@@ -31,7 +32,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.Ok(message);
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.OkSuccess>();
+            await Assert.That(success).IsTypeOf<OkSuccess>();
             await Assert.That(success.Code).IsEqualTo(100);
             await Assert.That(success.Message).IsEqualTo(message);
         }
@@ -45,7 +46,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.Created();
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.CreatedSuccess>();
+            await Assert.That(success).IsTypeOf<CreatedSuccess>();
             await Assert.That(success.Code).IsEqualTo(101);
             await Assert.That(success.Message).IsEqualTo("Recurso criado com sucesso.");
         }
@@ -60,7 +61,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.Created(message);
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.CreatedSuccess>();
+            await Assert.That(success).IsTypeOf<CreatedSuccess>();
             await Assert.That(success.Code).IsEqualTo(101);
             await Assert.That(success.Message).IsEqualTo(message);
         }
@@ -74,7 +75,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.Accepted();
             
             // Assert
-            await Assert.That(success).IsTypeOf<Success.AcceptedSuccess>();
+            await Assert.That(success).IsTypeOf<AcceptedSuccess>();
             await Assert.That(success.Code).IsEqualTo(102);
             await Assert.That(success.Message).IsEqualTo("A solicitação foi aceita para processamento.");
         }
@@ -89,7 +90,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.Accepted(message);
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.AcceptedSuccess>();
+            await Assert.That(success).IsTypeOf<AcceptedSuccess>();
             await Assert.That(success.Code).IsEqualTo(102);
             await Assert.That(success.Message).IsEqualTo(message);
         }
@@ -103,7 +104,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.NoContent();
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.NoContentSuccess>();
+            await Assert.That(success).IsTypeOf<NoContentSuccess>();
             await Assert.That(success.Code).IsEqualTo(103);
         }
 
@@ -117,7 +118,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.NoContent(message);
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.NoContentSuccess>();
+            await Assert.That(success).IsTypeOf<NoContentSuccess>();
             await Assert.That(success.Code).IsEqualTo(103);
             await Assert.That(success.Message).IsEqualTo(message);
         }

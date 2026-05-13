@@ -30,7 +30,7 @@ public sealed class ResultAggregator
         }
         catch (Exception ex)
         {
-            AppendError(ex.FromException());
+            AppendError(ex.ToError());
         }
 
         return this;
@@ -52,7 +52,7 @@ public sealed class ResultAggregator
         }
         catch (Exception ex)
         {
-            AppendError(ex.FromException());
+            AppendError(ex.ToError());
             value = default;
             return this;
         }

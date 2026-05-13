@@ -9,7 +9,10 @@ namespace LightningArc.Json.Converters
     /// Factory that creates a JSON converter for any type that implements <see cref="IValueObject{T}"/>.
     /// This allows Value Objects to be serialized and deserialized as their underlying primitive values.
     /// </summary>
-    public class ValueObjectJsonConverterFactory : JsonConverterFactory
+    /// <remarks>
+    /// A value object is JSON-convertible when it implements <see cref="IValueObject{T}"/> and exposes a public static Create(T value) method.
+    /// </remarks>
+    public sealed class ValueObjectJsonConverterFactory : JsonConverterFactory
     {
         /// <inheritdoc />
         public override bool CanConvert(Type typeToConvert)
@@ -56,23 +59,18 @@ namespace LightningArc.Json.Converters
         private class ValueObjectJsonConverter<TValueObject, TValue> : JsonConverter<TValueObject>
             where TValueObject : IValueObject<TValue>
         {
-            private readonly MethodInfo _createMethod;
+            private readonly MethodInfo _createMethod = typeof(TValueObject).GetMethod(
+                                                            "Create",
+                                                            BindingFlags.Public | BindingFlags.Static,
+                                                            null,
+                                                            [typeof(TValue)],
+                                                            null
+                                                        )
+                                                        ?? throw new InvalidOperationException(
+                                                            $"Type {typeof(TValueObject).Name} must have a static method 'Create({typeof(TValue).Name})'."
+                                                        );
 
-            public ValueObjectJsonConverter()
-            {
-                // Looking for the static 'Create' method that takes the underlying value type as parameter.
-                _createMethod =
-                    typeof(TValueObject).GetMethod(
-                        "Create",
-                        BindingFlags.Public | BindingFlags.Static,
-                        null,
-                        [typeof(TValue)],
-                        null
-                    )
-                    ?? throw new InvalidOperationException(
-                        $"Type {typeof(TValueObject).Name} must have a static method 'Create({typeof(TValue).Name})'."
-                    );
-            }
+            // Looking for the static 'Create' method that takes the underlying value type as parameter.
 
             public override TValueObject? Read(
                 ref Utf8JsonReader reader,

@@ -1,7 +1,7 @@
 namespace LightningArc.Results
 {
     /// <summary>
-    /// Métodos de extensão para operações de Encademaneto (Bind), como <c>MatchBindAsync</c>, que encadeiam uma operação
+    /// MÃ©todos de extensÃ£o para operaÃ§Ãµes de Encademaneto (Bind), como <c>MatchBindAsync</c>, que encadeiam uma operaÃ§Ã£o
     /// que retorna um novo <see cref="Result"/> ou <see cref="Task{TResult}">Task&lt;Result&gt;</see>.
     /// </summary>
     public static partial class ResultExtensions
@@ -19,7 +19,8 @@ namespace LightningArc.Results
             this Result result,
             Func<Task<Result>> success,
             Func<Error, Task<Result>> failure
-        ) => result.IsSuccess
+        ) =>
+            result.IsSuccess
                 ? await success().ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
 
@@ -102,7 +103,8 @@ namespace LightningArc.Results
             this Result<TIn> result,
             Func<Result<TIn>, Task<Result<TOut>>> success, // Receives Result<TIn>
             Func<Error, Task<Result<TOut>>> failure
-        ) => result.IsSuccess
+        ) =>
+            result.IsSuccess
                 ? await success(result).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
 
@@ -130,7 +132,8 @@ namespace LightningArc.Results
             this Result result,
             Func<Result, Task<Result>> success, // Receives Result
             Func<Error, Task<Result>> failure
-        ) => result.IsSuccess
+        ) =>
+            result.IsSuccess
                 ? await success(result).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
         #endregion
@@ -149,8 +152,9 @@ namespace LightningArc.Results
             this Result<TIn> result,
             Func<Success<TIn>, Task<Result<TOut>>> success,
             Func<Error, Task<Result<TOut>>> failure
-        ) => result.IsSuccess
-                ? await success(result.SuccessDetails).ConfigureAwait(false)
+        ) =>
+            result.IsSuccess
+                ? await success(result.SuccessState).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
 
         /// <summary>
@@ -172,7 +176,7 @@ namespace LightningArc.Results
             var result = await resultTask.ConfigureAwait(false);
 
             return result.IsSuccess
-                ? await success(result.SuccessDetails!).ConfigureAwait(false)
+                ? await success(result.SuccessState!).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
         }
 
@@ -194,7 +198,7 @@ namespace LightningArc.Results
         {
             var result = await resultTask.ConfigureAwait(false);
 
-            return result.IsSuccess ? success(result.SuccessDetails!) : failure(result.Error);
+            return result.IsSuccess ? success(result.SuccessState!) : failure(result.Error);
         }
 
         /// <summary>
@@ -205,8 +209,9 @@ namespace LightningArc.Results
             this Result<TIn> result,
             Func<Success<TIn>, Task<Result<TOut>>> success,
             Func<Error, Result<TOut>> failure
-        ) => result.IsSuccess
-                ? await success(result.SuccessDetails!).ConfigureAwait(false)
+        ) =>
+            result.IsSuccess
+                ? await success(result.SuccessState!).ConfigureAwait(false)
                 : failure(result.Error);
 
         /// <summary>
@@ -222,7 +227,7 @@ namespace LightningArc.Results
             var result = await resultTask.ConfigureAwait(false);
 
             return result.IsSuccess
-                ? success(result.SuccessDetails!)
+                ? success(result.SuccessState!)
                 : await failure(result.Error).ConfigureAwait(false);
         }
 
@@ -244,10 +249,9 @@ namespace LightningArc.Results
             Result? result = await resultTask.ConfigureAwait(false);
 
             return result.IsSuccess
-                ? await success(result.SuccessDetails).ConfigureAwait(false)
+                ? await success(result.SuccessState).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
         }
         #endregion
     }
 }
-
