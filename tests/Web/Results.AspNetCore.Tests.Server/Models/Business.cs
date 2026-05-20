@@ -102,7 +102,7 @@ public class Business : Error.ErrorModule
 {
     public new const int CodePrefix = 12;
 
-    // Classe de erro específica do módulo de negócio
+    // Specific error class for the business module
     public class OrderRejectedError : Error
     {
         internal OrderRejectedError(string message, params IEnumerable<ErrorDetail>? details)

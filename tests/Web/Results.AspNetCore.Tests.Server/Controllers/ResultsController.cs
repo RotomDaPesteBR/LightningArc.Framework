@@ -17,7 +17,7 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
             {
                 return Error
                     .Of<Business>()
-                    .OrderRejected("Erro de teste", [new("Teste", "Erro de teste")]);
+                    .OrderRejected("Test error", [new("Test", "Test error")]);
             }
             catch (Exception exception)
             {
@@ -52,8 +52,8 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
                     new ErrorDetail("Id", id.ToString()),
                     new ErrorDetail("Code", (id + 1).ToString())
                 ),
-                0 => "Teste",
-                1 => Result.Created($"Teste {id} foi criado", $"Teste criado com sucesso"),
+                0 => "Test",
+                1 => Result.Created($"Test {id} created", $"Test created successfully"),
                 >= 2 => Error.Database.ConnectionFailed("Falha na conexão do banco de dados"),
                 _ => Error.Application.Internal(),
             };
@@ -72,7 +72,7 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
                     new ErrorDetail("Code", (id + 1).ToString())
                 ),
                 0 => Success<string>.Of.OrderProcessed("Test"),
-                1 => Result.OrderProcessed($"Teste {id} foi criado", $"Teste criado com sucesso"),
+                1 => Result.OrderProcessed($"Test {id} created", $"Test processed successfully"),
                 >= 2 => Result<string>.Of.OrderProcessed("Falha na conexão do banco de dados"),
                 _ => Error.Application.Internal(),
             };
@@ -82,9 +82,9 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
 
         [HttpGet("Example")]
         public EndpointResult<string> Example() =>
-            Result.Success("teste").WithContentType("text/plain");
+            Result.Success("test").WithContentType("text/plain");
 
-        //Result.Success("{\"teste\": \"teste\"}").WithContentType("application/json"); //, "Exemplo bem sucedido"
+        //Result.Success("{\"test\": \"test\"}").WithContentType("application/json"); //, "Successful example"
 
         public class Product { }
 

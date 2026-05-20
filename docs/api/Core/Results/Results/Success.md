@@ -51,7 +51,7 @@ Inherits from `Success`. Encapsulates a value.
 Success metadata = Success.Created("Resource created successfully");
 
 // Type checking
-if (metadata is Success.CreatedSuccess) { ... }
+if (metadata is CreatedSuccess) { ... }
 
 // Creating a typed success
 Success<int> typedMetadata = metadata.WithValue(42);

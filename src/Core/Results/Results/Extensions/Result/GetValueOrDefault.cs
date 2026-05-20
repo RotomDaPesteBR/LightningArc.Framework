@@ -36,9 +36,9 @@ namespace LightningArc.Results
         /// Returns the success value contained in the <see cref="Result{TValue}"/>.
         /// If the result is a failure, returns the default value of <typeparamref name="TValue"/> (i.e., null for reference/nullable types, 0 for int, etc.).
         /// </summary>
-        /// <typeparam name="TValue">O tipo de valor.</typeparam>
+        /// <typeparam name="TValue">The value type.</typeparam>
         /// <param name="result">O resultado.</param>
-        /// <returns>O valor de sucesso ou o valor padr�o de <typeparamref name="TValue"/>.</returns>
+        /// <returns>The success value or the default value of <typeparamref name="TValue"/>.</returns>
         public static TValue? GetValueOrDefault<TValue>(this Result<TValue> result) =>
             result.IsSuccess ? result.Value : default;
     }

@@ -22,5 +22,5 @@ This is a self-contained reference for the most important types across the `Ligh
 
 ## `LightningArc.Metalama`
 - **`NamedTypeFactory`**: Static factory to resolve `Result` types at compile-time.
-- **`ITypeExtensions`**: Extension methods like `.IsResult()` and `.IsTaskResult()`.
+- **`ITypeExtensions`**: Extension methods like `.IsResult()`.
 - **`ResultTypeFactory`**: Advanced factories for generating `Result` instances in templates.

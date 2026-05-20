@@ -11,7 +11,7 @@ namespace LightningArc.Results.Tests
         [Test]
         public async Task Ok_ShouldCreateOkSuccess_WithDefaultMessage()
         {
-            LocalizationManager.Configure("pt-BR");
+            LocalizationManager.Configure("en");
 
             // Act
             Success success = Success.Ok();
@@ -19,7 +19,7 @@ namespace LightningArc.Results.Tests
             // Assert
             await Assert.That(success).IsTypeOf<OkSuccess>();
             await Assert.That(success.Code).IsEqualTo(100);
-            await Assert.That(success.Message).IsEqualTo("Operação concluída com sucesso.");
+            await Assert.That(success.Message).IsEqualTo("Operation completed successfully.");
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace LightningArc.Results.Tests
         [Test]
         public async Task Created_ShouldCreateCreatedSuccess_WithDefaultMessage()
         {
-            LocalizationManager.Configure("pt-BR");
+            LocalizationManager.Configure("en");
 
             // Act
             Success success = Success.Created();
@@ -48,7 +48,7 @@ namespace LightningArc.Results.Tests
             // Assert
             await Assert.That(success).IsTypeOf<CreatedSuccess>();
             await Assert.That(success.Code).IsEqualTo(101);
-            await Assert.That(success.Message).IsEqualTo("Recurso criado com sucesso.");
+            await Assert.That(success.Message).IsEqualTo("Resource created successfully.");
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace LightningArc.Results.Tests
         [Test]
         public async Task Accepted_ShouldCreateAcceptedSuccess_WithDefaultMessage()
         {
-            LocalizationManager.Configure("pt-BR");
+            LocalizationManager.Configure("en");
 
             // Act
             Success success = Success.Accepted();
@@ -77,7 +77,7 @@ namespace LightningArc.Results.Tests
             // Assert
             await Assert.That(success).IsTypeOf<AcceptedSuccess>();
             await Assert.That(success.Code).IsEqualTo(102);
-            await Assert.That(success.Message).IsEqualTo("A solicitação foi aceita para processamento.");
+            await Assert.That(success.Message).IsEqualTo("The request has been accepted for processing.");
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace LightningArc.Results.Tests
         [Test]
         public async Task NoContent_ShouldCreateNoContentSuccess_WithNullMessage()
         {
-            LocalizationManager.Configure("pt-BR");
+            LocalizationManager.Configure("en");
 
             // Act
             Success success = Success.NoContent();

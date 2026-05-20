@@ -1,8 +1,8 @@
 namespace LightningArc.Results
 {
     /// <summary>
-    /// Métodos de extensão para operações de Encademaneto (Bind), como <c>MatchBindAsync</c>, que encadeiam uma operação
-    /// que retorna um novo <see cref="Result"/> ou <see cref="Task{TResult}">Task&lt;Result&gt;</see>.
+    /// Extension methods for Bind operations, such as <c>MatchBindAsync</c>, which chain an operation
+    /// that returns a new <see cref="Result"/> or <see cref="Task{TResult}">Task&lt;Result&gt;</see>.
     /// </summary>
     public static partial class ResultExtensions
     {

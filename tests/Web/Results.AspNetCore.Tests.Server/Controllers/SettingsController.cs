@@ -21,7 +21,7 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
             {
                 await _cache.EvictByTagAsync("All", CancellationToken.None);
 
-                return Result.Success("Cache de toda aplicação limpo com sucesso.");
+                return Result.Success("Application cache cleared successfully.");
             }
             catch (Exception exception)
             {
@@ -39,7 +39,7 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
             {
                 await _cache.EvictByTagAsync("All", CancellationToken.None);
 
-                return Result.Created("Cache de toda aplicação limpo com sucesso.").WithContentType("text/plain");
+                return Result.Created("Application cache cleared successfully.").WithContentType("text/plain");
             }
             catch (Exception exception)
             {
@@ -56,7 +56,7 @@ namespace LightningArc.Results.AspNetCore.Tests.Server.Controllers
             {
                 await _cache.EvictByTagAsync(tag, CancellationToken.None);
 
-                return Result.Success($"Caches com a tag {tag} limpo com sucesso.");
+                return Result.Success($"Caches with tag {tag} cleared successfully.");
             }
             catch (Exception exception)
             {
