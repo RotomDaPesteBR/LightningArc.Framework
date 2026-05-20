@@ -8,7 +8,7 @@
 
   <!-- Microsoft -->
   <PropertyGroup>
-      <MicrosoftPackagesVersion>10.0.7</MicrosoftPackagesVersion> 
+      <MicrosoftPackagesVersion>10.0.8</MicrosoftPackagesVersion> 
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftPackagesVersion)" />
@@ -40,22 +40,22 @@
 
   <!-- Drivers -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.0.1" />
     <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.26.200" />
   </ItemGroup>
   
   <!-- ORMs -->
   <ItemGroup>
-    <PackageVersion Include="Dapper" Version="2.1.72" />
+    <PackageVersion Include="Dapper" Version="2.1.79" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'netstandard2.0'" Version="3.1.32" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.16" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net10.0'" Version="$(MicrosoftPackagesVersion)" />
   </ItemGroup>
 
   <!-- AspNetCore -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.20" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.16" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net10.0'" Version="$(MicrosoftPackagesVersion)" />
   </ItemGroup>
   
@@ -67,7 +67,7 @@
 
   <!-- Metalama -->
   <PropertyGroup>
-      <MetalamaPackagesVersion>2026.0.21</MetalamaPackagesVersion>
+      <MetalamaPackagesVersion>2026.0.23</MetalamaPackagesVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Metalama.Framework" Version="$(MetalamaPackagesVersion)" />
@@ -87,8 +87,8 @@
   
   <!-- Tests -->
   <ItemGroup> 
-    <PackageVersion Include="TUnit" Version="1.37.35" />
-    <PackageVersion Include="TUnit.AspNetCore" Version="1.37.35" />
+    <PackageVersion Include="TUnit" Version="1.45.22" />
+    <PackageVersion Include="TUnit.AspNetCore" Version="1.45.22" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="coverlet.collector" Version="8.0.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
