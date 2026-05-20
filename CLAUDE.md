@@ -63,8 +63,8 @@ Working conventions for AI assistants operating in this repository.
 - **Pack on build** — `GeneratePackageOnBuild=true` for all projects
 
 ## Test Running Rules
-- Use `dotnet test -c Test` for all tests.
-- Use `dotnet test --project "tests/<Path>/<Project>.csproj" -c Test` for a specific project.
+- Use `dotnet test` for all tests.
+- Use `dotnet test --project "tests/<Path>/<Project>.csproj"` for a specific project.
 - Never use VSTest `--filter` in this repo.
 - Use TUnit `--treenode-filter` syntax when filtering is needed. Examples:
     All tests in a class: `dotnet run -- --treenode-filter "/*/*/MyTestClass/*"`

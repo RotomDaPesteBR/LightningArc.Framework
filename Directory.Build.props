@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <!-- Platform & Configuration -->
-    <Configurations>Debug;Release;LamaDebug;Test</Configurations>
+    <Configurations>Debug;Release;LamaDebug;Dev</Configurations>
     <Platforms>AnyCPU</Platforms>
 
     <!-- Code Analysis & Quality -->

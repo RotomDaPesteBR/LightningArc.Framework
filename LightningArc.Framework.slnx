@@ -3,7 +3,7 @@
     <BuildType Name="Debug" />
     <BuildType Name="Release" />
     <BuildType Name="LamaDebug" />
-    <BuildType Name="Test" />
+    <BuildType Name="Dev" />
   </Configurations>
   <Folder Name="/root/">
     <File Path=".gitignore" />
@@ -69,183 +69,145 @@
   </Folder>
   <Folder Name="/tests/Core/">
     <Project Path="tests/Core/Primitives.Tests/LightningArc.Primitives.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Core/Json.Tests/LightningArc.Json.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Core/Results.Tests/LightningArc.Results.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
   </Folder>
   <Folder Name="/tests/Validations/">
     <Project Path="tests/Validations/Validations.Tests/LightningArc.Validations.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Validations/DependencyInjection/LightningArc.Validations.DependencyInjection.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
   </Folder>
   <Folder Name="/tests/Data/">
     <Project Path="tests/Data/Data.Abstractions.Tests/LightningArc.Data.Abstractions.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Data/Data.ADO.Oracle.Tests/LightningArc.Data.ADO.Oracle.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Data/Data.ADO.SqlServer.Tests/LightningArc.Data.ADO.SqlServer.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Data/Data.ADO.Tests/LightningArc.Data.ADO.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Data/Data.EntityFramework.Tests/LightningArc.Data.EntityFramework.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Data/Data.ADO.SqlBuilder.Tests/LightningArc.Data.ADO.SqlBuilder.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Data/Mappers.AutoMapper.Tests/LightningArc.Mappers.AutoMapper.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Data/Mappers.Mapster.Tests/LightningArc.Mappers.Mapster.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
   </Folder>
   <Folder Name="/tests/Meta/">
     <Project Path="tests/Meta/Metalama.Tests/LightningArc.Metalama.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Meta/Metalama.Results.Tests/LightningArc.Metalama.Results.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
   </Folder>
   <Folder Name="/tests/Web/">
     <Project Path="tests/Web/Results.AspNetCore.Tests/LightningArc.Results.AspNetCore.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Web/Results.AspNetCore.Tests.Server/LightningArc.Results.AspNetCore.Tests.Server.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Web/CORS.AspNetCore.Tests/LightningArc.CORS.AspNetCore.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
     <Project Path="tests/Web/OpenAPI.AspNetCore.Tests/LightningArc.OpenAPI.AspNetCore.Tests.csproj">
-      <Configuration Solution="Debug|*" Project="Test" />
-      <Configuration Solution="Release|*" Project="Test" />
-      <Configuration Solution="LamaDebug|*" Project="Test" />
-      
-      <Build Solution="Debug|*" Project="false" />
-      <Build Solution="LamaDebug|*" Project="false" />
-      <Build Solution="Release|*" Project="false" />
+      <Configuration Solution="Debug|*" Project="Debug" />
+      <Configuration Solution="Release|*" Project="Release" />
+      <Configuration Solution="LamaDebug|*" Project="LamaDebug" />
+      <Configuration Solution="Dev|*" Project="Dev" />
+      <Build Solution="Dev|*" Project="false" />
     </Project>
   </Folder>
 </Solution>

@@ -9,7 +9,7 @@ on:
 
 env:
   DOTNET_VERSION: '10.0.x'
-  CONFIGURATION: Test
+  CONFIGURATION: Debug
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
