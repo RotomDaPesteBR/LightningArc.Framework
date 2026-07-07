@@ -22,7 +22,7 @@ public class SelectBuilder(
     public string Build(bool filterByKey = false, int limit = 0)
     {
         string columnSeparator = Options.Indented ? $",{Environment.NewLine}{Indent}" : ", ";
-        string columnList = string.Join(columnSeparator, Columns.Select(c => c.ColumnName));
+        string columnList = string.Join(columnSeparator, Columns.Select(c => QuoteColumnName(c.ColumnName)));
 
         // SQL Server TOP
         string topClause =
@@ -48,7 +48,7 @@ public class SelectBuilder(
         // Dialect specific limit at the end
         string limitClause = BuildLimitClause(limit);
 
-        return $"SELECT{topClause} {columnList}{NewLine}FROM {TableName}{whereClause}{orderByClause}{limitClause}";
+        return $"SELECT{topClause} {columnList}{NewLine}FROM {QuoteTableName(TableName)}{whereClause}{orderByClause}{limitClause}";
     }
 
     private string BuildLimitClause(int limit)
@@ -78,7 +78,7 @@ public class SelectBuilder(
 
         string orderSeparator = Options.Indented ? $",{Environment.NewLine}{Indent}" : ", ";
         var sortExpressions = orderedColumns.Select(c =>
-            $"{c.ColumnName} {(c.Order!.Direction == OrderDirection.Ascending ? "ASC" : "DESC")}"
+            $"{QuoteColumnName(c.ColumnName)} {(c.Order!.Direction == OrderDirection.Ascending ? "ASC" : "DESC")}"
         );
 
         return $"{NewLine}ORDER BY {string.Join(orderSeparator, sortExpressions)}";

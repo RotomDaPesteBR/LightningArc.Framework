@@ -14,5 +14,15 @@ public record SqlBuilderOptions
     /// Gets the number of spaces to use for each level of indentation.
     /// </summary>
     public int IndentSize { get; init; } = 4;
+
+    /// <summary>
+    /// Gets a value indicating whether table names should be quoted using dialect-specific delimiters.
+    /// </summary>
+    public bool QuoteTableNames { get; init; } = true;
+
+    /// <summary>
+    /// Gets a value indicating whether column names should be quoted using dialect-specific delimiters.
+    /// </summary>
+    public bool QuoteColumnNames { get; init; } = true;
 }
 

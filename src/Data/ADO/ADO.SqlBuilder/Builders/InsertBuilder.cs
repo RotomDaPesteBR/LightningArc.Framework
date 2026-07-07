@@ -37,7 +37,7 @@ public class InsertBuilder(
 
         string columnSeparator = Options.Indented ? $",{Environment.NewLine}{Indent}" : ", ";
 
-        string columnNames = string.Join(columnSeparator, insertColumns.Select(c => c.ColumnName));
+        string columnNames = string.Join(columnSeparator, insertColumns.Select(c => QuoteColumnName(c.ColumnName)));
         string parameterNames = string.Join(
             columnSeparator,
             insertColumns.Select(c => GetParameter(c.PropertyName))
@@ -47,12 +47,12 @@ public class InsertBuilder(
 
         if (Options.Indented)
         {
-            sqlBuilder.Append($"INSERT INTO {TableName}{Environment.NewLine}");
+            sqlBuilder.Append($"INSERT INTO {QuoteTableName(TableName)}{Environment.NewLine}");
             sqlBuilder.Append($"({Environment.NewLine}{Indent}{columnNames}{Environment.NewLine})");
         }
         else
         {
-            sqlBuilder.Append($"INSERT INTO {TableName} ({columnNames})");
+            sqlBuilder.Append($"INSERT INTO {QuoteTableName(TableName)} ({columnNames})");
         }
 
         // SQL Server OUTPUT
@@ -60,7 +60,7 @@ public class InsertBuilder(
         {
             string outputList = string.Join(
                 columnSeparator,
-                outputColumns.Select(c => $"INSERTED.{c.ColumnName}")
+                outputColumns.Select(c => $"INSERTED.{QuoteColumnName(c.ColumnName)}")
             );
             sqlBuilder.Append(
                 Options.Indented
@@ -87,7 +87,7 @@ public class InsertBuilder(
 
         string returningList = string.Join(
             columnSeparator,
-            outputColumns.Select(c => c.ColumnName)
+            outputColumns.Select(c => QuoteColumnName(c.ColumnName))
         );
 
         switch (Dialect)

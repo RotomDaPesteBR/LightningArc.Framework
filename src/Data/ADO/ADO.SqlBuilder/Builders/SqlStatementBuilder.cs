@@ -85,6 +85,42 @@ public abstract class SqlStatementBuilder
     }
 
     /// <summary>
+    /// Quotes an identifier using the correct quote characters for the current SQL dialect.
+    /// </summary>
+    /// <param name="identifier">The identifier to quote (e.g., table name or column name).</param>
+    /// <returns>A quoted identifier appropriate for the current dialect.</returns>
+    protected string QuoteIdentifier(string identifier)
+    {
+        return Dialect switch
+        {
+            SqlDialect.SqlServer => $"[{identifier}]",
+            SqlDialect.PostgreSQL => $"\"{identifier}\"",
+            SqlDialect.Oracle => $"\"{identifier}\"",
+            _ => identifier
+        };
+    }
+
+    /// <summary>
+    /// Quotes a table name using the correct quote characters for the current SQL dialect.
+    /// </summary>
+    /// <param name="tableName">The table name to quote.</param>
+    /// <returns>A quoted table name appropriate for the current dialect, or unquoted if disabled.</returns>
+    protected string QuoteTableName(string tableName)
+    {
+        return Options.QuoteTableNames ? QuoteIdentifier(tableName) : tableName;
+    }
+
+    /// <summary>
+    /// Quotes a column name using the correct quote characters for the current SQL dialect.
+    /// </summary>
+    /// <param name="columnName">The column name to quote.</param>
+    /// <returns>A quoted column name appropriate for the current dialect, or unquoted if disabled.</returns>
+    protected string QuoteColumnName(string columnName)
+    {
+        return Options.QuoteColumnNames ? QuoteIdentifier(columnName) : columnName;
+    }
+
+    /// <summary>
     /// Builds a SQL WHERE clause for the primary key columns.
     /// </summary>
     /// <param name="keys">The collection of column definitions representing keys.</param>
@@ -94,7 +130,7 @@ public abstract class SqlStatementBuilder
     {
         string separator = Options.Indented ? $"{Environment.NewLine}{Indent}AND " : " AND ";
 
-        var conditions = keys.Select(key => $"{key.ColumnName} = {GetParameter(key.PropertyName)}")
+        var conditions = keys.Select(key => $"{QuoteColumnName(key.ColumnName)} = {GetParameter(key.PropertyName)}")
             .ToList();
 
         return conditions.Count == 0

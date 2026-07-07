@@ -29,7 +29,7 @@ public class DeleteBuilder(
         var keys = Columns.Where(c => c.IsKey);
         string whereClause = BuildKeyWhereClause(keys);
 
-        return $"DELETE FROM {TableName}{NewLine}WHERE {whereClause}";
+        return $"DELETE FROM {QuoteTableName(TableName)}{NewLine}WHERE {whereClause}";
     }
 }
 
