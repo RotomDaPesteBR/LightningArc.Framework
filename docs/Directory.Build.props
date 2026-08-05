@@ -6,7 +6,7 @@
     <IsTestProject>false</IsTestProject>
     
     <!-- Speed: Skip compilation and standard tasks -->
-    <Configurations>Debug;Release;LamaDebug;Test</Configurations>
+    <Configurations>Debug;Release;LamaDebug;Dev</Configurations>
     <SkipBuild>true</SkipBuild>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>

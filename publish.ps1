@@ -1,6 +1,6 @@
 # Script Settings
 $ErrorActionPreference = "Stop" # Stops the script if an unhandled error occurs
-$config = "Release"
+$config = "Dev"
 
 # --- 1. FUNCTION TO GET VERSION ---
 function Get-PackageVersionFromProps {
@@ -18,11 +18,22 @@ function Get-PackageVersionFromProps {
         [xml]$xmlContent = Get-Content $PropsFile -Raw
         
         # Look for <PackageVersion> directly inside a <PropertyGroup>
-        $versionNode = $xmlContent.Project.PropertyGroup | Where-Object { $_.PackageVersion }
-        $version = $versionNode.PackageVersion
+        $versionNode = $xmlContent.Project.PropertyGroup.PackageVersion | Select-Object -First 1
 
-        if ([string]::IsNullOrEmpty($version)) {
+        if ($null -eq $versionNode) {
             Write-Host "WARNING: The <PackageVersion> property was not found in '$PropsFile'. Using default version '1.0.0'." -ForegroundColor Yellow
+            return "1.0.0"
+        }
+        
+        $version = ""
+        if ($versionNode -is [System.Xml.XmlElement]) {
+            $version = $versionNode.InnerText
+        } else {
+            $version = [string]$versionNode
+        }
+
+        if ([string]::IsNullOrWhiteSpace($version)) {
+            Write-Host "WARNING: The <PackageVersion> property is empty in '$PropsFile'. Using default version '1.0.0'." -ForegroundColor Yellow
             return "1.0.0"
         }
         
@@ -51,24 +62,31 @@ $projects_to_pack = @(
     "src\Core\Framework\LightningArc.Framework.csproj",
 
     # Data
-    "src\Data\Data.Abstractions\LightningArc.Data.Abstractions.csproj",
+    "src\Data\Abstractions\LightningArc.Data.Abstractions.csproj",
     "src\Data\Mappers\Mappers.AutoMapper\LightningArc.Mappers.AutoMapper.csproj",
     "src\Data\Mappers\Mappers.Mapster\LightningArc.Mappers.Mapster.csproj",
-    "src\Data\ADO\Data.ADO\LightningArc.Data.ADO.csproj",
-    "src\Data\ADO\Data.ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj",
-    "src\Data\ADO\Data.ADO.Oracle\LightningArc.Data.ADO.Oracle.csproj",
-    "src\Data\ADO\Data.ADO.SqlServer\LightningArc.Data.ADO.SqlServer.csproj",
-    "src\Data\EF\Data.EntityFramework\LightningArc.Data.EntityFramework.csproj",
+    "src\Data\ADO\ADO\LightningArc.Data.ADO.csproj",
+    "src\Data\ADO\ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj",
+    "src\Data\ADO\ADO.Oracle\LightningArc.Data.ADO.Oracle.csproj",
+    "src\Data\ADO\ADO.SqlServer\LightningArc.Data.ADO.SqlServer.csproj",
+    "src\Data\EF\EntityFramework\LightningArc.Data.EntityFramework.csproj",
 
     # AspNetCore
     "src\Web\Results.AspNetCore\LightningArc.Results.AspNetCore.csproj",
     "src\Web\CORS.AspNetCore\LightningArc.CORS.AspNetCore.csproj",
     "src\Web\OpenAPI.AspNetCore\LightningArc.OpenAPI.AspNetCore.csproj",
     "src\Web\AspNetCore\LightningArc.AspNetCore.csproj",
+    
+    # Validations
+    "src\Validations\Validations\LightningArc.Validations.csproj",
+    "src\Validations\DependencyInjection\LightningArc.Validations.DependencyInjection.csproj",
 
     # Meta
     "src\Meta\Metalama\LightningArc.Metalama.csproj",
-    "src\Meta\Metalama.Results\LightningArc.Metalama.Results.csproj"
+    "src\Meta\Metalama.Results\LightningArc.Metalama.Results.csproj",
+    
+    # Analyzers
+    "src\Analyzers\LightningArc.Analyzers.csproj"
 )
 
 # --- General Clean and Build ---

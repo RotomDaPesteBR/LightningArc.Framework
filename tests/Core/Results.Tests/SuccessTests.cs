@@ -1,6 +1,7 @@
 
 using LightningArc.Results;
 using LightningArc.Results.Localization;
+using LightningArc.Results.Successes;
 using System;
 
 namespace LightningArc.Results.Tests
@@ -10,15 +11,15 @@ namespace LightningArc.Results.Tests
         [Test]
         public async Task Ok_ShouldCreateOkSuccess_WithDefaultMessage()
         {
-            LocalizationManager.Configure("pt-BR");
+            LocalizationManager.Configure("en");
 
             // Act
             Success success = Success.Ok();
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.OkSuccess>();
+            await Assert.That(success).IsTypeOf<OkSuccess>();
             await Assert.That(success.Code).IsEqualTo(100);
-            await Assert.That(success.Message).IsEqualTo("Operação concluída com sucesso.");
+            await Assert.That(success.Message).IsEqualTo("Operation completed successfully.");
         }
 
         [Test]
@@ -31,7 +32,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.Ok(message);
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.OkSuccess>();
+            await Assert.That(success).IsTypeOf<OkSuccess>();
             await Assert.That(success.Code).IsEqualTo(100);
             await Assert.That(success.Message).IsEqualTo(message);
         }
@@ -39,15 +40,15 @@ namespace LightningArc.Results.Tests
         [Test]
         public async Task Created_ShouldCreateCreatedSuccess_WithDefaultMessage()
         {
-            LocalizationManager.Configure("pt-BR");
+            LocalizationManager.Configure("en");
 
             // Act
             Success success = Success.Created();
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.CreatedSuccess>();
+            await Assert.That(success).IsTypeOf<CreatedSuccess>();
             await Assert.That(success.Code).IsEqualTo(101);
-            await Assert.That(success.Message).IsEqualTo("Recurso criado com sucesso.");
+            await Assert.That(success.Message).IsEqualTo("Resource created successfully.");
         }
 
         [Test]
@@ -60,7 +61,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.Created(message);
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.CreatedSuccess>();
+            await Assert.That(success).IsTypeOf<CreatedSuccess>();
             await Assert.That(success.Code).IsEqualTo(101);
             await Assert.That(success.Message).IsEqualTo(message);
         }
@@ -68,15 +69,15 @@ namespace LightningArc.Results.Tests
         [Test]
         public async Task Accepted_ShouldCreateAcceptedSuccess_WithDefaultMessage()
         {
-            LocalizationManager.Configure("pt-BR");
+            LocalizationManager.Configure("en");
 
             // Act
             Success success = Success.Accepted();
             
             // Assert
-            await Assert.That(success).IsTypeOf<Success.AcceptedSuccess>();
+            await Assert.That(success).IsTypeOf<AcceptedSuccess>();
             await Assert.That(success.Code).IsEqualTo(102);
-            await Assert.That(success.Message).IsEqualTo("A solicitação foi aceita para processamento.");
+            await Assert.That(success.Message).IsEqualTo("The request has been accepted for processing.");
         }
 
         [Test]
@@ -89,7 +90,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.Accepted(message);
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.AcceptedSuccess>();
+            await Assert.That(success).IsTypeOf<AcceptedSuccess>();
             await Assert.That(success.Code).IsEqualTo(102);
             await Assert.That(success.Message).IsEqualTo(message);
         }
@@ -97,13 +98,13 @@ namespace LightningArc.Results.Tests
         [Test]
         public async Task NoContent_ShouldCreateNoContentSuccess_WithNullMessage()
         {
-            LocalizationManager.Configure("pt-BR");
+            LocalizationManager.Configure("en");
 
             // Act
             Success success = Success.NoContent();
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.NoContentSuccess>();
+            await Assert.That(success).IsTypeOf<NoContentSuccess>();
             await Assert.That(success.Code).IsEqualTo(103);
         }
 
@@ -117,7 +118,7 @@ namespace LightningArc.Results.Tests
             Success success = Success.NoContent(message);
 
             // Assert
-            await Assert.That(success).IsTypeOf<Success.NoContentSuccess>();
+            await Assert.That(success).IsTypeOf<NoContentSuccess>();
             await Assert.That(success.Code).IsEqualTo(103);
             await Assert.That(success.Message).IsEqualTo(message);
         }

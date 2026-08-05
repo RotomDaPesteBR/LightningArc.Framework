@@ -12,7 +12,7 @@ namespace LightningArc.Results
     /// status codes in the application's presentation layer.
     /// <para>
     /// The error code is composed of a prefix (category) and a suffix (specific error).
-    /// For example: 1001 (prefix 10 for "Application", suffix 01 for "Internal").
+    /// For example: 1001 (prefix 1 for "Application", suffix 01 for "Internal").
     /// </para>
     /// </remarks>
     public partial class Error : IEquatable<Error>
@@ -117,7 +117,15 @@ namespace LightningArc.Results
             Details = details?.ToList() ?? [];
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines whether the specified <see cref="Error"/> is equal to the current <see cref="Error"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="Error"/> to compare with the current instance.</param>
+        /// <returns>true if the specified <see cref="Error"/> is equal to the current <see cref="Error"/>; otherwise, false.</returns>
+        /// <remarks>
+        /// Equality is based on the <see cref="CodePrefix"/>, <see cref="CodeSuffix"/>, and <see cref="Details"/> properties.
+        /// The localized <see cref="Message"/> is not considered.
+        /// </remarks>
         public virtual bool Equals(Error? other)
         {
             if (other is null)
@@ -136,7 +144,13 @@ namespace LightningArc.Results
             return obj is Error other && Equals(other);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Returns the hash code for this <see cref="Error"/>.
+        /// </summary>
+        /// <remarks>
+        /// The hash code is based on the <see cref="CodePrefix"/>, <see cref="CodeSuffix"/>, and <see cref="Details"/> properties.
+        /// The localized <see cref="Message"/> is not considered.
+        /// </remarks>
         public override int GetHashCode()
         {
 #if NETSTANDARD2_0

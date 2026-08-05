@@ -12,7 +12,7 @@ namespace LightningArc.Primitives.ValueObjects
     /// This 'record' is an immutable value type. CPF validation is enforced
     /// in the private constructor, accessible through the <see cref="Create(string)"/> static factory method.
     /// </remarks>
-    public record Cpf : IValueObject<string>
+    public sealed record Cpf : IValueObject<string>
     {
         /// <summary>
         /// Gets the string value of the CPF.

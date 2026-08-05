@@ -5,7 +5,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" />
-    <ProjectReference Include="..\..\..\src\Data\ADO\Data.ADO.SqlServer\LightningArc.Data.ADO.SqlServer.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\ADO\ADO.SqlServer\LightningArc.Data.ADO.SqlServer.csproj" />
     <ProjectReference Include="..\Data.ADO.Tests\LightningArc.Data.ADO.Tests.csproj" />
   </ItemGroup>
 </Project>

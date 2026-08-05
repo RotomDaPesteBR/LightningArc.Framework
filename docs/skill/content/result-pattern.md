@@ -47,10 +47,10 @@ Error errors = Error.Validation.MissingField("Name") +
 | `Match` | Final unwrapping of success and failure cases. |
 
 ## Async Support
-Use `TaskResult<T>` for I/O bound operations. It allows seamless chaining of `Async` methods.
+Use `Task<Result<T>>` for I/O bound operations. `Result<T>` provides async extension methods for seamless chaining.
 
 ```csharp
-public async TaskResult<User> GetUserAsync(int id) => 
+public async Task<Result<User>> GetUserAsync(int id) => 
     await _db.Users.FindAsync(id)
         .MapAsync(u => u.ToDto());
 ```

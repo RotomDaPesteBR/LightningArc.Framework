@@ -5,7 +5,7 @@ namespace LightningArc.Primitives.ValueObjects
     /// <summary>
     /// Represents a valid Brazilian CNPJ (Cadastro Nacional da Pessoa Jurídica).
     /// </summary>
-    public record Cnpj : IValueObject<string>
+    public sealed record Cnpj : IValueObject<string>
     {
         /// <summary>
         /// Gets the numeric string value of the CNPJ.

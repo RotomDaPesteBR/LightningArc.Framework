@@ -34,7 +34,7 @@ This skill provides the architectural constraints, coding standards, and API ref
 
 ### 1. Creating a Service Method
 ```csharp
-public async TaskResult<UserDto> RegisterUser(string email, string password)
+public async Task<Result<UserDto>> RegisterUser(string email, string password)
 {
     // 1. Value Object Creation
     return Email.Create(email) 

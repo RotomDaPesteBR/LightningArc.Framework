@@ -159,14 +159,15 @@ internal static class ResultGuardHelper
             return TryCallCheck(condition, resultExpression, semanticModel, checkProperty);
         }
 
-        return PropertyCheck(condition, resultExpression, semanticModel, checkProperty);
+        return PropertyCheck(condition, resultExpression, semanticModel, checkProperty, isTryCall);
     }
 
     private static bool PropertyCheck(
         ExpressionSyntax condition,
         ExpressionSyntax resultExpression,
         SemanticModel semanticModel,
-        string checkProperty)
+        string checkProperty,
+        bool isTryCall)
     {
         switch (condition)
         {
@@ -186,6 +187,29 @@ internal static class ResultGuardHelper
                            ExpressionReferencesSameResult(negated.Expression, resultExpression, semanticModel);
                 }
 
+                break;
+            }
+            // Bare result identifier: result -> checks IsSuccess
+            case IdentifierNameSyntax identifier when !isTryCall:
+            {
+                // Only treat bare identifier as IsSuccess check when we're looking for IsSuccess guarding
+                if (checkProperty == "IsSuccess")
+                {
+                    return ExpressionReferencesSameResult(identifier, resultExpression, semanticModel);
+                }
+                break;
+            }
+            // Negated bare result identifier: !result -> checks IsFailure
+            case PrefixUnaryExpressionSyntax prefix when
+                prefix.OperatorToken.IsKind(SyntaxKind.ExclamationToken) &&
+                prefix.Operand is IdentifierNameSyntax identifier &&
+                !isTryCall:
+            {
+                // Treat !result as IsFailure check when we're looking for IsFailure guarding
+                if (checkProperty == "IsFailure")
+                {
+                    return ExpressionReferencesSameResult(identifier, resultExpression, semanticModel);
+                }
                 break;
             }
         }

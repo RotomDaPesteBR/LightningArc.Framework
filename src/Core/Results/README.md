@@ -49,9 +49,9 @@ public Result<User> CreateUser(string email, string password)
 ```csharp
 Result<User> result = CreateUser("test@email.com", "12345678");
 
-if (result)
+if (result.TryGetValue(out var user))
 {
-    Console.WriteLine(result.Value);
+    Console.WriteLine(user);
 }
 else
 {
@@ -82,24 +82,60 @@ if (!result)
 
 ## Strongly Typed Success
 
+Successful results may also carry explicit success semantics:
+
+- `Ok`
+- `Created`
+- `Accepted`
+- `NoContent`
+
 ```csharp
 return Result.Created(user);
 ```
 
 ---
 
-## Async Support
+## Exception Mapping
+
+LightningArc.Results provides built-in exception-to-error mapping and allows registering custom mappings.
 
 ```csharp
-TaskResult<User> result = userService.CreateAsync();
+using LightningArc.Results.Exceptions;
 
-var userResult = await result;
-
-if (userResult)
-{
-    Console.WriteLine(userResult.Value);
-}
+Error error = ExceptionMapper.Map(exception);
 ```
+
+For convenience, exceptions can also be converted directly:
+
+```csharp
+using LightningArc.Results.Exceptions;
+
+Error error = exception.ToError();
+```
+
+Custom mappings may be registered during application startup:
+
+```csharp
+using LightningArc.Results.Exceptions;
+
+ExceptionMapper.Register<SqlException>(
+    ex => Error.Database.QueryExecutionFailed()
+);
+```
+
+---
+
+## Localization
+
+LightningArc.Results supports explicit message localization and custom resource providers.
+
+```csharp
+using LightningArc.Results.Localization;
+
+LocalizationManager.Configure("pt-BR");
+```
+
+Custom resource managers may also be supplied during application startup.
 
 ---
 

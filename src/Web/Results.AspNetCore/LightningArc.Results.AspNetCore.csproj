@@ -3,24 +3,21 @@
     <TargetFrameworks>net6.0;net9.0;net10.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <RootNamespace>LightningArc.Results.AspNetCore</RootNamespace>
-    <NoWarn>IDE0130</NoWarn>
+    <NoWarn>$(NoWarn);IDE0130</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>LightningArc.Results.AspNetCore</AssemblyName>
     <PackageTags>lightningarc dotnet clean-code aspnetcore api middleware problem-details result-pattern</PackageTags>
-    <Description>Bridges LightningArc.Results with ASP.NET Core, mapping functional results to standardized RFC 7807 Problem Details responses.</Description>
+    <Description>Metapackage bundle containing LightningArc ASP.NET Core integrations.</Description>
   </PropertyGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="PolySharp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Results\LightningArc.Results.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <InternalsVisibleTo Include="LightningArc.Core" />
   </ItemGroup>
 </Project>
 

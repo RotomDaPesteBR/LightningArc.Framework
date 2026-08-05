@@ -6,7 +6,7 @@ namespace LightningArc.Primitives.ValueObjects
     /// <summary>
     /// Represents a valid phone number (digits only).
     /// </summary>
-    public record PhoneNumber : IValueObject<string>
+    public sealed record PhoneNumber : IValueObject<string>
     {
         /// <summary>
         /// Gets the numeric string value of the phone number.

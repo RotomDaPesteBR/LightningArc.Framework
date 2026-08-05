@@ -4,7 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Data\Data.Abstractions\LightningArc.Data.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\Abstractions\LightningArc.Data.Abstractions.csproj" />
   </ItemGroup>
 </Project>
 

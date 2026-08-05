@@ -1,48 +1,83 @@
 # LightningArc Documentation
 
-Bem-vindo à documentação oficial do ecossistema **LightningArc**. Esta biblioteca foi projetada para fornecer padrões arquiteturais robustos e utilitários de alta performance para aplicações .NET modernas.
+Welcome to the official documentation of the **LightningArc** ecosystem. This library is designed to provide robust architectural patterns and high-performance utilities for modern .NET applications.
 
-## 🚀 Guia Rápido
-- **[Introdução](getting-started/introduction.md)**: Visão geral e filosofia do projeto.
-- **[Padrão Result](core-features/result-pattern.md)**: Como tratar erros de forma funcional e elegante.
-- **[Integração Web](web-integration/results-mapping.md)**: Automatizando respostas HTTP no ASP.NET Core.
+## Quick Start
+- **[Introduction](getting-started/introduction.md)**: Overview and project philosophy.
+- **[Result Pattern](core-features/result-pattern.md)**: Functional error handling done right.
+- **[Web Integration](web-integration/results-mapping.md)**: Automating HTTP responses in ASP.NET Core.
 
 ---
 
-## 📚 Seções
+## Sections
 
 ### 1. [Core Features](core-features/result-pattern.md)
-O coração do ecossistema.
-- [Result Pattern](core-features/result-pattern.md): Sucessos, Falhas e Agregação de Erros.
-- [Value Objects](core-features/value-objects.md): Tipos primitivos com regras de negócio (Email, etc).
-- [JSON Serialization](core-features/json-serialization.md): Conversores e extensões para `System.Text.Json`.
+The heart of the ecosystem.
+- [Result Pattern](core-features/result-pattern.md): Successes, Failures, and Error Aggregation.
+- [Value Objects](core-features/value-objects.md): Primitives with business rules (Email, CPF, CNPJ, etc).
+- [JSON Serialization](core-features/json-serialization.md): Converters and extensions for `System.Text.Json`.
 
 ### 2. [Data Access](data-access/abstractions.md)
-Padronização da camada de persistência.
-- [Abstractions](data-access/abstractions.md): Repositórios e Unit of Work.
-- [ADO.NET & Dapper](data-access/ado-dapper.md): Implementações leves para SQL Server e Oracle.
-- [Entity Framework Core](data-access/entity-framework.md): Repositório base para EF.
-- [Mappers](data-access/mappers.md): Adaptadores para AutoMapper e Mapster.
+Standardizing the persistence layer.
+- [Abstractions](data-access/abstractions.md): Repositories and Unit of Work.
+- [ADO.NET & Dapper](data-access/ado-dapper.md): Lightweight implementations for SQL Server and Oracle.
+- [Entity Framework Core](data-access/entity-framework.md): Base repository for EF.
+- [Mappers](data-access/mappers.md): Adapters for AutoMapper and Mapster.
 
 ### 3. [Web Integration](web-integration/results-mapping.md)
-Extensões específicas para ASP.NET Core.
-- [HTTP Mapping](web-integration/results-mapping.md): Conversão automática de `Result` para RFC 7807 (Problem Details).
-- [CORS Policies](web-integration/cors.md): Configurações simplificadas de segurança.
-- [OpenAPI](web-integration/openapi.md): Suporte aprimorado para Swagger e documentação de API.
+ASP.NET Core specific extensions.
+- [HTTP Mapping](web-integration/results-mapping.md): Automatic `Result` to RFC 7807 (Problem Details) conversion.
+- [OpenAPI](web-integration/openapi.md): Enhanced Swagger and API documentation support.
 
-### 3. [Analyzers](analyzers/README.md)
-Análise estática em tempo de compilação para o ecossistema.
-- [Regras Result](analyzers/result-rules.md): LARC001–LARC003 — Uso seguro de `.Value`, `.Error` e descarte de `Result`.
-- [Regras ValueObject](analyzers/value-object-rules.md): LARC010–LARC012 — Conversão implícita e criação descartada.
-- [Regras Data & Infra](analyzers/infra-rules.md): LARC020–LARC030 — Conexões síncronas, HostedServices vazios e `ReleaseConnection(null)`.
+### 4. [Analyzers](analyzers/README.md)
+Compile-time static analysis for the ecosystem.
+- [Rules](analyzers/README.md): 9 rules and 2 code fixes for Result, ValueObjects, and Data.
 
-### 4. [Advanced Topics](advanced/metalama.md)
-Recursos para cenários complexos.
-- [Metalama](advanced/metalama.md): Programação orientada a aspectos (AOP) em tempo de compilação.
-- [Internals](advanced/internals/README.md): Detalhes técnicos de implementação.
+### 5. [Advanced](advanced/internals/README.md)
+Internal implementation details and architecture decisions.
+- [Internals](advanced/internals/README.md): Source-level documentation of core components.
 
 ---
 
-## 🛠️ Referência Técnica
-- **[API Reference](api/README.md)**: Documentação detalhada de namespaces e classes.
-- **[AI Skill](skill/SKILL.md)**: Contexto otimizado para assistentes de IA (Claude Code/Gemini).
+## Package Overview
+
+* **`LightningArc.Framework`** → Meta package for the full framework.
+* **`LightningArc.AspNetCore`** → ASP.NET Core integrations (includes `Results.AspNetCore`).
+* **`LightningArc.Results`** → Core Result pattern (Success/Failure, Error, Value Objects).
+* **`LightningArc.Primitives`** → Base types and abstractions.
+* **`LightningArc.Json`** → `System.Text.Json` converters for Value Objects.
+* **`LightningArc.Analyzers`** → Roslyn analyzers enforcing best practices at compile time.
+* **`LightningArc.Metalama`** → Aspect-oriented programming integration.
+
+---
+
+## Philosophy
+
+* **Fail-Fast and Functional**: Prefer `Result` over exceptions for normal business flow.
+* **Compile-Time Enforcement**: Roslyn analyzers catch misuse before runtime.
+* **Extensible**: Most classes are designed for inheritance and extension.
+* **Lightweight**: Minimal dependencies, optimized for high-throughput APIs.
+
+---
+
+## Getting Started
+
+Install the meta package:
+
+```bash
+dotnet add package LightningArc.Framework
+```
+
+For ASP.NET Core integration:
+
+```bash
+dotnet add package LightningArc.AspNetCore
+```
+
+Or install individual modules directly:
+
+```bash
+dotnet add package LightningArc.Results
+dotnet add package LightningArc.Results.AspNetCore
+dotnet add package LightningArc.Primitives
+```

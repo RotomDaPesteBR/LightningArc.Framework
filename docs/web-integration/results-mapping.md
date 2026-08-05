@@ -1,73 +1,73 @@
-# Documentação do Módulo Results.AspNetCore
+# Results.AspNetCore
 
-O módulo **`LightningArc.Results.AspNetCore`** fornece uma ponte robusta entre o domínio da aplicação (que utiliza `Result<T>`) e a camada Web (ASP.NET Core), automatizando a conversão de resultados em respostas HTTP padronizadas.
+The **`LightningArc.Results.AspNetCore`** library provides a bridge between your domain layer (`Result<T>`) and ASP.NET Core, automatically converting results to standardized HTTP responses (RFC 7807 Problem Details).
 
------
+---
 
-## 1. Adaptadores de Endpoint (`EndpointResult`)
+## 1. Endpoint Adaptors (`EndpointResult`)
 
-As classes `EndpointResult` e `EndpointResult<TValue>` eliminam o código repetitivo de conversão manual. Elas implementam `IResult` e suportam conversão implícita.
+The `EndpointResult` and `EndpointResult<TValue>` types eliminate boilerplate when converting `Result` objects into `IResult` for ASP.NET Core controllers.
 
 ```csharp
 [HttpGet("{id}")]
 public async Task<EndpointResult<Product>> Get(int id)
 {
-    // Retorna Result<Product> diretamente.
-    // O adaptador converte para 200 OK ou 4xx/5xx baseado no erro.
+    // Returns Result<Product> directly.
+    // The adaptor converts to 200 OK or 4xx/5xx based on the result.
     return await _service.GetProduct(id);
 }
 ```
 
-### Comportamento Automático:
-- **Sucesso**: Mapeia para o código HTTP correspondente ao tipo de `Success` (ex: `Ok` -> 200, `Created` -> 201).
-- **Falha**: Converte o objeto `Error` em um **Problem Details (RFC 7807)** com o Status Code apropriado.
+### Automatic Behavior
+- **Success**: Maps to the HTTP code matching the success type (e.g., `Ok` → 200, `Created` → 201).
+- **Failure**: Converts the `Error` object into a Problem Details response with the appropriate status code.
 
------
+---
 
-## 2. Tratamento Global de Exceções
+## 2. Global Exception Handling
 
-A biblioteca inclui o **`ResultExceptionHandler`**, que captura exceções não tratadas e as transforma em objetos `Error` padronizados, garantindo que sua API nunca retorne um stack trace bruto ou respostas inconsistentes.
+The library includes `ResultExceptionHandler`, which captures unhandled exceptions and converts them into standardized `Error` objects, ensuring your API never returns a raw stack trace.
 
-### Configuração:
-No `Program.cs` (requer .NET 8.0+):
+### Setup
+In `Program.cs` (.NET 8.0+):
 
 ```csharp
-builder.Services.AddEndpointResults(); // Já registra o ExceptionHandler
+builder.Services.AddEndpointResults(); // Also registers the ExceptionHandler
 // ...
-app.UseExceptionHandler(); // Ativa o pipeline de exceções do ASP.NET Core
+app.UseExceptionHandler(); // Activates the ASP.NET Core exception pipeline
 ```
 
-### Mapeamentos de Exceção Padrão:
-| Exceção | Erro Result | Status HTTP |
+### Default Exception Mappings
+| Exception | Result Error | HTTP Status |
 | :--- | :--- | :--- |
 | `ValidationException` | `Validation.InvalidParameter` | 400 Bad Request |
 | `UnauthorizedAccessException` | `Authentication.Forbidden` | 403 Forbidden |
 | `DbException` | `Database.ConnectionFailed` | 500 Internal Server Error |
 | `NotImplementedException` | `Application.NotImplemented` | 501 Not Implemented |
 
------
+---
 
-## 3. Configuração de Mapeamento
+## 3. Mapping Configuration
 
-Você pode centralizar a tradução entre erros de domínio e contratos HTTP:
+You can centralize the translation between domain errors and HTTP contracts:
 
 ```csharp
 builder.Services.AddEndpointResults(configureMappings: (successes, errors) =>
 {
-    errors.Map<MyDomainError>(HttpStatusCode.Conflict, "Título do Erro", "urn:api:error-type");
+    errors.Map<MyDomainError>(HttpStatusCode.Conflict, "Error Title", "urn:api:error-type");
 });
 ```
 
------
+---
 
-## 4. Documentação Automática de Erros
+## 4. Automatic Error Documentation
 
-Mantenha a documentação da sua API sempre atualizada com o vocabulário de erros do domínio:
+Keep your API documentation up to date with your domain's error vocabulary:
 
 ```csharp
 if (app.Environment.IsDevelopment())
 {
-    // Gera um arquivo Markdown com todos os erros conhecidos e seus mapeamentos HTTP
+    // Generates a Markdown file listing all known errors and their HTTP mappings
     app.OutputErrorsList("Docs/Errors.md");
 }
 ```

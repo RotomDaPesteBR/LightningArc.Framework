@@ -9,20 +9,21 @@
     
     <!-- Build -->
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TestingPlatformCommandLineArguments>$(TestingPlatformCommandLineArguments) --config-file "$(MSBuildThisFileDirectory)testconfig.json"</TestingPlatformCommandLineArguments>
     
     <!-- Speed: Only build in Test configuration -->
-    <Configurations>Debug;Release;LamaDebug;Test</Configurations>
+    <Configurations>Debug;Release;LamaDebug;Dev</Configurations>
   </PropertyGroup>
 
-  <Target Name="SkipTestBuild" BeforeTargets="BeforeBuild" Condition="'$(Configuration)' != 'Test'">
-    <Message Importance="high" Text="Skipping test project build because configuration is not 'Test'." />
+  <Target Name="SkipTestBuild" BeforeTargets="BeforeBuild" Condition="'$(Configuration)' == 'Dev'">
+    <Message Importance="high" Text="Skipping test project build because configuration is 'Dev'." />
     <PropertyGroup>
       <IsSkipBuild>true</IsSkipBuild>
     </PropertyGroup>
   </Target>
 
-  <!-- Prevent compilation and other main tasks if not in Test config -->
-  <PropertyGroup Condition="'$(Configuration)' != 'Test'">
+  <!-- Prevent compilation and other main tasks in Dev config -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Dev'">
     <CoreBuildDependsOn></CoreBuildDependsOn>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>

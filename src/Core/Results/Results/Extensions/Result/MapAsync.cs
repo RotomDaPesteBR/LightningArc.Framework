@@ -37,7 +37,7 @@ public static partial class ResultExtensions
         Func<Task<TOut>> mapper
     ) =>
         result.IsSuccess
-            ? await result.SuccessDetails.MapAsync<TOut>(mapper).ConfigureAwait(false)
+            ? await result.SuccessState.MapAsync<TOut>(mapper).ConfigureAwait(false)
             : result.Error;
 
     #endregion
@@ -206,7 +206,7 @@ public static partial class ResultExtensions
         Func<TIn, Task<TOut>> mapper
     ) =>
         result.IsSuccess
-            ? await result.SuccessDetails.MapAsync<TIn, TOut>(mapper).ConfigureAwait(false)
+            ? await result.SuccessState.MapAsync<TIn, TOut>(mapper).ConfigureAwait(false)
             : result.Error;
     #endregion
 
@@ -358,4 +358,3 @@ public static partial class ResultExtensions
 
     #endregion
 }
-

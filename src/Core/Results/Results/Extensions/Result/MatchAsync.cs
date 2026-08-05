@@ -88,7 +88,7 @@ namespace LightningArc.Results
         {
             Result result = await resultTask.ConfigureAwait(false);
             return result.IsSuccess
-                ? await success(result.SuccessDetails).ConfigureAwait(false)
+                ? await success(result.SuccessState).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
         }
 
@@ -101,7 +101,7 @@ namespace LightningArc.Results
             Func<Error, Task<Result>> failure
         ) =>
             result.IsSuccess
-                ? await success(result.SuccessDetails).ConfigureAwait(false)
+                ? await success(result.SuccessState).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace LightningArc.Results
         {
             Result result = await resultTask.ConfigureAwait(false);
             return result.IsSuccess
-                ? await success(result.SuccessDetails).ConfigureAwait(false)
+                ? await success(result.SuccessState).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
         }
 
@@ -139,7 +139,7 @@ namespace LightningArc.Results
             Func<Error, Task<Result<TOut>>> failure
         ) =>
             result.IsSuccess
-                ? await success(result.SuccessDetails).ConfigureAwait(false)
+                ? await success(result.SuccessState).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace LightningArc.Results
             Func<Error, Task<Result<TOut>>> failure
         ) =>
             result.IsSuccess
-                ? await success(result.SuccessDetails).ConfigureAwait(false)
+                ? await success(result.SuccessState).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
         #endregion
 
@@ -176,7 +176,7 @@ namespace LightningArc.Results
             Func<Error, Task<Result<TOut>>> failure
         ) =>
             result.IsSuccess
-                ? await success(result.SuccessDetails).ConfigureAwait(false)
+                ? await success(result.SuccessState).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace LightningArc.Results
         {
             Result<TIn> result = await resultTask.ConfigureAwait(false);
             return result.IsSuccess
-                ? await success(result.SuccessDetails).ConfigureAwait(false)
+                ? await success(result.SuccessState).ConfigureAwait(false)
                 : await failure(result.Error).ConfigureAwait(false);
         }
 
@@ -219,7 +219,7 @@ namespace LightningArc.Results
         {
             Result<TIn> result = await resultTask.ConfigureAwait(false);
             return result.IsSuccess
-                ? (Result<TOut>)success(result.SuccessDetails)
+                ? (Result<TOut>)success(result.SuccessState)
                 : failure(result.Error);
         }
 
@@ -233,7 +233,7 @@ namespace LightningArc.Results
             Func<Error, Result<TOut>> failure
         ) =>
             result.IsSuccess
-                ? await success(result.SuccessDetails).ConfigureAwait(false)
+                ? await success(result.SuccessState).ConfigureAwait(false)
                 : failure(result.Error);
 
         /// <summary>
@@ -248,10 +248,9 @@ namespace LightningArc.Results
         {
             Result<TIn> result = await resultTask.ConfigureAwait(false);
             return result.IsSuccess
-                ? success(result.SuccessDetails)
+                ? success(result.SuccessState)
                 : await failure(result.Error).ConfigureAwait(false);
         }
         #endregion
     }
 }
-

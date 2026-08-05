@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net9.0;net10.0</TargetFrameworks>
+
+    <RootNamespace>LightningArc.Data.ADO.Oracle</RootNamespace>
+
+    <NoWarn>$(NoWarn);IDE0130</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>LightningArc.Data.ADO.Oracle</AssemblyName>
+    <PackageTags>lightningarc dotnet clean-code repository-pattern dapper ado-net oracle</PackageTags>
+    <Description>Oracle implementation of the LightningArc ADO.NET connection factory.</Description>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="PolySharp" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ADO\LightningArc.Data.ADO.csproj" />
+  </ItemGroup>
+
+</Project>
+
+
+
+
+

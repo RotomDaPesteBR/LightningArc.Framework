@@ -1,7 +1,6 @@
-
-using LightningArc.Results;
 using System.Net;
 using System.Reflection;
+using LightningArc.Results.Successes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -42,15 +41,15 @@ public class SuccessMappingService
 
         // Library success mappings
         // ------------------------
-        Map<Success.OkSuccess>(HttpStatusCode.OK, "OK");
-        Map<Success.CreatedSuccess>(HttpStatusCode.Created, "Created");
-        Map<Success.AcceptedSuccess>(HttpStatusCode.Accepted, "Accepted");
-        Map<Success.NoContentSuccess>(HttpStatusCode.NoContent, "No Content");
+        Map<OkSuccess>(HttpStatusCode.OK, "OK");
+        Map<CreatedSuccess>(HttpStatusCode.Created, "Created");
+        Map<AcceptedSuccess>(HttpStatusCode.Accepted, "Accepted");
+        Map<NoContentSuccess>(HttpStatusCode.NoContent, "No Content");
 
-        Map(typeof(Success<>.OkSuccess), HttpStatusCode.OK, "OK");
-        Map(typeof(Success<>.CreatedSuccess), HttpStatusCode.Created, "Created");
-        Map(typeof(Success<>.AcceptedSuccess), HttpStatusCode.Accepted, "Accepted");
-        Map(typeof(Success<>.NoContentSuccess), HttpStatusCode.NoContent, "No Content");
+        Map(typeof(OkSuccess<>), HttpStatusCode.OK, "OK");
+        Map(typeof(CreatedSuccess<>), HttpStatusCode.Created, "Created");
+        Map(typeof(AcceptedSuccess<>), HttpStatusCode.Accepted, "Accepted");
+        Map(typeof(NoContentSuccess<>), HttpStatusCode.NoContent, "No Content");
 
         if (options.Value.SuccessMappings.Count > 0)
         {
@@ -132,56 +131,19 @@ public class SuccessMappingService
     {
         Type successType = success.GetType();
 
-        Type? typeToLookup = successType;
-
-        // 2. If it's a nested generic type (e.g. Success<User>.OkSuccess)
-        //    we need to extract its generic definition.
-        if (successType.IsGenericType && successType.IsNested)
+        // If it's a constructed generic type (e.g. OkSuccess<User>),
+        // try to look up its generic type definition (e.g. OkSuccess<>).
+        if (successType.IsGenericType && !successType.IsGenericTypeDefinition)
         {
-            // Get the parent type (e.g. Success<User>)
-            Type? declaringType = successType.DeclaringType;
-
-            // If the parent type is generic, we need to build the lookup type:
-            if (declaringType?.IsGenericType == true)
+            Type genericDef = successType.GetGenericTypeDefinition();
+            if (_mappings.TryGetValue(genericDef, out SuccessMapping? mapping))
             {
-                try
-                {
-                    // 2a. Get the generic type definition of the parent (e.g. Success<>)
-                    Type genericParentDef = declaringType.GetGenericTypeDefinition();
-
-                    // 2b. Find the corresponding nested type in the parent's generic definition (e.g. Success<>.{Operation}Success)
-                    Type genericTypeDefinition = genericParentDef.GetNestedType(
-                        successType.Name,
-                        BindingFlags.Public | BindingFlags.NonPublic
-                    )!;
-                    typeToLookup = genericTypeDefinition;
-                }
-                catch (Exception ex)
-                {
-                    // Log error if reflection fails unexpectedly.
-                    if (_logger.IsEnabled(LogLevel.Error))
-                    {
-                        _logger.LogError(
-                            ex,
-                            "Error trying to get generic type definition for nested success '{SuccessType}'.",
-                            successType.Name
-                        );
-                    }
-                }
-
-                // Fallback
-                typeToLookup ??= successType;
+                return mapping;
             }
         }
 
-        // 3. Try to get the mapping with the lookup type (either the exact type or the generic definition).
-        if (_mappings.TryGetValue(typeToLookup, out SuccessMapping? mapping))
-        {
-            return mapping;
-        }
-
-        // 4. Try exact type as fallback (in case the generic mapping failed or it's an exact custom mapping)
-        if (typeToLookup != successType && _mappings.TryGetValue(successType, out SuccessMapping? exactMapping))
+        // Try exact type lookup
+        if (_mappings.TryGetValue(successType, out SuccessMapping? exactMapping))
         {
             return exactMapping;
         }
@@ -198,7 +160,3 @@ public class SuccessMappingService
         return null;
     }
 }
-
-
-
-

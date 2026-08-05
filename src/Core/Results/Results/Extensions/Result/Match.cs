@@ -41,7 +41,7 @@ namespace LightningArc.Results
         {
             return !result.IsSuccess
                 ? failure(result.Error)
-                : Result.Success<TOut>(success(), result.SuccessDetails);
+                : Result.Success<TOut>(success(), result.SuccessState);
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace LightningArc.Results
             Func<Error, Result> failure
         )
         {
-            return !result.IsSuccess ? failure(result.Error) : success(result.SuccessDetails);
+            return !result.IsSuccess ? failure(result.Error) : success(result.SuccessState);
         }
 
         /// <summary>
@@ -113,10 +113,7 @@ namespace LightningArc.Results
         {
             return !result.IsSuccess
                 ? failure(result.Error)
-                : Result.Success<TOut>(
-                    success(result.SuccessDetails),
-                    (Success)result.SuccessDetails
-                );
+                : Result.Success<TOut>(success(result.SuccessState), (Success)result.SuccessState);
         }
 
         /// <summary>
@@ -134,7 +131,7 @@ namespace LightningArc.Results
             Func<Error, Result<TOut>> failure
         )
         {
-            return !result.IsSuccess ? failure(result.Error) : success(result.SuccessDetails);
+            return !result.IsSuccess ? failure(result.Error) : success(result.SuccessState);
         }
 
         /// <summary>
@@ -153,9 +150,8 @@ namespace LightningArc.Results
             Func<Error, TOut> failure
         )
         {
-            return !result.IsSuccess ? failure(result.Error) : success(result.SuccessDetails);
+            return !result.IsSuccess ? failure(result.Error) : success(result.SuccessState);
         }
         #endregion
     }
 }
-

@@ -12,7 +12,7 @@ namespace LightningArc.Samples
     /// </summary>
     public class UserService
     {
-        public async TaskResult<UserDto> RegisterUserAsync(string emailRaw, string name)
+        public async Task<Result<UserDto>> RegisterUserAsync(string emailRaw, string name)
         {
             // 1. Validation using Error Aggregation (+)
             Error? validationErrors = null;
@@ -29,7 +29,7 @@ namespace LightningArc.Samples
                 .Tap(user => NotifyAdmin(user));
         }
 
-        private async TaskResult<Email> CheckDatabaseUniqueness(Email email)
+        private async Task<Result<Email>> CheckDatabaseUniqueness(Email email)
         {
             await Task.Delay(10); // Simulate DB
             return email; // Success

@@ -8,20 +8,22 @@
 
   <!-- Microsoft -->
   <PropertyGroup>
-      <MicrosoftPackagesVersion>10.0.5</MicrosoftPackagesVersion> 
+      <MicrosoftPackagesVersion>10.0.10</MicrosoftPackagesVersion> 
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftPackagesVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftPackagesVersion)" />
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="$(MicrosoftPackagesVersion)" />
   </ItemGroup>
 
   <!-- Compatibility -->
   <ItemGroup>
-    <PackageVersion Include="PolySharp" Version="1.15.0" />
+    <PackageVersion Include="PolySharp" Version="1.16.0" />
     <PackageVersion Include="System.Text.Json" Condition="'$(TargetFramework)' == 'net6.0'" Version="8.0.6" />
     <PackageVersion Include="System.Text.Json" Condition="'$(TargetFramework)' == 'netstandard2.0' 
                                                        OR '$(TargetFramework)' == 'net8.0' 
@@ -31,42 +33,52 @@
   </ItemGroup>
 
   <!-- Mappers -->
+  <PropertyGroup>
+    <MapsterPackagesVersion>10.0.11</MapsterPackagesVersion> 
+  </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="AutoMapper" Version="16.1.1" />
-    <PackageVersion Include="Mapster" Version="10.0.7" />
-    <PackageVersion Include="Mapster.DependencyInjection" Version="10.0.7" />
+    <PackageVersion Include="AutoMapper" Version="16.2.0" />
+    <PackageVersion Include="Mapster" Version="$(MapsterPackagesVersion)" />
+    <PackageVersion Include="Mapster.DependencyInjection" Version="$(MapsterPackagesVersion)" />
   </ItemGroup>
 
   <!-- Drivers -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.0.0" />
-    <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.26.200" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+    <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.26.300" />
   </ItemGroup>
   
   <!-- ORMs -->
   <ItemGroup>
-    <PackageVersion Include="Dapper" Version="2.1.66" />
+    <PackageVersion Include="Dapper" Version="2.1.79" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'netstandard2.0'" Version="3.1.32" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.18" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net10.0'" Version="$(MicrosoftPackagesVersion)" />
   </ItemGroup>
 
   <!-- AspNetCore -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.20" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.28" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.18" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net10.0'" Version="$(MicrosoftPackagesVersion)" />
+    <PackageVersion Include="Microsoft.OpenApi" Condition="'$(TargetFramework)' == 'net10.0'" Version="2.10.0" />
   </ItemGroup>
   
   <!-- Roslyn Analyzers -->
+  <PropertyGroup>
+      <MicrosoftCodeAnalysisPackagesVersion>5.6.0</MicrosoftCodeAnalysisPackagesVersion>
+  </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.3.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(MicrosoftCodeAnalysisPackagesVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="$(MicrosoftCodeAnalysisPackagesVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Features" Version="$(MicrosoftCodeAnalysisPackagesVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(MicrosoftCodeAnalysisPackagesVersion)" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Scripting.Common" Version="$(MicrosoftCodeAnalysisPackagesVersion)" />
   </ItemGroup>
 
   <!-- Metalama -->
   <PropertyGroup>
-      <MetalamaPackagesVersion>2026.0.20</MetalamaPackagesVersion>
+      <MetalamaPackagesVersion>2026.1.21</MetalamaPackagesVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Metalama.Framework" Version="$(MetalamaPackagesVersion)" />
@@ -85,15 +97,18 @@
   </ItemGroup>
   
   <!-- Tests -->
+  <PropertyGroup>
+    <TUnitPackagesVersion>1.63.0</TUnitPackagesVersion> 
+  </PropertyGroup>
   <ItemGroup> 
-    <PackageVersion Include="TUnit" Version="1.31.0" />
-    <PackageVersion Include="TUnit.AspNetCore" Version="1.31.0" />
+    <PackageVersion Include="TUnit" Version="$(TUnitPackagesVersion)" />
+    <PackageVersion Include="TUnit.AspNetCore" Version="$(TUnitPackagesVersion)" />
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="coverlet.collector" Version="8.0.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(MicrosoftPackagesVersion)" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.3" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.3" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.4" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.4" />
   </ItemGroup>
   
   <!-- Self -->
@@ -101,4 +116,9 @@
     <PackageVersion Include="LightningArc.Framework" Version="$(PackageVersion)" />
     <PackageVersion Include="LightningArc.Metalama" Version="$(PackageVersion)" />
   </ItemGroup>
+<!-- Documentation -->
+  <ItemGroup>
+    <PackageVersion Include="XmlDocMarkdown.Core" Version="2.9.0" />
+  </ItemGroup>
+
 </Project>

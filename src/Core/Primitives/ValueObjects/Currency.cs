@@ -7,7 +7,7 @@ namespace LightningArc.Primitives.ValueObjects;
 /// <summary>
 /// Represents a monetary value with an ISO 4217 currency code.
 /// </summary>
-public record Currency : IValueObject<decimal>
+public sealed record Currency : IValueObject<decimal>
 {
     private static readonly Dictionary<string, int> KnownCodes = new()
     {

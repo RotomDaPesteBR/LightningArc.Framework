@@ -4,7 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Data\ADO\Data.ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj" />
+    <ProjectReference Include="..\..\..\src\Data\ADO\ADO.SqlBuilder\LightningArc.Data.ADO.SqlBuilder.csproj" />
   </ItemGroup>
 </Project>
 

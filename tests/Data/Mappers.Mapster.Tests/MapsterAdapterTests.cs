@@ -25,5 +25,25 @@ public class MapsterAdapterTests
         await Assert.That(result).IsNotNull();
         await Assert.That(result.Name).IsEqualTo(source.Name);
     }
+
+    [Test]
+    public async Task Map_WithExistingDestination_ShouldUpdateDestination()
+    {
+        // Arrange
+        TypeAdapterConfig config = new();
+        Mapper mapper = new(config);
+        MapsterAdapter adapter = new(mapper);
+        Source source = new() { Name = "Updated" };
+        Destination destination = new() { Name = "Original" };
+
+        // Act
+        Destination result = adapter.Map(source, destination);
+
+        // Assert
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result.Name).IsEqualTo("Updated");
+    }
+
+    // Note: Mapster throws ArgumentNullException on null source - behavior validated in usage
 }
 
