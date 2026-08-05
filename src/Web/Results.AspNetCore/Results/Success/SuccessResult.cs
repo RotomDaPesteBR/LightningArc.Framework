@@ -29,25 +29,24 @@ public sealed class SuccessResult(Success success) : IResult
 
         httpContext.Response.StatusCode = statusCode;
 
-        if (statusCode == (int)HttpStatusCode.NoContent)
+        if (
+            statusCode == (int)HttpStatusCode.NoContent
+            || !options.WrapSuccessResponses
+            || options.SuccessResponseBuilder == null
+        )
         {
             return Task.CompletedTask;
         }
 
-        if (options.WrapSuccessResponses && options.SuccessResponseBuilder != null)
+        SuccessDetail successDetails = new()
         {
-            SuccessDetail successDetails = new()
-            {
-                Status = mapping?.StatusCode ?? HttpStatusCode.OK,
-                Message = success.Message ?? "",
-                Data = null,
-            };
+            Status = mapping?.StatusCode ?? HttpStatusCode.OK,
+            Message = success.Message ?? "",
+            Data = null,
+        };
 
-            object? response = options.SuccessResponseBuilder(successDetails, httpContext);
-            return httpContext.Response.WriteAsJsonAsync(response);
-        }
-
-        return Task.CompletedTask;
+        object? response = options.SuccessResponseBuilder(successDetails, httpContext);
+        return httpContext.Response.WriteAsJsonAsync(response);
     }
 }
 
@@ -95,22 +94,20 @@ public sealed class SuccessResult<TValue>(Success<TValue> success, string? conte
             return httpContext.Response.WriteAsync(success.Value?.ToString() ?? string.Empty);
         }
 
-        if (options.WrapSuccessResponses && options.SuccessResponseBuilder != null)
-        {
-            SuccessDetail successDetails = new()
-            {
-                Status = mapping?.StatusCode ?? HttpStatusCode.OK,
-                Message = success.Message ?? "",
-                Instance = httpContext.Request.Path,
-                Data = success.Value,
-            };
-
-            object? response = options.SuccessResponseBuilder(successDetails, httpContext);
-            return httpContext.Response.WriteAsJsonAsync(response);
-        }
-        else
+        if (!options.WrapSuccessResponses || options.SuccessResponseBuilder == null)
         {
             return httpContext.Response.WriteAsJsonAsync(success.Value);
         }
+
+        SuccessDetail successDetails = new()
+        {
+            Status = mapping?.StatusCode ?? HttpStatusCode.OK,
+            Message = success.Message ?? "",
+            Instance = httpContext.Request.Path,
+            Data = success.Value,
+        };
+
+        object? response = options.SuccessResponseBuilder(successDetails, httpContext);
+        return httpContext.Response.WriteAsJsonAsync(response);
     }
 }

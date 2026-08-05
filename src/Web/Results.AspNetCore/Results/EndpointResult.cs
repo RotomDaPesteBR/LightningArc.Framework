@@ -42,6 +42,13 @@ public sealed class EndpointResult : IResult
             ? new EndpointResult(new SuccessResult(result.SuccessState))
             : new EndpointResult(new ErrorResult(result.Error));
     }
+
+    /// <summary>
+    /// Allows implicit conversion from an <see cref="Error"/> into an <see cref="EndpointResult"/>.
+    /// </summary>
+    /// <param name="error">The <see cref="Error"/> to be converted.</param>
+    /// <returns>An <see cref="EndpointResult"/> that encapsulates the corresponding HTTP response.</returns>
+    public static implicit operator EndpointResult(Error error) => new(new ErrorResult(error));
 }
 
 /// <summary>

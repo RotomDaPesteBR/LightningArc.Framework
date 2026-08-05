@@ -24,22 +24,18 @@ namespace LightningArc.CORS.AspNetCore.Policies
         /// </remarks>
         public static IServiceCollection AddAllowAllPolicy(this IServiceCollection services)
         {
-            CorsPolicy policy = new();
-
-            policy.Headers.Add("*");
-            policy.Methods.Add("*");
-            policy.Origins.Add("*");
-
             services.AddCors(options =>
             {
-                options.AddPolicy(name: "AllowAll", policy: policy);
+                options.AddPolicy(
+                    "AllowAll",
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                    }
+                );
             });
 
             return services;
         }
     }
 }
-
-
-
-
