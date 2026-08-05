@@ -4,7 +4,7 @@ namespace LightningArc.Data.Abstractions.UnitOfWork;
 /// Defines the interface for the Unit of Work pattern, responsible for coordinating
 /// business transactions and data persistence operations.
 /// </summary>
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork : IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// Starts a new business transaction.
@@ -36,4 +36,3 @@ public interface IUnitOfWork : IDisposable
     /// </summary>
     Task RollbackAsync(CancellationToken cancellationToken = default);
 }
-
