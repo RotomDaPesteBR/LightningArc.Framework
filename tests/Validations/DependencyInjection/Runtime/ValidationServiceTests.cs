@@ -21,10 +21,12 @@ public sealed class ScopedPingValidator(ScopedDependency dependency) : IValidato
 {
     public ScopedDependency Dependency { get; } = dependency;
 
-    public Result Validate(ScopedPingCommand instance)
-    {
-        return Result.Success();
-    }
+    public Result Validate(ScopedPingCommand instance) => Result.Success();
+    public Result Validate(ScopedPingCommand instance, string ruleSet) => Validate(instance);
+    public Result Validate(ScopedPingCommand instance, ValidationOptions options) => Validate(instance);
+    public Task<Result> ValidateAsync(ScopedPingCommand instance, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(ScopedPingCommand instance, string ruleSet, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(ScopedPingCommand instance, ValidationOptions options) => Task.FromResult(Validate(instance));
 }
 
 public sealed class ScopedDependency

@@ -13,15 +13,19 @@ public sealed record UpdateUserCommand(string Name);
 
 public sealed class MultiContractValidator : IValidator<CreateUserCommand>, IValidator<UpdateUserCommand>
 {
-    public Result Validate(CreateUserCommand instance)
-    {
-        return Result.Success();
-    }
+    public Result Validate(CreateUserCommand instance) => Result.Success();
+    public Result Validate(CreateUserCommand instance, string ruleSet) => Validate(instance);
+    public Result Validate(CreateUserCommand instance, ValidationOptions options) => Validate(instance);
+    public Task<Result> ValidateAsync(CreateUserCommand instance, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(CreateUserCommand instance, string ruleSet, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(CreateUserCommand instance, ValidationOptions options) => Task.FromResult(Validate(instance));
 
-    public Result Validate(UpdateUserCommand instance)
-    {
-        return Result.Success();
-    }
+    public Result Validate(UpdateUserCommand instance) => Result.Success();
+    public Result Validate(UpdateUserCommand instance, string ruleSet) => Validate(instance);
+    public Result Validate(UpdateUserCommand instance, ValidationOptions options) => Validate(instance);
+    public Task<Result> ValidateAsync(UpdateUserCommand instance, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(UpdateUserCommand instance, string ruleSet, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(UpdateUserCommand instance, ValidationOptions options) => Task.FromResult(Validate(instance));
 }
 
 public class ManualRegistrationTests

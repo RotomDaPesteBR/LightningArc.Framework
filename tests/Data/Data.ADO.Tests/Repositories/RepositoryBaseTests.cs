@@ -11,6 +11,18 @@ namespace LightningArc.Data.Tests.Repositories;
 
 public class RepositoryBaseTests
 {
+    private class TestDbTransaction(TestDbConnection connection) : DbTransaction
+    {
+        public int CommitCount { get; private set; }
+        public int RollbackCount { get; private set; }
+
+        protected override DbConnection DbConnection { get; } = connection;
+        public override IsolationLevel IsolationLevel => IsolationLevel.ReadCommitted;
+
+        public override void Commit() => CommitCount++;
+        public override void Rollback() => RollbackCount++;
+    }
+
     private class TestDbConnection : DbConnection
     {
         public int CloseCount { get; private set; }
@@ -165,6 +177,22 @@ public class RepositoryBaseTests
         // Assert
         await Assert.That(mockConn.CloseCount).IsEqualTo(1);
         await Assert.That(mockConn.DisposeCount).IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task Repository_WithProvidedConnection_ShouldNotDisposeOnRelease()
+    {
+        // Arrange - connection provided via UoW pattern
+        TestDbConnection mockConn = new();
+        TestDbTransaction mockTrans = new(mockConn);
+
+        // Act - release without factory should not dispose provided connection
+        InternalTestRepository repo = new(mockConn, mockTrans);
+        repo.ReleaseConnection(mockConn);
+
+        // Assert - connection remains managed by UoW
+        await Assert.That(mockConn.DisposeCount).IsEqualTo(0);
+        await Assert.That(mockConn.CloseCount).IsEqualTo(0);
     }
 }
 

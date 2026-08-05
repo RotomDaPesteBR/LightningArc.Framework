@@ -27,11 +27,21 @@ public sealed class OrderValidator : AbstractValidator<OrderCommand>
 public sealed class DetaillessOrderLineValidator : IValidator<OrderLineCommand>
 {
     public Result Validate(OrderLineCommand instance) => Error.Application.InvalidOperation("Collection child validator failed without details");
+    public Result Validate(OrderLineCommand instance, string ruleSet) => Validate(instance);
+    public Result Validate(OrderLineCommand instance, ValidationOptions options) => Validate(instance);
+    public Task<Result> ValidateAsync(OrderLineCommand instance, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(OrderLineCommand instance, string ruleSet, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(OrderLineCommand instance, ValidationOptions options) => Task.FromResult(Validate(instance));
 }
 
 public sealed class ResourceOrderLineValidator : IValidator<OrderLineCommand>
 {
     public Result Validate(OrderLineCommand instance) => Error.Resource.NotFound("Order line resource was not found");
+    public Result Validate(OrderLineCommand instance, string ruleSet) => Validate(instance);
+    public Result Validate(OrderLineCommand instance, ValidationOptions options) => Validate(instance);
+    public Task<Result> ValidateAsync(OrderLineCommand instance, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(OrderLineCommand instance, string ruleSet, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(OrderLineCommand instance, ValidationOptions options) => Task.FromResult(Validate(instance));
 }
 
 public sealed class DetailedResourceOrderLineValidator : IValidator<OrderLineCommand>
@@ -39,6 +49,11 @@ public sealed class DetailedResourceOrderLineValidator : IValidator<OrderLineCom
     public Result Validate(OrderLineCommand instance) => Error.Resource.NotFound(
         "Order line resource was not found",
         [new ErrorDetail(nameof(OrderLineCommand.Sku), "Sku could not be resolved")]);
+    public Result Validate(OrderLineCommand instance, string ruleSet) => Validate(instance);
+    public Result Validate(OrderLineCommand instance, ValidationOptions options) => Validate(instance);
+    public Task<Result> ValidateAsync(OrderLineCommand instance, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(OrderLineCommand instance, string ruleSet, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(OrderLineCommand instance, ValidationOptions options) => Task.FromResult(Validate(instance));
 }
 
 public sealed class OrderWithDetaillessValidator : AbstractValidator<OrderCommand>

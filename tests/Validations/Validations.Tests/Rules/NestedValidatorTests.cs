@@ -50,11 +50,21 @@ public sealed class UserWithFailFastAddressValidator : AbstractValidator<UserCom
 public sealed class DetaillessAddressValidator : IValidator<AddressCommand>
 {
     public Result Validate(AddressCommand instance) => Error.Application.InvalidOperation("Child validator failed without details");
+    public Result Validate(AddressCommand instance, string ruleSet) => Validate(instance);
+    public Result Validate(AddressCommand instance, ValidationOptions options) => Validate(instance);
+    public Task<Result> ValidateAsync(AddressCommand instance, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(AddressCommand instance, string ruleSet, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(AddressCommand instance, ValidationOptions options) => Task.FromResult(Validate(instance));
 }
 
 public sealed class ResourceAddressValidator : IValidator<AddressCommand>
 {
     public Result Validate(AddressCommand instance) => Error.Resource.NotFound("Address resource was not found");
+    public Result Validate(AddressCommand instance, string ruleSet) => Validate(instance);
+    public Result Validate(AddressCommand instance, ValidationOptions options) => Validate(instance);
+    public Task<Result> ValidateAsync(AddressCommand instance, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(AddressCommand instance, string ruleSet, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(AddressCommand instance, ValidationOptions options) => Task.FromResult(Validate(instance));
 }
 
 public sealed class DetailedResourceAddressValidator : IValidator<AddressCommand>
@@ -62,6 +72,11 @@ public sealed class DetailedResourceAddressValidator : IValidator<AddressCommand
     public Result Validate(AddressCommand instance) => Error.Resource.NotFound(
         "Address resource was not found",
         [new ErrorDetail(nameof(AddressCommand.ZipCode), "Zip code could not be resolved")]);
+    public Result Validate(AddressCommand instance, string ruleSet) => Validate(instance);
+    public Result Validate(AddressCommand instance, ValidationOptions options) => Validate(instance);
+    public Task<Result> ValidateAsync(AddressCommand instance, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(AddressCommand instance, string ruleSet, CancellationToken cancellationToken = default) => Task.FromResult(Validate(instance));
+    public Task<Result> ValidateAsync(AddressCommand instance, ValidationOptions options) => Task.FromResult(Validate(instance));
 }
 
 public sealed class UserWithDetaillessAddressValidator : AbstractValidator<UserCommand>
