@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using LightningArc.Results;
 using LightningArc.Validations.Internal;
 
@@ -17,5 +21,18 @@ internal sealed class ObjectValidationRule<T>(
         }
 
         return [new ValidationFailure(path ?? string.Empty, message, errorFactory)];
+    }
+
+    public async IAsyncEnumerable<ValidationFailure> ValidateAsync(
+        T instance,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        IEnumerable<ValidationFailure> failures = Validate(instance);
+        foreach (var failure in failures)
+        {
+            yield return failure;
+        }
     }
 }

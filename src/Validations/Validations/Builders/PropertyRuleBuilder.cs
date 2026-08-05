@@ -1,7 +1,10 @@
+using System;
+using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 using LightningArc.Results;
 using LightningArc.Validations.Internal;
 using LightningArc.Validations.Rules;
-using System.Collections;
 
 namespace LightningArc.Validations.Builders;
 
@@ -109,6 +112,34 @@ public sealed partial class PropertyRuleBuilder<T, TProperty>
     }
 
     /// <summary>
+    /// Requires the property value to satisfy the provided asynchronous predicate.
+    /// </summary>
+    /// <param name="predicate">The asynchronous predicate that must evaluate to <see langword="true"/>.</param>
+    /// <param name="message">The validation message used when the predicate fails.</param>
+    /// <param name="errorFactory">The optional error factory used when validation fails.</param>
+    /// <returns>The current builder instance.</returns>
+    public PropertyRuleBuilder<T, TProperty> MustAsync(
+        Func<TProperty, CancellationToken, Task<bool>> predicate,
+        string message,
+        Func<TProperty, string, string, Error>? errorFactory = null)
+    {
+        Rule.AddAsync(async (value, ct) =>
+        {
+            bool result = await predicate(value, ct).ConfigureAwait(false);
+            return result
+                ? null
+                : new ValidationFailure(
+                    Rule.Path,
+                    message,
+                    (path, text) => errorFactory is null
+                        ? Error.Validation.InvalidParameter(text, [(path, text)])
+                        : errorFactory(value, path, text));
+        });
+
+        return this;
+    }
+
+    /// <summary>
     /// Applies a child validator to the selected property and prefixes any reported member paths.
     /// </summary>
     /// <param name="validator">The validator used to validate the nested property value.</param>
@@ -116,6 +147,28 @@ public sealed partial class PropertyRuleBuilder<T, TProperty>
     public PropertyRuleBuilder<T, TProperty> SetValidator(IValidator<TProperty> validator)
     {
         RegisterRule(new NestedValidatorRule<T, TProperty>(Rule.Accessor, Rule.Path, validator));
+        return this;
+    }
+
+    /// <summary>
+    /// Specifies a condition that must be met for the rule to execute.
+    /// </summary>
+    /// <param name="condition">The condition predicate evaluated against the parent instance.</param>
+    /// <returns>The current builder instance.</returns>
+    public PropertyRuleBuilder<T, TProperty> When(Func<T, bool> condition)
+    {
+        Rule.SetCondition(condition);
+        return this;
+    }
+
+    /// <summary>
+    /// Specifies a condition that, when met, skips the rule execution.
+    /// </summary>
+    /// <param name="condition">The condition predicate evaluated against the parent instance.</param>
+    /// <returns>The current builder instance.</returns>
+    public PropertyRuleBuilder<T, TProperty> Unless(Func<T, bool> condition)
+    {
+        Rule.SetCondition(instance => !condition(instance));
         return this;
     }
 
