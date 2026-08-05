@@ -9,6 +9,7 @@
     
     <!-- Build -->
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TestingPlatformCommandLineArguments>$(TestingPlatformCommandLineArguments) --config-file "$(MSBuildThisFileDirectory)testconfig.json"</TestingPlatformCommandLineArguments>
     
     <!-- Speed: Only build in Test configuration -->
     <Configurations>Debug;Release;LamaDebug;Dev</Configurations>

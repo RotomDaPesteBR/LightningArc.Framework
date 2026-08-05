@@ -16,7 +16,6 @@
     <!-- Build -->
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts</ArtifactsPath>
-    <VSTestResultsDirectory>$(ArtifactsPath)\TestResults</VSTestResultsDirectory>
 
     <!-- Versioning -->
     <PackageVersion Condition="'$(PackageVersion)' == ''">1.0.0</PackageVersion>
