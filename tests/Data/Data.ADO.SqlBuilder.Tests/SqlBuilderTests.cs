@@ -16,7 +16,7 @@ public class SqlBuilderTests
     public async Task Select_All_ShouldGenerateCorrectSql()
     {
         // Arrange
-        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer);
+        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer, new SqlBuilderOptions { QuoteTableNames = false, QuoteColumnNames = false });
 
         // Act
         string sql = builder.Select.Build();
@@ -29,7 +29,7 @@ public class SqlBuilderTests
     public async Task Insert_All_ShouldGenerateCorrectSql()
     {
         // Arrange
-        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer);
+        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer, new SqlBuilderOptions { QuoteTableNames = false, QuoteColumnNames = false });
 
         // Act
         string sql = builder.Insert.Build();
@@ -42,7 +42,7 @@ public class SqlBuilderTests
     public async Task Update_ById_ShouldGenerateCorrectSql()
     {
         // Arrange
-        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer);
+        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer, new SqlBuilderOptions { QuoteTableNames = false, QuoteColumnNames = false });
 
         // Act
         string sql = builder.Update.Build();
@@ -55,7 +55,7 @@ public class SqlBuilderTests
     public async Task Delete_ById_ShouldGenerateCorrectSql()
     {
         // Arrange
-        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer);
+        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.SqlServer, new SqlBuilderOptions { QuoteTableNames = false, QuoteColumnNames = false });
 
         // Act
         string sql = builder.Delete.Build();
@@ -68,14 +68,12 @@ public class SqlBuilderTests
     public async Task Select_PostgreSql_ShouldUseCorrectQuotes()
     {
         // Arrange
-        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.PostgreSQL);
+        SqlBuilder builder = new("Users", DefaultColumns, SqlDialect.PostgreSQL, new SqlBuilderOptions { QuoteTableNames = true, QuoteColumnNames = true });
 
         // Act
         string sql = builder.Select.Build();
 
         // Assert
-        // Current implementation seems to NOT be adding quotes by default for PostgreSQL either 
-        // based on the test failure output.
-        await Assert.That(sql).IsEqualTo("SELECT Id, Name, Age FROM Users");
+        await Assert.That(sql).IsEqualTo("SELECT \"Id\", \"Name\", \"Age\" FROM \"Users\"");
     }
 }
