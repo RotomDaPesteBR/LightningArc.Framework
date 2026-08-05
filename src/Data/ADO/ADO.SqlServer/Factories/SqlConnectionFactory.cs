@@ -1,8 +1,8 @@
 using System.Data.Common;
+using LightningArc.Data.ADO.Factories;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using LightningArc.Data.ADO.Factories;
 
 namespace LightningArc.Data.ADO.SqlServer.Factories;
 
@@ -22,16 +22,29 @@ public class SqlConnectionFactory : IConnectionFactory
     private readonly ILogger<SqlConnectionFactory>? _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SqlConnectionFactory"/> class using <see cref="IConfiguration"/>.
+    /// Initializes a new instance of the <see cref="SqlConnectionFactory"/> class using <see cref="IConfiguration"/>
+    /// and a custom connection string name.
     /// </summary>
     /// <param name="configuration">The configuration containing the connection string.</param>
-    /// <exception cref="InvalidOperationException">Thrown when the connection string is not found.</exception>
-    public SqlConnectionFactory(IConfiguration configuration)
+    /// <param name="connectionName">The name of the connection string in the configuration (defaults to 'DatabaseConnection').</param>
+    public SqlConnectionFactory(
+        IConfiguration configuration,
+        string connectionName = "DatabaseConnection"
+    )
     {
+#if NETSTANDARD2_0
+        if (configuration is null)
+        {
+            throw new ArgumentNullException(nameof(configuration));
+        }
+#else
+        ArgumentNullException.ThrowIfNull(configuration);
+#endif
+
         _connectionString =
-            configuration.GetConnectionString("DatabaseConnection")
+            configuration.GetConnectionString(connectionName)
             ?? throw new InvalidOperationException(
-                "Connection string 'DatabaseConnection' not found."
+                $"Connection string '{connectionName}' not found in the configuration."
             );
     }
 
@@ -41,16 +54,26 @@ public class SqlConnectionFactory : IConnectionFactory
     /// <param name="connectionString">The SQL Server connection string.</param>
     public SqlConnectionFactory(string connectionString)
     {
-        _connectionString = connectionString;
+        _connectionString = !string.IsNullOrWhiteSpace(connectionString)
+            ? connectionString
+            : throw new ArgumentException(
+                "Connection string cannot be null or empty.",
+                nameof(connectionString)
+            );
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SqlConnectionFactory"/> class with logging support.
+    /// Initializes a new instance of the <see cref="SqlConnectionFactory"/> class with logging and custom connection string support.
     /// </summary>
     /// <param name="logger">The logger instance.</param>
-    /// <param name="config">The configuration containing the connection string.</param>
-    public SqlConnectionFactory(ILogger<SqlConnectionFactory> logger, IConfiguration config)
-        : this(config)
+    /// <param name="configuration">The configuration containing the connection string.</param>
+    /// <param name="connectionName">The name of the connection string in the configuration (defaults to 'DatabaseConnection').</param>
+    public SqlConnectionFactory(
+        ILogger<SqlConnectionFactory> logger,
+        IConfiguration configuration,
+        string connectionName = "DatabaseConnection"
+    )
+        : this(configuration, connectionName)
     {
         _logger = logger;
     }
@@ -68,4 +91,3 @@ public class SqlConnectionFactory : IConnectionFactory
         return connection;
     }
 }
-

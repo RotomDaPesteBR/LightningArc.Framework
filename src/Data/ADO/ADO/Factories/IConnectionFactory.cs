@@ -14,4 +14,3 @@ public interface IConnectionFactory
     /// <returns>An open instance of <see cref="DbConnection"/>.</returns>
     DbConnection GetConnection();
 }
-

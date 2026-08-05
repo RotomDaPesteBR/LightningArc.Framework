@@ -17,16 +17,22 @@ public sealed class UnitOfWork(IConnectionFactory connectionFactory) : IDbUnitOf
     /// <inheritdoc />
     public DbConnection Connection
     {
-        get => field ??
-               throw new InvalidOperationException("Unit of Work not started. Call Begin() or BeginAsync() first.");
+        get =>
+            field
+            ?? throw new InvalidOperationException(
+                "Unit of Work not started. Call Begin() or BeginAsync() first."
+            );
         private set;
     }
 
     /// <inheritdoc />
     public DbTransaction Transaction
     {
-        get => field ??
-               throw new InvalidOperationException("Unit of Work not started. Call Begin() or BeginAsync() first.");
+        get =>
+            field
+            ?? throw new InvalidOperationException(
+                "Unit of Work not started. Call Begin() or BeginAsync() first."
+            );
         private set;
     }
 
@@ -61,14 +67,16 @@ public sealed class UnitOfWork(IConnectionFactory connectionFactory) : IDbUnitOf
 
         if (Connection.State != ConnectionState.Open)
         {
-            await Connection.OpenAsync(cancellationToken);
+            await Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
         }
 
 #if NETSTANDARD2_0
         Transaction = Connection.BeginTransaction();
         await Task.CompletedTask;
 #else
-        Transaction = await Connection.BeginTransactionAsync(cancellationToken);
+        Transaction = await Connection
+            .BeginTransactionAsync(cancellationToken)
+            .ConfigureAwait(false);
 #endif
 
         _isStarted = true;
@@ -79,11 +87,19 @@ public sealed class UnitOfWork(IConnectionFactory connectionFactory) : IDbUnitOf
     {
         if (!_isStarted)
         {
-            throw new InvalidOperationException("Unit of Work not started. Call Begin() or BeginAsync() first.");
+            throw new InvalidOperationException(
+                "Unit of Work not started. Call Begin() or BeginAsync() first."
+            );
         }
 
-        Transaction.Commit();
-        Dispose();
+        try
+        {
+            Transaction.Commit();
+        }
+        finally
+        {
+            Dispose();
+        }
     }
 
     /// <inheritdoc />
@@ -91,71 +107,188 @@ public sealed class UnitOfWork(IConnectionFactory connectionFactory) : IDbUnitOf
     {
         if (!_isStarted)
         {
-            throw new InvalidOperationException("Unit of Work not started. Call Begin() or BeginAsync() first.");
+            throw new InvalidOperationException(
+                "Unit of Work not started. Call Begin() or BeginAsync() first."
+            );
         }
 
+        try
+        {
 #if NETSTANDARD2_0
-        Transaction.Commit();
-        await Task.CompletedTask;
+            Transaction.Commit();
+            await Task.CompletedTask;
 #else
-        await Transaction.CommitAsync(cancellationToken);
+            await Transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
 #endif
-        Dispose();
+        }
+        finally
+        {
+#if NETSTANDARD2_0
+            Dispose();
+#else
+            await DisposeAsync().ConfigureAwait(false);
+#endif
+        }
     }
 
     /// <inheritdoc />
     public void Rollback()
     {
-        if (!_isStarted) return;
+        if (!_isStarted)
+        {
+            return;
+        }
 
-        Transaction.Rollback();
-        Dispose();
+        try
+        {
+            Transaction.Rollback();
+        }
+        catch (Exception)
+        {
+            // Suppress or log rollback exceptions (e.g., connection lost) to ensure Dispose runs
+        }
+        finally
+        {
+            Dispose();
+        }
     }
 
     /// <inheritdoc />
     public async Task RollbackAsync(CancellationToken cancellationToken = default)
     {
-        if (_isStarted)
+        if (!_isStarted)
+        {
+            return;
+        }
+
+        try
         {
 #if NETSTANDARD2_0
             Transaction.Rollback();
             await Task.CompletedTask;
 #else
-            await Transaction.RollbackAsync(cancellationToken);
+            // CRITICAL: We intentionally use CancellationToken.None here.
+            // If the user's token is canceled, we MUST still attempt to rollback the transaction
+            // to release database locks and avoid leaving the transaction in an uncommitted limbo state.
+            await Transaction.RollbackAsync(CancellationToken.None).ConfigureAwait(false);
 #endif
+        }
+        catch (Exception)
+        {
+            // Suppress or log rollback exceptions to ensure Dispose/DisposeAsync runs smoothly
+        }
+        finally
+        {
+#if NETSTANDARD2_0
             Dispose();
+#else
+            await DisposeAsync().ConfigureAwait(false);
+#endif
         }
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
+        Dispose(true);
+    }
+
+    /// <summary>
+    /// Performs asynchronous disposal of managed resources.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore().ConfigureAwait(false);
+        Dispose(false);
+    }
+
+    /// <summary>
+    /// Releases unmanaged and optionally managed resources.
+    /// </summary>
+    /// <param name="disposing">True to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    private void Dispose(bool disposing)
+    {
         if (_isDisposed)
         {
             return;
         }
 
-        if (_isStarted)
+        if (disposing && _isStarted)
         {
             try
             {
+                // Synchronous cleanup fallback
                 Transaction.Dispose();
-                Connection.Close();
+
+                if (Connection.State != ConnectionState.Closed)
+                {
+                    Connection.Close();
+                }
+
                 Connection.Dispose();
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
-                // In case the connection or transaction were already disposed or closed.
+                // Prevent exceptions from bubbling up during disposal phases
             }
             finally
             {
-                _isStarted = false;
-                Connection = null!;
-                Transaction = null!;
+                ResetState();
             }
         }
 
         _isDisposed = true;
     }
-}
 
+    /// <summary>
+    /// Performs asynchronous cleanup of database resources.
+    /// </summary>
+    private async ValueTask DisposeAsyncCore()
+    {
+        if (_isDisposed || !_isStarted)
+        {
+            return;
+        }
+
+        try
+        {
+#if !NETSTANDARD2_0
+            await Transaction.DisposeAsync().ConfigureAwait(false);
+
+            if (Connection.State != ConnectionState.Closed)
+            {
+                await Connection.CloseAsync().ConfigureAwait(false);
+            }
+
+            await Connection.DisposeAsync().ConfigureAwait(false);
+#else
+            // Fallback for .NET Standard 2.0 which lacks async dispose for ADO.NET
+            Transaction?.Dispose();
+            if (Connection != null)
+            {
+                Connection.Close();
+                Connection.Dispose();
+            }
+            await Task.CompletedTask;
+#endif
+        }
+        catch (Exception)
+        {
+            // Prevent exceptions from bubbling up during asynchronous disposal
+        }
+        finally
+        {
+            ResetState();
+        }
+    }
+
+    /// <summary>
+    /// Resets the internal operational state of the Unit of Work.
+    /// </summary>
+    private void ResetState()
+    {
+        _isStarted = false;
+        Connection = null!;
+        Transaction = null!;
+    }
+}

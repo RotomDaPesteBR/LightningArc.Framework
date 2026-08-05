@@ -96,24 +96,29 @@ public abstract class RepositoryBase
         : this(dbConnection, transaction, mapper) => Logger = logger ?? NullLogger.Instance;
 
     /// <summary>
-    /// Retrieves a database connection. Returns the existing connection if provided,
-    /// or creates a new one using the connection factory.
+    /// Retrieves the database connection using the inherited connection factory or an existing connection.
     /// </summary>
-    /// <returns>An instance of <see cref="System.Data.Common.DbConnection"/>.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when the repository is not properly initialized with a connection or a factory.</exception>
-    protected DbConnection GetConnection()
+    protected DbConnection GetConnection() => GetConnection(customFactory: null);
+
+    /// <summary>
+    /// Retrieves a database connection overriding the default behavior with a custom connection factory.
+    /// </summary>
+    /// <param name="customFactory">The custom connection factory to use.</param>
+    protected DbConnection GetConnection(IConnectionFactory? customFactory)
     {
-        if (DbConnection != null)
+        if (DbConnection != null && customFactory == null)
         {
             return DbConnection;
         }
 
-        if (ConnectionFactory == null)
-        {
-            throw new InvalidOperationException("Repository not properly initialized.");
-        }
+        IConnectionFactory factoryToUse =
+            customFactory
+            ?? ConnectionFactory
+            ?? throw new InvalidOperationException(
+                "Repository not properly initialized. No connection factory available."
+            );
 
-        DbConnection dbConnection = ConnectionFactory.GetConnection();
+        DbConnection dbConnection = factoryToUse.GetConnection();
 
         if (dbConnection.State != ConnectionState.Open)
         {
@@ -122,32 +127,45 @@ public abstract class RepositoryBase
 
         if (Logger.IsEnabled(LogLevel.Debug))
         {
-            Logger.LogDebug("Connection opened");
+            Logger.LogDebug(
+                "Connection opened via factory: {FactoryType}",
+                factoryToUse.GetType().Name
+            );
         }
 
         return dbConnection;
     }
 
     /// <summary>
-    /// Asynchronously retrieves a database connection. Returns the existing connection if provided,
-    /// or creates a new one using the connection factory.
+    /// Asynchronously retrieves the database connection using the inherited connection factory or an existing connection.
     /// </summary>
+    protected Task<DbConnection> GetConnectionAsync(
+        CancellationToken cancellationToken = default
+    ) => GetConnectionAsync(customFactory: null, cancellationToken);
+
+    /// <summary>
+    /// Asynchronously retrieves a database connection overriding the default behavior with a custom connection factory.
+    /// </summary>
+    /// <param name="customFactory">The custom connection factory to use.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>A task that contains an instance of <see cref="System.Data.Common.DbConnection"/>.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when the repository is not properly initialized with a connection or a factory.</exception>
-    protected async Task<DbConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
+    protected async Task<DbConnection> GetConnectionAsync(
+        IConnectionFactory? customFactory,
+        CancellationToken cancellationToken = default
+    )
     {
-        if (DbConnection != null)
+        if (DbConnection != null && customFactory == null)
         {
             return DbConnection;
         }
 
-        if (ConnectionFactory == null)
-        {
-            throw new InvalidOperationException("Repository not properly initialized.");
-        }
+        IConnectionFactory factoryToUse =
+            customFactory
+            ?? ConnectionFactory
+            ?? throw new InvalidOperationException(
+                "Repository not properly initialized. No connection factory available."
+            );
 
-        DbConnection dbConnection = ConnectionFactory.GetConnection();
+        DbConnection dbConnection = factoryToUse.GetConnection();
 
         if (dbConnection.State != ConnectionState.Open)
         {
@@ -156,7 +174,10 @@ public abstract class RepositoryBase
 
         if (Logger.IsEnabled(LogLevel.Debug))
         {
-            Logger.LogDebug("Connection opened");
+            Logger.LogDebug(
+                "Connection opened asynchronously via factory: {FactoryType}",
+                factoryToUse.GetType().Name
+            );
         }
 
         return dbConnection;
@@ -283,4 +304,3 @@ public abstract class RepositoryBase<TEntity, TResult> : RepositoryBase
     )
         : base(dbConnection, transaction, mapper, logger) { }
 }
-

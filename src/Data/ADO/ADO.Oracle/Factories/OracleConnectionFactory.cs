@@ -1,8 +1,8 @@
 using System.Data.Common;
+using LightningArc.Data.ADO.Factories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Oracle.ManagedDataAccess.Client;
-using LightningArc.Data.ADO.Factories;
 
 namespace LightningArc.Data.ADO.Oracle.Factories;
 
@@ -22,16 +22,29 @@ public class OracleConnectionFactory : IConnectionFactory
     private readonly ILogger<OracleConnectionFactory>? _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="OracleConnectionFactory"/> class using <see cref="IConfiguration"/>.
+    /// Initializes a new instance of the <see cref="OracleConnectionFactory"/> class using <see cref="IConfiguration"/>
+    /// and a custom connection string name.
     /// </summary>
     /// <param name="configuration">The configuration containing the connection string.</param>
-    /// <exception cref="InvalidOperationException">Thrown when the connection string is not found.</exception>
-    public OracleConnectionFactory(IConfiguration configuration)
+    /// <param name="connectionName">The name of the connection string in the configuration (defaults to 'DatabaseConnection').</param>
+    public OracleConnectionFactory(
+        IConfiguration configuration,
+        string connectionName = "DatabaseConnection"
+    )
     {
+#if NETSTANDARD2_1
+        if (configuration is null)
+        {
+            throw new ArgumentNullException(nameof(configuration));
+        }
+#else
+        ArgumentNullException.ThrowIfNull(configuration);
+#endif
+
         _connectionString =
-            configuration.GetConnectionString("DatabaseConnection")
+            configuration.GetConnectionString(connectionName)
             ?? throw new InvalidOperationException(
-                "Connection string 'DatabaseConnection' not found."
+                $"Connection string '{connectionName}' not found in the configuration."
             );
     }
 
@@ -41,16 +54,26 @@ public class OracleConnectionFactory : IConnectionFactory
     /// <param name="connectionString">The Oracle connection string.</param>
     public OracleConnectionFactory(string connectionString)
     {
-        _connectionString = connectionString;
+        _connectionString = !string.IsNullOrWhiteSpace(connectionString)
+            ? connectionString
+            : throw new ArgumentException(
+                "Connection string cannot be null or empty.",
+                nameof(connectionString)
+            );
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="OracleConnectionFactory"/> class with logging support.
+    /// Initializes a new instance of the <see cref="OracleConnectionFactory"/> class with logging and custom connection string support.
     /// </summary>
     /// <param name="logger">The logger instance.</param>
-    /// <param name="config">The configuration containing the connection string.</param>
-    public OracleConnectionFactory(ILogger<OracleConnectionFactory> logger, IConfiguration config)
-        : this(config)
+    /// <param name="configuration">The configuration containing the connection string.</param>
+    /// <param name="connectionName">The name of the connection string in the configuration (defaults to 'DatabaseConnection').</param>
+    public OracleConnectionFactory(
+        ILogger<OracleConnectionFactory> logger,
+        IConfiguration configuration,
+        string connectionName = "DatabaseConnection"
+    )
+        : this(configuration, connectionName)
     {
         _logger = logger;
     }
@@ -68,4 +91,3 @@ public class OracleConnectionFactory : IConnectionFactory
         return connection;
     }
 }
-
