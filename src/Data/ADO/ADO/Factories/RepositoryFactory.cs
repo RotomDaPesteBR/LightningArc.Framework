@@ -108,11 +108,29 @@ public sealed class RepositoryFactory(
             }
         }
 
-        // 2. Instantiate the type using ActivatorUtilities.
+        // 2. Build argument list: explicit args + mapper + logger
+        List<object> args = [.. explicitArgs];
+        if (_mapper != null)
+        {
+            args.Add(_mapper);
+        }
+
+        ILogger? logger = null;
+        if (_loggerFactory != null)
+        {
+            logger = _loggerFactory.CreateLogger(targetType);
+        }
+
+        if (logger != null)
+        {
+            args.Add(logger);
+        }
+
+        // 3. Instantiate the type using ActivatorUtilities.
         object newInstance = ActivatorUtilities.CreateInstance(
             _serviceProvider,
             targetType,
-            explicitArgs
+            [.. args]
         );
 
         return (TRepository)newInstance;
