@@ -19,16 +19,20 @@ public static class DependencyInjection
     /// <returns>The updated service collection.</returns>
     public static IServiceCollection AddMapsterAdapter(this IServiceCollection services, TypeAdapterConfig? config = null)
     {
-        // Use the standard Mapster registration
-        services.AddMapster();
-
         if (config != null)
         {
             services.AddSingleton(config);
         }
+        else
+        {
+            services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+        }
 
+        // Use the standard Mapster registration
+        services.AddMapster();
+        
         // Register our specific adapter for our abstraction
-        services.AddScoped<LightningArc.Data.Abstractions.Mappers.IMapper, MapsterAdapter>();
+        services.AddSingleton<LightningArc.Data.Abstractions.Mappers.IMapper, MapsterAdapter>();
 
         return services;
     }
