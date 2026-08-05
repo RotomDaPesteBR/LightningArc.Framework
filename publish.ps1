@@ -1,6 +1,6 @@
 # Script Settings
 $ErrorActionPreference = "Stop" # Stops the script if an unhandled error occurs
-$config = "Release"
+$config = "Dev"
 
 # --- 1. FUNCTION TO GET VERSION ---
 function Get-PackageVersionFromProps {
