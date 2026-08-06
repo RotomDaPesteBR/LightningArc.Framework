@@ -1,4 +1,4 @@
-# CLAUDE.md — LightningArc.Utils
+# AGENTS.md — LightningArc.Framework
 
 Working conventions for AI assistants operating in this repository.
 
@@ -6,13 +6,13 @@ Working conventions for AI assistants operating in this repository.
 
 ## Project Overview
 
-**LightningArc** is a C# .NET utility library ecosystem focused on:
+**LightningArc** is a modular .NET framework ecosystem focused on:
 - Functional error handling (`Result<T>` pattern)
 - Domain-Driven Design Value Objects (`Email`, `Cpf`, `Cnpj`, `PhoneNumber`, `Url`)
 - Repository pattern with ADO.NET/EF Core support
 - ASP.NET Core integration (HTTP mapping, OpenAPI)
 - Roslyn static analyzers
-- Business Source License (BSL 1.1) with MIT fallback after Change Date
+- Licensed under Apache License 2.0
 
 ---
 
@@ -56,7 +56,7 @@ Working conventions for AI assistants operating in this repository.
 ## Key Conventions
 
 ### Build & Config
-- **Central Package Management** — `Directory.Packages.props` for all versions (currently v1.5.0)
+- **Central Package Management** — `Directory.Packages.props` for all versions, see the file for current versions.
 - **Centralized build props** — `Directory.Build.props` (root) and `src/Directory.Build.props`
 - **Multi-targeting** — `netstandard2.0`, `net9.0`, `net10.0` (varies by project)
 - **Artifacts** — Output to `.artifacts/` folder
@@ -67,22 +67,14 @@ Working conventions for AI assistants operating in this repository.
 - Use `dotnet test --project "tests/<Path>/<Project>.csproj"` for a specific project.
 - Never use VSTest `--filter` in this repo.
 - Use TUnit `--treenode-filter` syntax when filtering is needed. Examples:
-    All tests in a class: `dotnet run -- --treenode-filter "/*/*/MyTestClass/*"`
-    A specific test method: `dotnet run -- --treenode-filter "/*/*/MyTestClass/MyTestMethod"`
-    By category: `dotnet run -- --treenode-filter "/*/*/*/*[Category=Integration]"`
-    Exclude a category: `dotnet run -- --treenode-filter "/*/*/*/*[Category!=Performance]"`
-    Multiple filters (OR): `dotnet run -- --treenode-filter "/*/*/ClassA/*|/*/*/ClassB/*"`
-    Combine filters (AND): `dotnet run -- --treenode-filter "/*/*/*/*[Category=Integration][Priority=High]"`
+    All tests in a class: `dotnet test -- --treenode-filter "/*/*/MyTestClass/*"`
+    A specific test method: `dotnet test -- --treenode-filter "/*/*/MyTestClass/MyTestMethod"`
+    By category: `dotnet test -- --treenode-filter "/*/*/*/*[Category=Integration]"`
+    Exclude a category: `dotnet test -- --treenode-filter "/*/*/*/*[Category!=Performance]"`
+    Multiple filters (OR): `dotnet test -- --treenode-filter "/*/*/ClassA/*|/*/*/ClassB/*"`
+    Combine filters (AND): `dotnet test -- --treenode-filter "/*/*/*/*[Category=Integration][Priority=High]"`
 
 ---
-
-Most effective for subagents: say it in the dispatch prompt
-
-When you launch the implementer/reviewer agent, include a line like:
-
-▎ Repository-specific rule: every dotnet test command must use --project when targeting a project file. In this repo, dotnet test "<path>.csproj" is considered wrong. Do not use --filter; use TUnit
-tree-node filters only.
-
 
 ### Coding Style
 - `ImplicitUsings: enable`, `Nullable: enable`
@@ -112,7 +104,7 @@ return errors != null ? errors : Result.Success();
 ## Key Files
 | File | Purpose |
 |------|---------|
-| `Utils.slnx` | Solution file |
+| `LightningArc.Framework.slnx` | Solution file |
 | `Directory.Packages.props` | Central package versions |
 | `Directory.Build.props` | Root build/license metadata |
 | `src/Directory.Build.props` | Source-level build props + analyzer reference |
@@ -127,3 +119,7 @@ return errors != null ? errors : Result.Success();
 3. Do not create files unless necessary — prefer editing existing files
 4. Commits should follow conventional commits and be atomic and focused
 5. Never auto-commit without user request
+
+## Notes for Multi-Agent Workflows
+
+- When dispatching test-running tasks to a subagent, restate the `--project` rule explicitly in the dispatch prompt (e.g., "every `dotnet test` command must use `--project` when targeting a project file — do not use `--filter`; use TUnit tree-node filters only"). This rule is easy for subagents to miss otherwise.

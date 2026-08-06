@@ -1,14 +1,12 @@
-# Contributing to LightningArc.Utils
+# Contributing to LightningArc.Framework
 
-Thank you for your interest in contributing to **LightningArc.Utils**! Since this project operates under a Business Source License (BSL), we have established these guidelines to ensure the project remains sustainable and legally sound.
+Thank you for your interest in contributing to **LightningArc.Framework**! This project is licensed under the **Apache License 2.0** — contributions are welcome and are accepted under the same terms as the project itself.
 
-## Contributor License Agreement (CLA)
+## Licensing of Contributions
 
-By submitting a Pull Request or any contribution to this repository, you agree to the following terms:
+By submitting a Pull Request or any other contribution to this repository, you agree that your contribution is licensed under the **Apache License 2.0**, consistent with Section 5 of that license (submission of contributions). No separate Contributor License Agreement is required.
 
-1.  **Grant of Rights:** You grant João Pedro S. Souza a perpetual, worldwide, non-exclusive, and irrevocable license to use, reproduce, modify, and distribute your contribution.
-2.  **Ownership and Relicensing:** You acknowledge that the Licensor (João Pedro S. Souza) retains the full authority to change the project's license (including for commercial purposes or the transition to Apache 2.0 as defined in LICENSE.md) without further approval.
-3.  **Originality:** You warrant that your contribution is your original work and that you have the legal right to grant these permissions.
+You warrant that your contribution is your original work and that you have the legal right to submit it under these terms.
 
 ---
 
@@ -23,12 +21,14 @@ By submitting a Pull Request or any contribution to this repository, you agree t
 * Please open an Issue to discuss the implementation before writing the code.
 
 ### 3. Pull Requests
+0.  **One-time setup:** run `git config core.hooksPath .githooks` after cloning. This keeps `CLAUDE.md` automatically in sync with `AGENTS.md` (the canonical instructions file) whenever you commit.
 1.  **Fork** the repository.
 2.  Create a feature branch (`git checkout -b feature/amazing-improvement`).
 3.  Ensure your code follows the project's standards (Clean Architecture, C# naming conventions).
 4.  Include unit tests where applicable.
-5.  Submit the PR with a detailed description of the changes.
+5.  Follow [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages (e.g., `feat:`, `fix:`, `refactor:`, `docs:`). Keep commits atomic and focused on a single change.
+6.  Submit the PR with a detailed description of the changes.
 
 ---
 
-For questions regarding commercial licensing or partnerships, please reach out via GitHub Issues.
+For general questions, please reach out via GitHub Issues.
