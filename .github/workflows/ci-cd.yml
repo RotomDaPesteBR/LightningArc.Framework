@@ -13,6 +13,20 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
+  docs-sync-check:
+    name: Verify AGENTS.md / CLAUDE.md sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Compare AGENTS.md and CLAUDE.md
+        run: |
+          if ! diff -q AGENTS.md CLAUDE.md > /dev/null; then
+            echo "::error::CLAUDE.md is out of sync with AGENTS.md. Run the pre-commit hook (git config core.hooksPath .githooks) or copy AGENTS.md over CLAUDE.md manually."
+            exit 1
+          fi
+
   build-and-test:
     name: Build & Test
     runs-on: windows-latest
