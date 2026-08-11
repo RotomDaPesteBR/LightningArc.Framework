@@ -8,7 +8,7 @@
 
   <!-- Microsoft -->
   <PropertyGroup>
-      <MicrosoftPackagesVersion>10.0.10</MicrosoftPackagesVersion> 
+      <MicrosoftPackagesVersion>10.0.11</MicrosoftPackagesVersion> 
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftPackagesVersion)" />
@@ -52,14 +52,14 @@
   <ItemGroup>
     <PackageVersion Include="Dapper" Version="2.1.79" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'netstandard2.0'" Version="3.1.32" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.18" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.19" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net10.0'" Version="$(MicrosoftPackagesVersion)" />
   </ItemGroup>
 
   <!-- AspNetCore -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.28" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.18" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.19" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net10.0'" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.OpenApi" Condition="'$(TargetFramework)' == 'net10.0'" Version="2.10.0" />
   </ItemGroup>
@@ -78,7 +78,7 @@
 
   <!-- Metalama -->
   <PropertyGroup>
-      <MetalamaPackagesVersion>2026.1.22</MetalamaPackagesVersion>
+      <MetalamaPackagesVersion>2026.1.23</MetalamaPackagesVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Metalama.Framework" Version="$(MetalamaPackagesVersion)" />
@@ -98,7 +98,7 @@
   
   <!-- Tests -->
   <PropertyGroup>
-    <TUnitPackagesVersion>1.63.0</TUnitPackagesVersion> 
+    <TUnitPackagesVersion>1.64.13</TUnitPackagesVersion> 
   </PropertyGroup>
   <ItemGroup> 
     <PackageVersion Include="TUnit" Version="$(TUnitPackagesVersion)" />
