@@ -8,25 +8,26 @@ It enforces best practices at compile time through Roslyn analyzers, helping dev
 
 ## Ecosystem Architecture
 
-The ecosystem is divided into two major categories:
+The ecosystem is divided into three major categories:
 
 ### 1. Core (Foundation)
 Framework-agnostic libraries that define the base patterns.
 - **`LightningArc.Results`**: Full implementation of the Result pattern.
 - **`LightningArc.Primitives`**: Contracts, Value Objects, and base types.
 - **`LightningArc.Json`**: Utilities for modern JSON serialization.
-- **`LightningArc.Core`**: A Swiss army knife with general-purpose helpers.
+- **`LightningArc.Framework`**: Meta package with all core layer packages.
 
-### 2. Integrations (Extensions)
+### 2. Data & Web (Integrations)
 Bridges to popular industry frameworks.
-- **`LightningArc.*.AspNetCore`**: HTTP mapping, CORS, OpenAPI.
+- **`LightningArc.AspNetCore`**: Core ASP.NET Core utilities, HTTP mapping, CORS, OpenAPI.
 - **`LightningArc.Data.*`**: Implementations for ADO.NET, Dapper, and Entity Framework Core.
 - **`LightningArc.Mappers.*`**: Adapters for AutoMapper and Mapster.
-- **`LightningArc.Metalama`**: Aspect-oriented programming integration.
 
-### 3. Analyzers (Static Analysis)
-A single Roslyn analyzers project with compile-time rules for the entire ecosystem.
-- **`LightningArc.Analyzers`**: 9 rules and 2 code fixes for Result, ValueObjects, and Data.
+### 3. Analyzers & Meta (Static Analysis & AOP)
+Compile-time tools.
+- **`LightningArc.Analyzers`**: 9 Roslyn analyzer rules and 2 code fixes for Result, ValueObjects, and Data.
+- **`LightningArc.Metalama`**: Metalama-powered AOP factories.
+- **`LightningArc.Metalama.Results`**: Result-related Metalama utilities.
 
 ---
 
@@ -34,7 +35,7 @@ A single Roslyn analyzers project with compile-time rules for the entire ecosyst
 
 1. **Fail-Fast and Functional**: Prefer `Result` over exceptions for normal business flow.
 2. **Extensible**: Most classes are designed to be inherited or extended (protecting internal APIs with `internal` and exposing what's needed with `protected`).
-3. **Modern**: Leverages the latest C# features (12/13+) and targets .NET 8.0 and 9.0/10.0.
+3. **Modern**: Leverages the latest C# features (14+) and targets modern .NET versions.
 4. **Ergonomic**: Implicit operators, deconstruction, and logical operators make the library feel native to the language.
 
 ---

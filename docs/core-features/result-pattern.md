@@ -133,19 +133,44 @@ Each success type has a numeric code following the `1xx` convention:
 | **`Success.Accepted()`** | 102 | Non-generic success |
 | **`Success.NoContent()`** | 103 | Non-generic success |
 
-### 5.2. Typed Success Values
+### 5.2. Success State (`SuccessState`)
 
-Use the generic `Success<TValue>.Create` factory to wrap values with success metadata:
+Both `Result` and `Result<TValue>` expose the underlying success metadata through the `SuccessState` property:
 
 ```csharp
-Success<User> userSuccess = Success<User>.Create(user);
+Result result = Result.Created();
+var successState = result.SuccessState; // Returns Success (code 101, message "Created")
+
+Result<User> typedResult = Result.Success(user);
+var typedSuccessState = typedResult.SuccessState; // Returns Success<User> (code 100, value: user)
 ```
 
-The `WithValue<TValue>` method converts a non-generic `Success` to a typed `Success<TValue>`:
+### 5.3. Typed Success Values
+
+Create typed success results using `Result.Success<TValue>` factories:
 
 ```csharp
-Success ok = Success.Ok();
-Success<User> typed = ok.WithValue(user);
+Result<User> userSuccess = Result.Success(user);        // Ok (100)
+Result<User> userCreated = Result.Created(user);        // Created (101)
+Result<User> userAccepted = Result.Accepted(user);      // Accepted (102)
+```
+
+The `WithValue<TValue>` method on `Result` converts a non-generic success result to a typed one:
+
+```csharp
+Result ok = Result.Ok();
+Result<User> typed = ok.WithValue(user);
+```
+
+### 5.4. Pattern Matching with `Match`
+
+The `Match` method reduces a result to a single value by handling both cases, preserving the `Success<TValue>`:
+
+```csharp
+string message = result.Match(
+    success => $"Created user {success.Value.Id} (code: {success.SuccessState.Code})",
+    error => $"Failed: {error.Message}"
+);
 ```
 
 ---
