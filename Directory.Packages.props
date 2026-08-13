@@ -78,7 +78,7 @@
 
   <!-- Metalama -->
   <PropertyGroup>
-      <MetalamaPackagesVersion>2026.1.23</MetalamaPackagesVersion>
+      <MetalamaPackagesVersion>2026.1.24</MetalamaPackagesVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Metalama.Framework" Version="$(MetalamaPackagesVersion)" />
@@ -98,7 +98,7 @@
   
   <!-- Tests -->
   <PropertyGroup>
-    <TUnitPackagesVersion>1.64.13</TUnitPackagesVersion> 
+    <TUnitPackagesVersion>1.65.0</TUnitPackagesVersion> 
   </PropertyGroup>
   <ItemGroup> 
     <PackageVersion Include="TUnit" Version="$(TUnitPackagesVersion)" />
