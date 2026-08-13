@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <MetalamaCompileTimeAssembly Include="../../../src/Core/Core/bin/$(Configuration)/netstandard2.0/LightningArc.Core.dll" />
+        <MetalamaCompileTimeAssembly Include="../../../src/Core/Results/bin/$(Configuration)/netstandard2.0/LightningArc.Results.dll" />
         <MetalamaCompileTimeAssembly Include="../../../src/Meta/Metalama/bin/$(Configuration)/netstandard2.0/LightningArc.Metalama.dll" />
     </ItemGroup>
 

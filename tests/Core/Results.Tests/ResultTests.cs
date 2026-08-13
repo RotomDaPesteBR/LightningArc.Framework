@@ -40,7 +40,7 @@ namespace LightningArc.Results.Tests
         }
 
         [Test]
-        public async Task SuccessDetails_ShouldThrowException_WhenResultIsFailure()
+        public async Task SuccessState_ShouldThrowException_WhenResultIsFailure()
         {
             // Arrange
             Result result = Result.Failure(TestError);

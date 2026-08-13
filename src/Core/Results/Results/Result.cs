@@ -509,12 +509,12 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
             int hash = base.GetHashCode();
             if (IsSuccess)
             {
-                hash = hash * 23 + Value!.GetHashCode();
+                hash = hash * 23 + (Value?.GetHashCode() ?? 0);
             }
             return hash;
         }
 #else
-        return IsSuccess ? HashCode.Combine(base.GetHashCode(), Value!) : base.GetHashCode();
+        return IsSuccess ? HashCode.Combine(base.GetHashCode(), Value) : base.GetHashCode();
 #endif
     }
 
