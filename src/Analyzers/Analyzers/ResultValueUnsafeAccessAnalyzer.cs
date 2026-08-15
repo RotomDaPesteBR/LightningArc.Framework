@@ -75,7 +75,8 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
         }
 
         if (ResultGuardHelper.IsGuardedByIsSuccess(memberAccess, context.SemanticModel) ||
-            ResultGuardHelper.IsGuardedByTryCall(memberAccess, context.SemanticModel, "TryGetValue"))
+            ResultGuardHelper.IsGuardedByTryCall(memberAccess, context.SemanticModel, "TryGetValue") ||
+            ResultGuardHelper.IsGuardedByPrecedingExit(memberAccess, context.SemanticModel, triggerProperty: "IsFailure"))
         {
             return;
         }

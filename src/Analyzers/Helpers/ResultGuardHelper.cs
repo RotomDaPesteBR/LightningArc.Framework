@@ -56,6 +56,77 @@ internal static class ResultGuardHelper
         return IsGuarded(access, semanticModel, tryMethodName, isTryCall: true);
     }
 
+    /// <summary>
+    /// Determines whether the given expression is guarded by a preceding early-return
+    /// guard clause — e.g. <c>if (result.IsFailure) { ...; return; }</c> followed later
+    /// in the same block by <c>result.Value</c>. This is a distinct topology from
+    /// <see cref="IsGuardedByIsSuccess"/>/<see cref="IsGuardedByIsFailure"/>: those walk
+    /// *upward* from the access looking for a wrapping guard (if/ternary/binary); this
+    /// walks *backward* through preceding sibling statements in the same block, since the
+    /// guard clause here doesn't wrap the access at all — it exits before the access is
+    /// ever reached, which is exactly what makes the access safe.
+    /// </summary>
+    /// <param name="access">The member access being checked (e.g. <c>result.Value</c>).</param>
+    /// <param name="semanticModel">The semantic model for symbol resolution.</param>
+    /// <param name="triggerProperty">
+    /// The property whose truthiness, if it caused a preceding unconditional exit, rules out
+    /// that state for all code after the guard. For guarding <c>.Value</c> (LARC001), pass
+    /// <c>"IsFailure"</c> — a preceding <c>if (result.IsFailure) { exit }</c> guarantees
+    /// success afterward. For guarding <c>.Error</c> (LARC002), pass <c>"IsSuccess"</c>.
+    /// </param>
+    public static bool IsGuardedByPrecedingExit(
+        MemberAccessExpressionSyntax access,
+        SemanticModel semanticModel,
+        string triggerProperty)
+    {
+        StatementSyntax? containingStatement = access.FirstAncestorOrSelf<StatementSyntax>();
+
+        // Only the access's own direct block is considered — this deliberately does not
+        // walk further outward through nested block levels (e.g. a guard clause in an outer
+        // block with the access inside a nested try/using block). That's a real but rarer
+        // pattern; scoping to the direct block keeps this addition narrow and predictable
+        // rather than risking a false "safe" suppression on a genuinely unsafe access.
+        if (containingStatement?.Parent is not BlockSyntax block)
+        {
+            return false;
+        }
+
+        int index = block.Statements.IndexOf(containingStatement);
+        if (index <= 0)
+        {
+            return false;
+        }
+
+        for (int i = index - 1; i >= 0; i--)
+        {
+            if (block.Statements[i] is IfStatementSyntax { Else: null } ifStmt
+                && UnconditionallyExits(ifStmt.Statement)
+                && PropertyCheck(ifStmt.Condition, access.Expression, semanticModel, triggerProperty, isTryCall: false))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Determines whether a statement unconditionally transfers control out of the current
+    /// flow (return/throw/continue/break), directly or as the last statement of a block.
+    /// Intentionally conservative: does not attempt general reachability analysis (e.g. an
+    /// exhaustive switch, or an if/else where every branch exits) — only the common single
+    /// guard-clause shapes actually seen in this codebase's early-return pattern.
+    /// </summary>
+    private static bool UnconditionallyExits(StatementSyntax statement)
+    {
+        return statement switch
+        {
+            ReturnStatementSyntax or ThrowStatementSyntax or ContinueStatementSyntax or BreakStatementSyntax => true,
+            BlockSyntax block when block.Statements.Count > 0 => UnconditionallyExits(block.Statements[^1]),
+            _ => false
+        };
+    }
+
     private static bool IsGuarded(
         MemberAccessExpressionSyntax access,
         SemanticModel semanticModel,
