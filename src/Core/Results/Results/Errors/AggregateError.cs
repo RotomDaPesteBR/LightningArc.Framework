@@ -79,7 +79,9 @@ namespace LightningArc.Results
         public AggregateError Flatten()
         {
             if (Errors.All(e => e is not AggregateError))
+            {
                 return this;
+            }
 
             var flattenedList = FlattenedErrors.ToList();
             return new AggregateError(CodePrefix, CodeSuffix, Message, flattenedList);
@@ -88,7 +90,9 @@ namespace LightningArc.Results
         private static IReadOnlyList<Error> ComputeFlattenedErrors(IReadOnlyList<Error> errors)
         {
             if (errors.All(e => e is not AggregateError))
+            {
                 return errors;
+            }
 
             return [.. FlattenErrors(errors)];
         }
@@ -118,13 +122,17 @@ namespace LightningArc.Results
         protected override bool DetailsEqual(Error other)
         {
             if (other is not AggregateError otherAggregate)
+            {
                 return base.DetailsEqual(other);
+            }
 
             var thisFlattened = FlattenedErrors;
             var otherFlattened = otherAggregate.FlattenedErrors;
 
             if (thisFlattened.Count != otherFlattened.Count)
+            {
                 return false;
+            }
 
             // Use a dictionary to count occurrences (multiset comparison)
             var counts = new Dictionary<int, int>();
@@ -133,16 +141,23 @@ namespace LightningArc.Results
             {
                 int key = error.Code;
                 if (counts.TryGetValue(key, out int count))
+                {
                     counts[key] = count + 1;
+                }
                 else
+                {
                     counts[key] = 1;
+                }
             }
 
             foreach (var error in otherFlattened)
             {
                 int key = error.Code;
                 if (!counts.TryGetValue(key, out int count) || count == 0)
+                {
                     return false;
+                }
+
                 counts[key] = count - 1;
             }
 
