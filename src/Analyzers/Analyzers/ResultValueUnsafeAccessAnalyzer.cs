@@ -15,7 +15,8 @@ namespace LightningArc.Analyzers;
 public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "LARC001";
-    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
+    public const string HelpLinkBase =
+        "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -25,17 +26,20 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
-        helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
+        helpLinkUri: HelpLinkBase + DiagnosticId + ".md"
+    );
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
 
-        context.RegisterSyntaxNodeAction(AnalyzeMemberAccess, SyntaxKind.SimpleMemberAccessExpression);
+        context.RegisterSyntaxNodeAction(
+            AnalyzeMemberAccess,
+            SyntaxKind.SimpleMemberAccessExpression
+        );
     }
 
     private static void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
@@ -50,7 +54,10 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken);
+        TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(
+            memberAccess.Expression,
+            context.CancellationToken
+        );
         if (typeInfo.Type is not INamedTypeSymbol namedType)
         {
             return;
@@ -74,14 +81,28 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (ResultGuardHelper.IsGuardedByIsSuccess(memberAccess, context.SemanticModel) ||
-            ResultGuardHelper.IsGuardedByTryCall(memberAccess, context.SemanticModel, "TryGetValue") ||
-            ResultGuardHelper.IsGuardedByPrecedingExit(memberAccess, context.SemanticModel, triggerProperty: "IsFailure"))
+        if (
+            ResultAccessSafetyRecognizer.IsGuardedByIsSuccess(memberAccess, context.SemanticModel)
+            || ResultAccessSafetyRecognizer.IsGuardedByTryCall(
+                memberAccess,
+                context.SemanticModel,
+                "TryGetValue"
+            )
+            || ResultAccessSafetyRecognizer.IsGuardedByPrecedingExit(
+                memberAccess,
+                context.SemanticModel,
+                triggerProperty: "IsFailure"
+            )
+        )
         {
             return;
         }
 
-        Diagnostic diagnostic = Diagnostic.Create(Rule, memberAccess.Name.GetLocation(), namedType.Name);
+        Diagnostic diagnostic = Diagnostic.Create(
+            Rule,
+            memberAccess.Name.GetLocation(),
+            namedType.Name
+        );
         context.ReportDiagnostic(diagnostic);
     }
 
@@ -131,7 +152,7 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
 
     private static bool HasNullForgivingOperator(MemberAccessExpressionSyntax memberAccess)
     {
-        return memberAccess.Parent is PostfixUnaryExpressionSyntax postfix &&
-               postfix.IsKind(SyntaxKind.SuppressNullableWarningExpression);
+        return memberAccess.Parent is PostfixUnaryExpressionSyntax postfix
+            && postfix.IsKind(SyntaxKind.SuppressNullableWarningExpression);
     }
 }

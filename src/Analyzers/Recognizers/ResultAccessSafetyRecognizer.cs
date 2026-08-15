@@ -5,23 +5,32 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace LightningArc.Analyzers;
 
 /// <summary>
-/// Shared helper for detecting when a Result.Value or Result.Error access is guarded
-/// by a prior IsSuccess/IsFailure check or TryGetValue/TryGetError call.
+/// Determines whether a <c>Result.Value</c> or <c>Result.Error</c> access is proven safe by a
+/// surrounding or preceding guard — an <c>IsSuccess</c>/<c>IsFailure</c> check, a
+/// <c>TryGetValue</c>/<c>TryGetError</c> call, or an early-return guard clause.
 ///
-/// Supports three short-circuit forms:
-///  1. if-statement: if (result.IsFailure) { ... result.Value ... } — Value in the "else"
+/// Supports four forms, falling into two distinct topologies:
+///
+/// Wrapping guards — the guard's condition contains or governs the access:
+///  1. if-statement: <c>if (result.IsFailure) { ... result.Value ... }</c> — Value in the "else"
 ///     branch is guarded when the "if" checks IsFailure.
-///     if (!result.IsSuccess) { return ... } // result.Value here is safe.
-///  2. Ternary: result.IsSuccess ? result.Value : ... — Value in the whenTrue branch
-///     is guarded; result.IsSuccess ? ... : result.Error — Error in whenFalse branch is guarded.
-///     The negated forms (!result.IsSuccess / !result.IsFailure) swap branches.
-///  3. Logical OR: result.IsFailure or result.Value — Value is guarded (LHS false -&gt; safe).
-///     Logical AND: result.IsSuccess and result.Value — Value is guarded (LHS true -&gt; safe).
-///     For LARC002: result.IsSuccess or result.Error — Error guarded (LHS true -&gt; safe).
+///     <c>if (!result.IsSuccess) { return ... }</c> // result.Value here is safe.
+///  2. Ternary: <c>result.IsSuccess ? result.Value : ...</c> — Value in the whenTrue branch is
+///     guarded; <c>result.IsSuccess ? ... : result.Error</c> — Error in whenFalse branch is
+///     guarded. The negated forms (!result.IsSuccess / !result.IsFailure) swap branches.
+///  3. Logical OR: <c>result.IsFailure or result.Value</c> — Value is guarded (LHS false -&gt;
+///     safe). Logical AND: <c>result.IsSuccess and result.Value</c> — Value is guarded (LHS
+///     true -&gt; safe). For LARC002: <c>result.IsSuccess or result.Error</c> — Error guarded
+///     (LHS true -&gt; safe). Also tracks across chained || / &amp;&amp; in a ternary's condition.
 ///
-/// Also tracks across chained || (OR) or &amp;&amp; (and) in the ternary condition.
+/// Preceding-exit guard — the guard is a sibling statement the access comes *after*, not a
+/// wrapper around it:
+///  4. Early return: <c>if (result.IsFailure) { ...; return; } result.Value</c> — the access,
+///     which does not sit inside the if-statement at all, is proven safe by elimination once the
+///     preceding statement is known to have exited on the opposite condition. See
+///     <see cref="IsGuardedByPrecedingExit"/> for why this needed separate logic from forms 1–3.
 /// </summary>
-internal static class ResultGuardHelper
+internal static class ResultAccessSafetyRecognizer
 {
     /// <summary>
     /// Determines whether the given expression is guarded by an IsSuccess check.
@@ -29,7 +38,8 @@ internal static class ResultGuardHelper
     /// </summary>
     public static bool IsGuardedByIsSuccess(
         MemberAccessExpressionSyntax access,
-        SemanticModel semanticModel)
+        SemanticModel semanticModel
+    )
     {
         return IsGuarded(access, semanticModel, "IsSuccess", isTryCall: false);
     }
@@ -40,7 +50,8 @@ internal static class ResultGuardHelper
     /// </summary>
     public static bool IsGuardedByIsFailure(
         MemberAccessExpressionSyntax access,
-        SemanticModel semanticModel)
+        SemanticModel semanticModel
+    )
     {
         return IsGuarded(access, semanticModel, "IsFailure", isTryCall: false);
     }
@@ -51,7 +62,8 @@ internal static class ResultGuardHelper
     public static bool IsGuardedByTryCall(
         MemberAccessExpressionSyntax access,
         SemanticModel semanticModel,
-        string tryMethodName)
+        string tryMethodName
+    )
     {
         return IsGuarded(access, semanticModel, tryMethodName, isTryCall: true);
     }
@@ -77,7 +89,8 @@ internal static class ResultGuardHelper
     public static bool IsGuardedByPrecedingExit(
         MemberAccessExpressionSyntax access,
         SemanticModel semanticModel,
-        string triggerProperty)
+        string triggerProperty
+    )
     {
         StatementSyntax? containingStatement = access.FirstAncestorOrSelf<StatementSyntax>();
 
@@ -99,9 +112,17 @@ internal static class ResultGuardHelper
 
         for (int i = index - 1; i >= 0; i--)
         {
-            if (block.Statements[i] is IfStatementSyntax { Else: null } ifStmt
+            if (
+                block.Statements[i] is IfStatementSyntax { Else: null } ifStmt
                 && UnconditionallyExits(ifStmt.Statement)
-                && PropertyCheck(ifStmt.Condition, access.Expression, semanticModel, triggerProperty, isTryCall: false))
+                && PropertyCheck(
+                    ifStmt.Condition,
+                    access.Expression,
+                    semanticModel,
+                    triggerProperty,
+                    isTryCall: false
+                )
+            )
             {
                 return true;
             }
@@ -121,9 +142,14 @@ internal static class ResultGuardHelper
     {
         return statement switch
         {
-            ReturnStatementSyntax or ThrowStatementSyntax or ContinueStatementSyntax or BreakStatementSyntax => true,
-            BlockSyntax block when block.Statements.Count > 0 => UnconditionallyExits(block.Statements[^1]),
-            _ => false
+            ReturnStatementSyntax
+            or ThrowStatementSyntax
+            or ContinueStatementSyntax
+            or BreakStatementSyntax => true,
+            BlockSyntax block when block.Statements.Count > 0 => UnconditionallyExits(
+                block.Statements[^1]
+            ),
+            _ => false,
         };
     }
 
@@ -131,7 +157,8 @@ internal static class ResultGuardHelper
         MemberAccessExpressionSyntax access,
         SemanticModel semanticModel,
         string checkProperty,
-        bool isTryCall)
+        bool isTryCall
+    )
     {
         SyntaxNode? current = access.Parent;
         while (current != null)
@@ -147,7 +174,15 @@ internal static class ResultGuardHelper
                         ? (checkProperty == "IsSuccess" ? "IsFailure" : "IsSuccess")
                         : checkProperty;
 
-                    if (ConditionChecks(ifStmt.Condition, access.Expression, semanticModel, effectiveProperty, isTryCall))
+                    if (
+                        ConditionChecks(
+                            ifStmt.Condition,
+                            access.Expression,
+                            semanticModel,
+                            effectiveProperty,
+                            isTryCall
+                        )
+                    )
                     {
                         return true;
                     }
@@ -157,19 +192,41 @@ internal static class ResultGuardHelper
 
                 case ConditionalExpressionSyntax conditional:
                 {
-                    if (conditional.WhenTrue == access || IsDescendantOf(access, conditional.WhenTrue))
+                    if (
+                        conditional.WhenTrue == access
+                        || IsDescendantOf(access, conditional.WhenTrue)
+                    )
                     {
                         // Expression is in the "true" branch — guard must check the property
-                        if (ConditionChecks(conditional.Condition, access.Expression, semanticModel, checkProperty, isTryCall))
+                        if (
+                            ConditionChecks(
+                                conditional.Condition,
+                                access.Expression,
+                                semanticModel,
+                                checkProperty,
+                                isTryCall
+                            )
+                        )
                         {
                             return true;
                         }
                     }
-                    else if (conditional.WhenFalse == access || IsDescendantOf(access, conditional.WhenFalse))
+                    else if (
+                        conditional.WhenFalse == access
+                        || IsDescendantOf(access, conditional.WhenFalse)
+                    )
                     {
                         // Expression is in the "false" branch — guard must check the negate
                         string negated = checkProperty == "IsSuccess" ? "IsFailure" : "IsSuccess";
-                        if (ConditionChecks(conditional.Condition, access.Expression, semanticModel, negated, isTryCall))
+                        if (
+                            ConditionChecks(
+                                conditional.Condition,
+                                access.Expression,
+                                semanticModel,
+                                negated,
+                                isTryCall
+                            )
+                        )
                         {
                             return true;
                         }
@@ -179,8 +236,10 @@ internal static class ResultGuardHelper
 
                 case BinaryExpressionSyntax binary:
                 {
-                    if (binary.Kind() == SyntaxKind.LogicalOrExpression ||
-                        binary.Kind() == SyntaxKind.LogicalAndExpression)
+                    if (
+                        binary.Kind() == SyntaxKind.LogicalOrExpression
+                        || binary.Kind() == SyntaxKind.LogicalAndExpression
+                    )
                     {
                         // Expression in RHS — check if LHS guards it.
                         // For ||: if LHS is true, RHS is skipped -> RHS is safe.
@@ -193,11 +252,20 @@ internal static class ResultGuardHelper
                         {
                             // For ||, the guard property is the opposite (LHS false -> safe).
                             // For &&, the guard property is the same (LHS true -> safe).
-                            string guardProperty = binary.Kind() == SyntaxKind.LogicalOrExpression
-                                ? (checkProperty == "IsSuccess" ? "IsFailure" : "IsSuccess")
-                                : checkProperty;
+                            string guardProperty =
+                                binary.Kind() == SyntaxKind.LogicalOrExpression
+                                    ? (checkProperty == "IsSuccess" ? "IsFailure" : "IsSuccess")
+                                    : checkProperty;
 
-                            if (ConditionChecks(binary.Left, access.Expression, semanticModel, guardProperty, isTryCall))
+                            if (
+                                ConditionChecks(
+                                    binary.Left,
+                                    access.Expression,
+                                    semanticModel,
+                                    guardProperty,
+                                    isTryCall
+                                )
+                            )
                             {
                                 return true;
                             }
@@ -223,7 +291,8 @@ internal static class ResultGuardHelper
         ExpressionSyntax resultExpression,
         SemanticModel semanticModel,
         string checkProperty,
-        bool isTryCall)
+        bool isTryCall
+    )
     {
         if (isTryCall)
         {
@@ -238,24 +307,34 @@ internal static class ResultGuardHelper
         ExpressionSyntax resultExpression,
         SemanticModel semanticModel,
         string checkProperty,
-        bool isTryCall)
+        bool isTryCall
+    )
     {
         switch (condition)
         {
             // Direct check: result.IsFailure / result.IsSuccess
-            case MemberAccessExpressionSyntax member when member.Name.Identifier.ValueText == checkProperty:
-                return ExpressionsAreEquivalent(member.Expression, resultExpression) ||
-                       ExpressionReferencesSameResult(member.Expression, resultExpression, semanticModel);
+            case MemberAccessExpressionSyntax member
+                when member.Name.Identifier.ValueText == checkProperty:
+                return ExpressionsAreEquivalent(member.Expression, resultExpression)
+                    || ExpressionReferencesSameResult(
+                        member.Expression,
+                        resultExpression,
+                        semanticModel
+                    );
             // Negated check: !result.IsSuccess / !result.IsFailure
-            case PrefixUnaryExpressionSyntax prefix when
-                prefix.OperatorToken.IsKind(SyntaxKind.ExclamationToken) &&
-                prefix.Operand is MemberAccessExpressionSyntax negated:
+            case PrefixUnaryExpressionSyntax prefix
+                when prefix.OperatorToken.IsKind(SyntaxKind.ExclamationToken)
+                    && prefix.Operand is MemberAccessExpressionSyntax negated:
             {
                 string negatedProp = checkProperty == "IsSuccess" ? "IsFailure" : "IsSuccess";
                 if (negated.Name.Identifier.ValueText == negatedProp)
                 {
-                    return ExpressionsAreEquivalent(negated.Expression, resultExpression) ||
-                           ExpressionReferencesSameResult(negated.Expression, resultExpression, semanticModel);
+                    return ExpressionsAreEquivalent(negated.Expression, resultExpression)
+                        || ExpressionReferencesSameResult(
+                            negated.Expression,
+                            resultExpression,
+                            semanticModel
+                        );
                 }
 
                 break;
@@ -266,20 +345,28 @@ internal static class ResultGuardHelper
                 // Only treat bare identifier as IsSuccess check when we're looking for IsSuccess guarding
                 if (checkProperty == "IsSuccess")
                 {
-                    return ExpressionReferencesSameResult(identifier, resultExpression, semanticModel);
+                    return ExpressionReferencesSameResult(
+                        identifier,
+                        resultExpression,
+                        semanticModel
+                    );
                 }
                 break;
             }
             // Negated bare result identifier: !result -> checks IsFailure
-            case PrefixUnaryExpressionSyntax prefix when
-                prefix.OperatorToken.IsKind(SyntaxKind.ExclamationToken) &&
-                prefix.Operand is IdentifierNameSyntax identifier &&
-                !isTryCall:
+            case PrefixUnaryExpressionSyntax prefix
+                when prefix.OperatorToken.IsKind(SyntaxKind.ExclamationToken)
+                    && prefix.Operand is IdentifierNameSyntax identifier
+                    && !isTryCall:
             {
                 // Treat !result as IsFailure check when we're looking for IsFailure guarding
                 if (checkProperty == "IsFailure")
                 {
-                    return ExpressionReferencesSameResult(identifier, resultExpression, semanticModel);
+                    return ExpressionReferencesSameResult(
+                        identifier,
+                        resultExpression,
+                        semanticModel
+                    );
                 }
                 break;
             }
@@ -292,7 +379,8 @@ internal static class ResultGuardHelper
         ExpressionSyntax condition,
         ExpressionSyntax resultExpression,
         SemanticModel semanticModel,
-        string tryMethodName)
+        string tryMethodName
+    )
     {
         if (condition is not InvocationExpressionSyntax invocation)
         {
@@ -309,8 +397,8 @@ internal static class ResultGuardHelper
             return false;
         }
 
-        return ExpressionsAreEquivalent(member.Expression, resultExpression) ||
-               ExpressionReferencesSameResult(member.Expression, resultExpression, semanticModel);
+        return ExpressionsAreEquivalent(member.Expression, resultExpression)
+            || ExpressionReferencesSameResult(member.Expression, resultExpression, semanticModel);
     }
 
     private static bool IsDescendantOf(SyntaxNode node, SyntaxNode? ancestor)
@@ -367,7 +455,8 @@ internal static class ResultGuardHelper
     internal static bool ExpressionReferencesSameResult(
         ExpressionSyntax a,
         ExpressionSyntax b,
-        SemanticModel semanticModel)
+        SemanticModel semanticModel
+    )
     {
         ISymbol? symbolA = GetSymbol(a, semanticModel);
         ISymbol? symbolB = GetSymbol(b, semanticModel);
@@ -385,8 +474,10 @@ internal static class ResultGuardHelper
         return expression switch
         {
             IdentifierNameSyntax id => semanticModel.GetSymbolInfo(id).Symbol,
-            MemberAccessExpressionSyntax member => semanticModel.GetSymbolInfo(member.Expression).Symbol,
-            _ => semanticModel.GetSymbolInfo(expression).Symbol
+            MemberAccessExpressionSyntax member => semanticModel
+                .GetSymbolInfo(member.Expression)
+                .Symbol,
+            _ => semanticModel.GetSymbolInfo(expression).Symbol,
         };
     }
 }
