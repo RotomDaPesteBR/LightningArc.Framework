@@ -13,18 +13,23 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  docs-sync-check:
-    name: Verify AGENTS.md / CLAUDE.md sync
+  docs-sync:
+    name: Sync AGENTS.md to CLAUDE.md
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Compare AGENTS.md and CLAUDE.md
-        run: |
-          if ! diff -q AGENTS.md CLAUDE.md > /dev/null; then
-            echo "::error::CLAUDE.md is out of sync with AGENTS.md. Run the pre-commit hook (git config core.hooksPath .githooks) or copy AGENTS.md over CLAUDE.md manually."
-            exit 1
+      - name: Sync and push changes
+        uses: ./.github/actions/configure-git
+      - run: |
+          cp AGENTS.md CLAUDE.md
+          if [ -n "$(git status --porcelain CLAUDE.md)" ]; then
+            git add CLAUDE.md
+            git commit -m "docs: auto-sync CLAUDE.md with AGENTS.md [skip ci]"
+            git push --force-with-lease
           fi
 
   build-and-test:
@@ -47,6 +52,133 @@ jobs:
 
       - name: Test
         run: dotnet test --configuration ${{ env.CONFIGURATION }} --no-build --verbosity normal
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-output
+          path: .artifacts/bin/
+          retention-days: 1
+
+  generate-api-docs:
+    name: Generate & Sync API Docs
+    needs: build-and-test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: build-output
+          path: .artifacts/bin
+
+      - name: Generate API Documentation
+        shell: pwsh
+        run: |
+          $baseOutput = "./docs/api"
+          # URL based on the current workflow branch
+          $branch = $env:GITHUB_REF_NAME
+          $repoUrl = "https://github.com/RotomDaPesteBR/LightningArc.Framework/tree/$branch"
+          $artifactsPath = "./.artifacts/bin"
+
+          # Clean previous output
+          Remove-Item -Path "$baseOutput/*" -Recurse -Force -ErrorAction SilentlyContinue
+
+          # Public API projects to document
+          # Excludes metapackages: LightningArc.Framework, LightningArc.AspNetCore (no code)
+          $docProjects = @(
+            "LightningArc.Primitives",
+            "LightningArc.Primitives.Results",
+            "LightningArc.Json",
+            "LightningArc.Results",
+            "LightningArc.Validations",
+            "LightningArc.Validations.DependencyInjection",
+            "LightningArc.Data.Abstractions",
+            "LightningArc.Data.ADO",
+            "LightningArc.Data.ADO.SqlBuilder",
+            "LightningArc.Data.ADO.SqlServer",
+            "LightningArc.Data.ADO.Oracle",
+            "LightningArc.Data.EntityFramework",
+            "LightningArc.Mappers.AutoMapper",
+            "LightningArc.Mappers.Mapster",
+            "LightningArc.Metalama.Results",
+            "LightningArc.Metalama",
+            "LightningArc.CORS.AspNetCore",
+            "LightningArc.OpenAPI.AspNetCore",
+            "LightningArc.Results.AspNetCore"
+          )
+
+          # 2. Find eligible DLLs
+          $allDlls = Get-ChildItem -Recurse -Filter "*.dll" -Path $artifactsPath | Where-Object {
+              $docProjects -contains $_.BaseName -and
+              (Test-Path ($_.FullName -replace '\.dll$', '.xml'))
+          }
+
+          # 3. Process and generate docs
+          $groupedProjects = $allDlls | Group-Object Name
+
+          foreach ($group in $groupedProjects) {
+              # Dynamically detect available TFMs from the DLL paths
+              $availableTfms = $group.Group | ForEach-Object {
+                  if ($_.FullName -match '(debug|release|dev)_(net\d+\.?\d*|netstandard\d+\.?\d*)') {
+                      $matches[2]
+                  }
+              } | Sort-Object -Unique -Descending
+
+              $selectedDll = $null
+              foreach ($tfm in $availableTfms) {
+                  $selectedDll = $group.Group | Where-Object { $_.FullName -match "(debug|release|dev)_$([regex]::Escape($tfm))" } | Select-Object -First 1
+                  if ($selectedDll) { break }
+              }
+
+              if ($selectedDll) {
+                  $projectName = $selectedDll.BaseName
+                  $projectOutput = "$baseOutput/$projectName"
+
+                  dotnet run --project tools/Documentation.Generator/LightningArc.Documentation.Generator.csproj -- $selectedDll.FullName $projectOutput --source "$repoUrl" --newline lf
+
+                  $entryFile = "$projectOutput/$projectName.md"
+                  if (Test-Path $entryFile) {
+                      $lines = Get-Content $entryFile
+                      $rawContent = $lines -join "`n"
+
+                      if ($lines.Count -le 3 -or $rawContent.Trim() -match "^#.*assembly`r?`n`r?`n<!-- DO NOT EDIT") {
+                          Remove-Item -Path $projectOutput -Recurse -Force -ErrorAction SilentlyContinue
+                      } else {
+                          Move-Item $entryFile "$projectOutput/README.md" -Force
+
+                          $pattern = '(\[.*?\]\()\.\/?' + [regex]::Escape("$projectName.md") + '(\))'
+                          Get-ChildItem -Path $projectOutput -Recurse -Filter "*.md" | ForEach-Object {
+                              (Get-Content $_.FullName) -replace $pattern, '$1README.md$2' | Set-Content $_.FullName
+                          }
+                      }
+                  }
+              }
+          }
+
+      - name: Commit and Push if changed
+        uses: ./.github/actions/configure-git
+      - shell: pwsh
+        run: |
+          $status = git status --porcelain docs/api
+          if ($status) {
+              Write-Host "Changes detected in documentation. Committing..."
+              git add docs/api
+              git commit -m "docs: update auto-generated API documentation [skip ci]"
+              git push --force-with-lease
+          } else {
+              Write-Host "No changes in public API. Commit skipped."
+          }
 
   pack:
     name: Pack NuGet Packages
