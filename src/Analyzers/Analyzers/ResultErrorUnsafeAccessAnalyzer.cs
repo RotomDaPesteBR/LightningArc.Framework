@@ -15,7 +15,8 @@ namespace LightningArc.Analyzers;
 public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "LARC002";
-    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
+    public const string HelpLinkBase =
+        "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -25,20 +26,37 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
-        helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
+        helpLinkUri: HelpLinkBase + DiagnosticId + ".md"
+    );
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
 
-        context.RegisterSyntaxNodeAction(AnalyzeMemberAccess, SyntaxKind.SimpleMemberAccessExpression);
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            ResultTypeRecognizer recognizer = ResultTypeRecognizer.Resolve(
+                compilationContext.Compilation
+            );
+            if (!recognizer.IsAvailable)
+            {
+                return;
+            }
+
+            compilationContext.RegisterSyntaxNodeAction(
+                nodeContext => AnalyzeMemberAccess(nodeContext, recognizer),
+                SyntaxKind.SimpleMemberAccessExpression
+            );
+        });
     }
 
-    private static void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeMemberAccess(
+        SyntaxNodeAnalysisContext context,
+        ResultTypeRecognizer recognizer
+    )
     {
         if (context.Node is not MemberAccessExpressionSyntax memberAccess)
         {
@@ -50,13 +68,16 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken);
+        TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(
+            memberAccess.Expression,
+            context.CancellationToken
+        );
         if (typeInfo.Type is not INamedTypeSymbol namedType)
         {
             return;
         }
 
-        if (!IsResultType(namedType))
+        if (!recognizer.IsResultType(namedType))
         {
             return;
         }
@@ -74,38 +95,29 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (ResultAccessSafetyRecognizer.IsGuardedByIsFailure(memberAccess, context.SemanticModel) ||
-            ResultAccessSafetyRecognizer.IsGuardedByTryCall(memberAccess, context.SemanticModel, "TryGetError") ||
-            ResultAccessSafetyRecognizer.IsGuardedByPrecedingExit(memberAccess, context.SemanticModel, triggerProperty: "IsSuccess"))
+        if (
+            ResultAccessSafetyRecognizer.IsGuardedByIsFailure(memberAccess, context.SemanticModel)
+            || ResultAccessSafetyRecognizer.IsGuardedByTryCall(
+                memberAccess,
+                context.SemanticModel,
+                "TryGetError"
+            )
+            || ResultAccessSafetyRecognizer.IsGuardedByPrecedingExit(
+                memberAccess,
+                context.SemanticModel,
+                triggerProperty: "IsSuccess"
+            )
+        )
         {
             return;
         }
 
-        Diagnostic diagnostic = Diagnostic.Create(Rule, memberAccess.Name.GetLocation(), namedType.Name);
+        Diagnostic diagnostic = Diagnostic.Create(
+            Rule,
+            memberAccess.Name.GetLocation(),
+            namedType.Name
+        );
         context.ReportDiagnostic(diagnostic);
-    }
-
-    private static bool IsResultType(INamedTypeSymbol namedType)
-    {
-        if (namedType.Name == "Result")
-        {
-            return true;
-        }
-
-        if (namedType.BaseType != null && IsResultType(namedType.BaseType))
-        {
-            return true;
-        }
-
-        foreach (INamedTypeSymbol? namedTypeSymbol in namedType.AllInterfaces)
-        {
-            if (namedTypeSymbol.Name.StartsWith("IResult"))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static bool IsInsideConversionOperator(MemberAccessExpressionSyntax memberAccess)
@@ -130,7 +142,7 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
 
     private static bool HasNullForgivingOperator(MemberAccessExpressionSyntax memberAccess)
     {
-        return memberAccess.Parent is PostfixUnaryExpressionSyntax postfix &&
-               postfix.IsKind(SyntaxKind.SuppressNullableWarningExpression);
+        return memberAccess.Parent is PostfixUnaryExpressionSyntax postfix
+            && postfix.IsKind(SyntaxKind.SuppressNullableWarningExpression);
     }
 }

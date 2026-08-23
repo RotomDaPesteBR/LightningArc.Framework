@@ -7,19 +7,15 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace LightningArc.Analyzers;
 
 /// <summary>
-/// LARC012 - Detects Create() or TryCreate() method calls on ValueObject types
+/// LARC022 - Detects Create() or TryCreate() method calls on ValueObject types
 /// where the return value is discarded.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ValueObjectCreationDiscardedAnalyzer : DiagnosticAnalyzer
 {
-    public const string DiagnosticId = "LARC012";
-    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
-
-    private static readonly string[] _knownValueObjectNames =
-    [
-        "Cep", "Cnpj", "Cpf", "Currency", "Email", "IpAddress", "Password", "PhoneNumber", "Rg", "Url"
-    ];
+    public const string DiagnosticId = "LARC022";
+    public const string HelpLinkBase =
+        "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -29,17 +25,20 @@ public class ValueObjectCreationDiscardedAnalyzer : DiagnosticAnalyzer
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
-        helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
+        helpLinkUri: HelpLinkBase + DiagnosticId + ".md"
+    );
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
 
-        context.RegisterSyntaxNodeAction(AnalyzeExpressionStatement, SyntaxKind.ExpressionStatement);
+        context.RegisterSyntaxNodeAction(
+            AnalyzeExpressionStatement,
+            SyntaxKind.ExpressionStatement
+        );
     }
 
     private static void AnalyzeExpressionStatement(SyntaxNodeAnalysisContext context)
@@ -67,14 +66,20 @@ public class ValueObjectCreationDiscardedAnalyzer : DiagnosticAnalyzer
 
         // Get the type that defines the Create/TryCreate method
         ITypeSymbol? containingType = null;
-        SymbolInfo symbolInfo = context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken);
+        SymbolInfo symbolInfo = context.SemanticModel.GetSymbolInfo(
+            invocation,
+            context.CancellationToken
+        );
         if (symbolInfo.Symbol is IMethodSymbol methodSymbol)
         {
             containingType = methodSymbol.ContainingType;
         }
         else if (memberAccess.Expression is IdentifierNameSyntax typeName)
         {
-            TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(typeName, context.CancellationToken);
+            TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(
+                typeName,
+                context.CancellationToken
+            );
             containingType = typeInfo.Type;
         }
 
@@ -85,36 +90,6 @@ public class ValueObjectCreationDiscardedAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static bool IsValueObjectType(INamedTypeSymbol type)
-    {
-        // Check known value object names
-        if (Array.IndexOf(_knownValueObjectNames, type.Name) >= 0 ||
-            type.Name.EndsWith("ValueObject"))
-        {
-            return true;
-        }
-
-        // Check if in LightningArc.Primitives namespace
-        if (type.ContainingNamespace.ToDisplayString() == "LightningArc.Primitives")
-        {
-            return true;
-        }
-
-        // Check if implements IValueObject
-        foreach (INamedTypeSymbol? iface in type.AllInterfaces)
-        {
-            if (iface.Name.StartsWith("IValueObject"))
-            {
-                return true;
-            }
-        }
-
-        // Check base type
-        if (type.BaseType?.Name.Contains("ValueObject") == true)
-        {
-            return true;
-        }
-
-        return false;
-    }
+    private static bool IsValueObjectType(INamedTypeSymbol type) =>
+        ValueObjectTypeRecognizer.IsValueObjectType(type);
 }

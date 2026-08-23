@@ -7,19 +7,15 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace LightningArc.Analyzers;
 
 /// <summary>
-/// LARC010 - Detects implicit conversion from string literal to ValueObject types
+/// LARC020 - Detects implicit conversion from string literal to ValueObject types
 /// (Email, Cpf, Cnpj, PhoneNumber, Url) in LightningArc.Primitives namespace.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
 {
-    public const string DiagnosticId = "LARC010";
-    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
-
-    private static readonly string[] _knownValueObjectNames =
-    [
-        "Cep", "Cnpj", "Cpf", "Currency", "Email", "IpAddress", "Password", "PhoneNumber", "Rg", "Url"
-    ];
+    public const string DiagnosticId = "LARC020";
+    public const string HelpLinkBase =
+        "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -29,10 +25,10 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
-        helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
+        helpLinkUri: HelpLinkBase + DiagnosticId + ".md"
+    );
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -51,8 +47,10 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (declarator.Initializer?.Value is not LiteralExpressionSyntax literal ||
-            !literal.IsKind(SyntaxKind.StringLiteralExpression))
+        if (
+            declarator.Initializer?.Value is not LiteralExpressionSyntax literal
+            || !literal.IsKind(SyntaxKind.StringLiteralExpression)
+        )
         {
             return;
         }
@@ -62,7 +60,8 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
         if (symbol?.Type is not INamedTypeSymbol destType)
         {
             // Could be a field
-            IFieldSymbol? fieldSymbol = context.SemanticModel.GetDeclaredSymbol(declarator) as IFieldSymbol;
+            IFieldSymbol? fieldSymbol =
+                context.SemanticModel.GetDeclaredSymbol(declarator) as IFieldSymbol;
             if (fieldSymbol?.Type is not INamedTypeSymbol fieldType)
             {
                 return;
@@ -71,10 +70,13 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
             destType = fieldType;
         }
 
-        string typeName = destType.Name;
-        if (IsKnownValueObjectTypeName(typeName))
+        if (ValueObjectTypeRecognizer.IsValueObjectType(destType))
         {
-            Diagnostic diagnostic = Diagnostic.Create(Rule, declarator.Initializer.Value.GetLocation(), typeName);
+            Diagnostic diagnostic = Diagnostic.Create(
+                Rule,
+                declarator.Initializer.Value.GetLocation(),
+                destType.Name
+            );
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -86,8 +88,10 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (assignment.Right is not LiteralExpressionSyntax literal ||
-            !literal.IsKind(SyntaxKind.StringLiteralExpression))
+        if (
+            assignment.Right is not LiteralExpressionSyntax literal
+            || !literal.IsKind(SyntaxKind.StringLiteralExpression)
+        )
         {
             return;
         }
@@ -97,11 +101,8 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (IsKnownValueObjectTypeName(typeName!))
-        {
-            Diagnostic diagnostic = Diagnostic.Create(Rule, assignment.Right.GetLocation(), typeName);
-            context.ReportDiagnostic(diagnostic);
-        }
+        Diagnostic diagnostic = Diagnostic.Create(Rule, assignment.Right.GetLocation(), typeName);
+        context.ReportDiagnostic(diagnostic);
     }
 
     private static void AnalyzeArgument(SyntaxNodeAnalysisContext context)
@@ -117,8 +118,10 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (argument.Expression is not LiteralExpressionSyntax literal ||
-            literal.Kind() != SyntaxKind.StringLiteralExpression)
+        if (
+            argument.Expression is not LiteralExpressionSyntax literal
+            || literal.Kind() != SyntaxKind.StringLiteralExpression
+        )
         {
             return;
         }
@@ -130,15 +133,22 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        string typeName = destType.Name;
-        if (IsKnownValueObjectTypeName(typeName))
+        if (ValueObjectTypeRecognizer.IsValueObjectType(destType))
         {
-            Diagnostic diagnostic = Diagnostic.Create(Rule, argument.Expression.GetLocation(), typeName);
+            Diagnostic diagnostic = Diagnostic.Create(
+                Rule,
+                argument.Expression.GetLocation(),
+                destType.Name
+            );
             context.ReportDiagnostic(diagnostic);
         }
     }
 
-    private static bool TryGetTypeName(ExpressionSyntax expression, SemanticModel semanticModel, out string? typeName)
+    private static bool TryGetTypeName(
+        ExpressionSyntax expression,
+        SemanticModel semanticModel,
+        out string? typeName
+    )
     {
         typeName = null;
 
@@ -148,26 +158,12 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
             return false;
         }
 
-        // Check known value object names
-        if (IsKnownValueObjectTypeName(destType.Name))
+        if (!ValueObjectTypeRecognizer.IsValueObjectType(destType))
         {
-            typeName = destType.Name;
-            return true;
+            return false;
         }
 
-        // Check if type is in LightningArc.Primitives namespace
-        if (destType.ContainingNamespace.ToDisplayString().Contains("LightningArc.Primitives"))
-        {
-            typeName = destType.Name;
-            return true;
-        }
-
-        return false;
-    }
-
-    private static bool IsKnownValueObjectTypeName(string typeName)
-    {
-        return Array.IndexOf(_knownValueObjectNames, typeName) >= 0 ||
-               typeName.EndsWith("ValueObject");
+        typeName = destType.Name;
+        return true;
     }
 }

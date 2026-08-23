@@ -168,7 +168,7 @@ internal static class ResultAccessSafetyRecognizer
                 case IfStatementSyntax ifStmt:
                 {
                     // Access in the else-block means the condition check is negated
-                    // (e.g., if (IsSuccess) { } else { result.Value } — IsSuccess guards Value here).
+                    // (e.g., if (IsFailure) { } else { result.Value } — IsFailure condition guards Value in else block)
                     bool inElse = IsInElseBlock(ifStmt, access);
                     string effectiveProperty = inElse
                         ? (checkProperty == "IsSuccess" ? "IsFailure" : "IsSuccess")

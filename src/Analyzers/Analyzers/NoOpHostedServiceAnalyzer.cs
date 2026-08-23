@@ -7,14 +7,15 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace LightningArc.Analyzers;
 
 /// <summary>
-/// LARC022 - Detects classes implementing IHostedService where StartAsync
+/// LARC080 - Detects classes implementing IHostedService where StartAsync
 /// body only consists of return Task.CompletedTask.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
 {
-    public const string DiagnosticId = "LARC022";
-    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
+    public const string DiagnosticId = "LARC080";
+    public const string HelpLinkBase =
+        "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -24,10 +25,10 @@ public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
-        helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
+        helpLinkUri: HelpLinkBase + DiagnosticId + ".md"
+    );
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -52,7 +53,10 @@ public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
         }
 
         // Check if we are inside a class that implements IHostedService
-        ClassDeclarationSyntax? classDeclaration = methodDeclaration.AncestorsAndSelf().OfType<ClassDeclarationSyntax>().FirstOrDefault();
+        ClassDeclarationSyntax? classDeclaration = methodDeclaration
+            .AncestorsAndSelf()
+            .OfType<ClassDeclarationSyntax>()
+            .FirstOrDefault();
         if (classDeclaration == null)
         {
             return;
@@ -73,7 +77,10 @@ public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(diagnostic);
     }
 
-    private static bool ImplementsIHostedService(ClassDeclarationSyntax classDeclaration, SemanticModel semanticModel)
+    private static bool ImplementsIHostedService(
+        ClassDeclarationSyntax classDeclaration,
+        SemanticModel semanticModel
+    )
     {
         INamedTypeSymbol? symbol = semanticModel.GetDeclaredSymbol(classDeclaration);
         if (symbol == null)
@@ -124,14 +131,16 @@ public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
             return false;
         }
 
-        if (expression is MemberAccessExpressionSyntax memberAccess &&
-            memberAccess.Name.Identifier.ValueText == "CompletedTask")
+        if (
+            expression is MemberAccessExpressionSyntax memberAccess
+            && memberAccess.Name.Identifier.ValueText == "CompletedTask"
+        )
         {
             string container = memberAccess.Expression.ToString();
-            return container == "Task" ||
-                   container == "System.Threading.Tasks.Task" ||
-                   container == "ValueTask" ||
-                   container == "System.Threading.Tasks.ValueTask";
+            return container == "Task"
+                || container == "System.Threading.Tasks.Task"
+                || container == "ValueTask"
+                || container == "System.Threading.Tasks.ValueTask";
         }
 
         return false;

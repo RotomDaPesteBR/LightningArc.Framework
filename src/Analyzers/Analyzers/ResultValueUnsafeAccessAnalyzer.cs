@@ -36,13 +36,27 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
 
-        context.RegisterSyntaxNodeAction(
-            AnalyzeMemberAccess,
-            SyntaxKind.SimpleMemberAccessExpression
-        );
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            ResultTypeRecognizer recognizer = ResultTypeRecognizer.Resolve(
+                compilationContext.Compilation
+            );
+            if (!recognizer.IsAvailable)
+            {
+                return;
+            }
+
+            compilationContext.RegisterSyntaxNodeAction(
+                nodeContext => AnalyzeMemberAccess(nodeContext, recognizer),
+                SyntaxKind.SimpleMemberAccessExpression
+            );
+        });
     }
 
-    private static void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeMemberAccess(
+        SyntaxNodeAnalysisContext context,
+        ResultTypeRecognizer recognizer
+    )
     {
         if (context.Node is not MemberAccessExpressionSyntax memberAccess)
         {
@@ -63,7 +77,14 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!IsResultType(namedType))
+        // Note: the previous local check required IsGenericType (i.e. specifically Result<T>,
+        // not the non-generic Result). ResultTypeRecognizer.IsResultType matches both. This is
+        // a deliberate widening, not an oversight — non-generic Result has no .Value member, so
+        // a syntactic `.Value` access on a non-generic Result receiver only occurs in code that
+        // already fails to compile for an unrelated reason (no such member). This analyzer
+        // firing in that case adds a redundant diagnostic on already-broken code, not a false
+        // positive on valid code.
+        if (!recognizer.IsResultType(namedType))
         {
             return;
         }
@@ -104,29 +125,6 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
             namedType.Name
         );
         context.ReportDiagnostic(diagnostic);
-    }
-
-    private static bool IsResultType(INamedTypeSymbol namedType)
-    {
-        if (namedType is { IsGenericType: true, Name: "Result" })
-        {
-            return true;
-        }
-
-        if (namedType.BaseType != null && IsResultType(namedType.BaseType))
-        {
-            return true;
-        }
-
-        foreach (INamedTypeSymbol? namedTypeSymbol in namedType.AllInterfaces)
-        {
-            if (namedTypeSymbol.Name.StartsWith("IResult"))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static bool IsInsideConversionOperator(MemberAccessExpressionSyntax memberAccess)

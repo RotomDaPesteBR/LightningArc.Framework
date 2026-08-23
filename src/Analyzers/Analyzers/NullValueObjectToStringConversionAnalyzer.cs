@@ -7,19 +7,15 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace LightningArc.Analyzers;
 
 /// <summary>
-/// LARC011 - Detects when a nullable ValueObject variable is used in a context
+/// LARC021 - Detects when a nullable ValueObject variable is used in a context
 /// that triggers implicit conversion to string.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
 {
-    public const string DiagnosticId = "LARC011";
-    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
-
-    private static readonly string[] _knownValueObjectNames =
-    [
-        "Cep", "Cnpj", "Cpf", "Currency", "Email", "IpAddress", "Password", "PhoneNumber", "Rg", "Url"
-    ];
+    public const string DiagnosticId = "LARC021";
+    public const string HelpLinkBase =
+        "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -29,10 +25,10 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
-        helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
+        helpLinkUri: HelpLinkBase + DiagnosticId + ".md"
+    );
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -79,7 +75,10 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
         TypeInfo valueTypeInfo = context.SemanticModel.GetTypeInfo(declarator.Initializer.Value);
         if (valueTypeInfo.Type != null && IsNullableValueObject(valueTypeInfo.Type))
         {
-            Diagnostic diagnostic = Diagnostic.Create(Rule, declarator.Initializer.Value.GetLocation());
+            Diagnostic diagnostic = Diagnostic.Create(
+                Rule,
+                declarator.Initializer.Value.GetLocation()
+            );
             context.ReportDiagnostic(diagnostic);
         }
     }
@@ -137,9 +136,7 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
 
     private static bool IsNullableValueObject(ITypeSymbol type)
     {
-        // Check known value object names
-        if (Array.IndexOf(_knownValueObjectNames, type.Name) < 0 &&
-            !type.Name.EndsWith("ValueObject"))
+        if (!ValueObjectTypeRecognizer.IsValueObjectType(type))
         {
             return false;
         }

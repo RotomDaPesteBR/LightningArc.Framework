@@ -8,14 +8,15 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace LightningArc.Analyzers;
 
 /// <summary>
-/// LARC022 - Detects direct instantiation of DbConnection types inside repositories.
+/// LARC042 - Detects direct instantiation of DbConnection types inside repositories.
 /// Repositories should use IConnectionFactory or GetConnection() from RepositoryBase.
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class DirectDbConnectionAnalyzer : DiagnosticAnalyzer
 {
-    public const string DiagnosticId = "LARC023";
-    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
+    public const string DiagnosticId = "LARC042";
+    public const string HelpLinkBase =
+        "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
@@ -25,7 +26,8 @@ public class DirectDbConnectionAnalyzer : DiagnosticAnalyzer
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
-        helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
+        helpLinkUri: HelpLinkBase + DiagnosticId + ".md"
+    );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
@@ -34,39 +36,60 @@ public class DirectDbConnectionAnalyzer : DiagnosticAnalyzer
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
 
-        context.RegisterSyntaxNodeAction(AnalyzeObjectCreation, SyntaxKind.ObjectCreationExpression);
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            RepositoryTypeRecognizer recognizer = RepositoryTypeRecognizer.Resolve(
+                compilationContext.Compilation
+            );
+            if (!recognizer.IsAvailable)
+            {
+                return;
+            }
+
+            compilationContext.RegisterSyntaxNodeAction(
+                nodeContext => AnalyzeObjectCreation(nodeContext, recognizer),
+                SyntaxKind.ObjectCreationExpression
+            );
+        });
     }
 
-    private static void AnalyzeObjectCreation(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeObjectCreation(
+        SyntaxNodeAnalysisContext context,
+        RepositoryTypeRecognizer recognizer
+    )
     {
-        var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-        
+        ObjectCreationExpressionSyntax objectCreation = (ObjectCreationExpressionSyntax)
+            context.Node;
+
         // 1. Are we inside a RepositoryBase?
-        var classDecl = objectCreation.Ancestors().OfType<ClassDeclarationSyntax>().FirstOrDefault();
-        if (classDecl == null) return;
+        var classDecl = objectCreation
+            .Ancestors()
+            .OfType<ClassDeclarationSyntax>()
+            .FirstOrDefault();
+        if (classDecl == null)
+        {
+            return;
+        }
 
         var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDecl);
-        if (classSymbol == null || !InheritsFromRepositoryBase(classSymbol)) return;
+        if (classSymbol == null || !recognizer.InheritsFromRepositoryBase(classSymbol))
+        {
+            return;
+        }
 
         // 2. Is this a DbConnection type?
         var typeInfo = context.SemanticModel.GetTypeInfo(objectCreation);
-        if (typeInfo.Type == null) return;
+        if (typeInfo.Type == null)
+        {
+            return;
+        }
 
         if (IsDbConnectionType(typeInfo.Type))
         {
-            context.ReportDiagnostic(Diagnostic.Create(Rule, objectCreation.GetLocation(), typeInfo.Type.Name));
+            context.ReportDiagnostic(
+                Diagnostic.Create(Rule, objectCreation.GetLocation(), typeInfo.Type.Name)
+            );
         }
-    }
-
-    private static bool InheritsFromRepositoryBase(INamedTypeSymbol symbol)
-    {
-        var current = symbol.BaseType;
-        while (current != null)
-        {
-            if (current.Name == "RepositoryBase") return true;
-            current = current.BaseType;
-        }
-        return false;
     }
 
     private static bool IsDbConnectionType(ITypeSymbol type)
@@ -75,7 +98,11 @@ public class DirectDbConnectionAnalyzer : DiagnosticAnalyzer
         while (current != null)
         {
             // Full metadata name for System.Data.Common.DbConnection
-            if (current.Name == "DbConnection" || current.Name == "IDbConnection") return true;
+            if (current.Name == "DbConnection" || current.Name == "IDbConnection")
+            {
+                return true;
+            }
+
             current = current.BaseType;
         }
         return false;

@@ -28,7 +28,10 @@ public class ResultErrorUnsafeAccessCodeFixProvider : CodeFixProvider
 
     public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        SyntaxNode? root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+        SyntaxNode? root = await context
+            .Document.GetSyntaxRootAsync(context.CancellationToken)
+            .ConfigureAwait(false);
+
         if (root == null)
         {
             return;
@@ -39,8 +42,13 @@ public class ResultErrorUnsafeAccessCodeFixProvider : CodeFixProvider
         SyntaxNode? node = root.FindToken(diagnosticSpan.Start).Parent;
 
         // Walk up to find the MemberAccessExpressionSyntax containing ".Error"
-        MemberAccessExpressionSyntax? memberAccess = node?.AncestorsAndSelf().OfType<MemberAccessExpressionSyntax>()
-            .FirstOrDefault(ma => ma.Name.Span.Start == diagnosticSpan.Start && ma.Name.Identifier.ValueText == "Error");
+        MemberAccessExpressionSyntax? memberAccess = node
+            ?.AncestorsAndSelf()
+            .OfType<MemberAccessExpressionSyntax>()
+            .FirstOrDefault(ma =>
+                ma.Name.Span.Start == diagnosticSpan.Start
+                && ma.Name.Identifier.ValueText == "Error"
+            );
 
         if (memberAccess == null)
         {
@@ -48,7 +56,11 @@ public class ResultErrorUnsafeAccessCodeFixProvider : CodeFixProvider
         }
 
         // Find the enclosing statement
-        StatementSyntax? statement = memberAccess.AncestorsAndSelf().OfType<StatementSyntax>().FirstOrDefault();
+        StatementSyntax? statement = memberAccess
+            .AncestorsAndSelf()
+            .OfType<StatementSyntax>()
+            .FirstOrDefault();
+
         if (statement == null)
         {
             return;
@@ -57,9 +69,12 @@ public class ResultErrorUnsafeAccessCodeFixProvider : CodeFixProvider
         context.RegisterCodeFix(
             CodeAction.Create(
                 title: _title,
-                createChangedDocument: c => ApplyFixAsync(context.Document, root, memberAccess, statement, c),
-                equivalenceKey: nameof(ResultErrorUnsafeAccessCodeFixProvider)),
-            diagnostics: context.Diagnostics);
+                createChangedDocument: c =>
+                    ApplyFixAsync(context.Document, root, memberAccess, statement, c),
+                equivalenceKey: nameof(ResultErrorUnsafeAccessCodeFixProvider)
+            ),
+            diagnostics: context.Diagnostics
+        );
     }
 
     private static async Task<Document> ApplyFixAsync(
@@ -67,7 +82,8 @@ public class ResultErrorUnsafeAccessCodeFixProvider : CodeFixProvider
         SyntaxNode root,
         MemberAccessExpressionSyntax memberAccess,
         StatementSyntax statement,
-        CancellationToken _)
+        CancellationToken _
+    )
     {
         ExpressionSyntax resultExpression = memberAccess.Expression;
 
@@ -76,46 +92,59 @@ public class ResultErrorUnsafeAccessCodeFixProvider : CodeFixProvider
                 MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     resultExpression.WithoutLeadingTrivia().WithoutTrailingTrivia(),
-                    IdentifierName("TryGetError")))
-            .WithArgumentList(ArgumentList(SeparatedList([
-                Argument(DeclarationExpression(
-                    IdentifierName("var"),
-                    SingleVariableDesignation(Identifier("err"))))
-                    .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword))
-            ])));
+                    IdentifierName("TryGetError")
+                )
+            )
+            .WithArgumentList(
+                ArgumentList(
+                    SeparatedList([
+                        Argument(
+                                DeclarationExpression(
+                                    IdentifierName("var"),
+                                    SingleVariableDesignation(Identifier("err"))
+                                )
+                            )
+                            .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword)),
+                    ])
+                )
+            );
 
         // Build the replacement block statement
         StatementSyntax rewritten = RewriteErrorAccess(statement, memberAccess);
 
-        IfStatementSyntax ifStatement = IfStatement(tryGetErrorInvocation,
-                Block(rewritten.WithLeadingTrivia(Space)))
+        IfStatementSyntax ifStatement = IfStatement(
+                tryGetErrorInvocation,
+                Block(rewritten.WithLeadingTrivia(Space))
+            )
             .WithAdditionalAnnotations(Formatter.Annotation);
 
-        SyntaxNode newRoot = root.ReplaceNode(statement, ifStatement.WithAdditionalAnnotations(Formatter.Annotation));
+        SyntaxNode newRoot = root.ReplaceNode(
+            statement,
+            ifStatement.WithAdditionalAnnotations(Formatter.Annotation)
+        );
         return document.WithSyntaxRoot(newRoot);
     }
 
     private static StatementSyntax RewriteErrorAccess(
         StatementSyntax statement,
-        MemberAccessExpressionSyntax errorAccess)
+        MemberAccessExpressionSyntax errorAccess
+    )
     {
         ErrorAccessRewriter rewriter = new(errorAccess);
         return (StatementSyntax)rewriter.Visit(statement);
     }
 
-    private class ErrorAccessRewriter(MemberAccessExpressionSyntax errorAccess) : CSharpSyntaxRewriter
+    private class ErrorAccessRewriter(MemberAccessExpressionSyntax errorAccess)
+        : CSharpSyntaxRewriter
     {
-        public override SyntaxNode? VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
-        {
-            if (node.Name.Identifier.ValueText == "Error" &&
-                node.Expression.IsEquivalentTo(errorAccess.Expression))
-            {
-                return IdentifierName("err")
+        public override SyntaxNode? VisitMemberAccessExpression(
+            MemberAccessExpressionSyntax node
+        ) =>
+            node.Name.Identifier.ValueText == "Error"
+            && node.Expression.IsEquivalentTo(errorAccess.Expression)
+                ? IdentifierName("err")
                     .WithLeadingTrivia(node.GetLeadingTrivia())
-                    .WithTrailingTrivia(node.GetTrailingTrivia());
-            }
-
-            return base.VisitMemberAccessExpression(node);
-        }
+                    .WithTrailingTrivia(node.GetTrailingTrivia())
+                : base.VisitMemberAccessExpression(node);
     }
 }
