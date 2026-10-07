@@ -1,8 +1,8 @@
+using System.Collections.Concurrent;
 using System.Data.Common;
 using LightningArc.Data.Abstractions.Mappers;
 using LightningArc.Data.ADO.UnitOfWork;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace LightningArc.Data.ADO.Factories;
 
@@ -13,14 +13,13 @@ namespace LightningArc.Data.ADO.Factories;
 public sealed class RepositoryFactory(
     IServiceProvider serviceProvider,
     IConnectionFactory connectionFactory,
-    IMapper? mapper = null,
-    ILoggerFactory? loggerFactory = null
+    IMapper? mapper = null
 ) : IRepositoryFactory
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
     private readonly IConnectionFactory _connectionFactory = connectionFactory;
     private readonly IMapper? _mapper = mapper;
-    private readonly ILoggerFactory? _loggerFactory = loggerFactory;
+    private readonly ConcurrentDictionary<Type, Type> _implementationCache = new();
 
     /// <inheritdoc />
     public TRepository Create<TRepository>()
@@ -56,8 +55,20 @@ public sealed class RepositoryFactory(
         ArgumentNullException.ThrowIfNull(dbUnitOfWork);
 #endif
 
-        // Extracts connection and transaction from the specialized Unit of Work
-        return CreateInstance<TRepository>(dbUnitOfWork.Connection, dbUnitOfWork.Transaction);
+        // Extracts connection and transaction from the specialized Unit of Work.
+        // Both are null while the Unit of Work is not active: fail fast with a
+        // clear message instead of a cryptic constructor-matching error.
+        DbConnection? connection = dbUnitOfWork.Connection;
+        DbTransaction? transaction = dbUnitOfWork.Transaction;
+
+        if (connection is null || transaction is null)
+        {
+            throw new InvalidOperationException(
+                "Unit of Work is not active. Call Begin() or BeginAsync() before creating repositories from it."
+            );
+        }
+
+        return CreateInstance<TRepository>(connection, transaction);
     }
 
     /// <summary>
@@ -69,61 +80,22 @@ public sealed class RepositoryFactory(
     {
         Type targetType = typeof(TRepository);
 
-        // 1. Resolve interfaces/abstract classes safely
+        // 1. Resolve interfaces/abstract classes safely (cached: avoids
+        // instantiating a throwaway repository on every call).
         if (targetType.IsInterface || targetType.IsAbstract)
         {
-            object? registeredService = null;
-
-            // Safe lookup using a temporary scope to prevent "scoped service from root provider" exception
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                registeredService = scope.ServiceProvider.GetService<TRepository>();
-            }
-
-            if (registeredService != null)
-            {
-                targetType = registeredService.GetType();
-            }
-            else
-            {
-                // Highly reliable scanning: Look for a concrete class implementing TRepository
-                Type? resolvedType = targetType
-                    .Assembly.GetTypes()
-                    .FirstOrDefault(t =>
-                        targetType.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract
-                    );
-
-                resolvedType ??= AppDomain
-                    .CurrentDomain.GetAssemblies()
-                    .SelectMany(a => a.GetTypes())
-                    .FirstOrDefault(t =>
-                        targetType.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract
-                    );
-
-                targetType =
-                    resolvedType
-                    ?? throw new InvalidOperationException(
-                        $"Could not automatically resolve a concrete implementation for '{targetType.Name}'."
-                    );
-            }
+            targetType = _implementationCache.GetOrAdd(targetType, ResolveImplementation);
         }
 
-        // 2. Build argument list: explicit args + mapper + logger
+        // 2. Only connection/transaction go explicit. IMapper and ILogger<T>
+        //    are resolved from the provider by ActivatorUtilities: passing a
+        //    non-generic ILogger explicitly breaks constructors declaring
+        //    ILogger<TRepository>. _mapper is a fallback for providers
+        //    without IMapper registered.
         List<object> args = [.. explicitArgs];
-        if (_mapper != null)
+        if (_mapper != null && _serviceProvider.GetService<IMapper>() is null)
         {
             args.Add(_mapper);
-        }
-
-        ILogger? logger = null;
-        if (_loggerFactory != null)
-        {
-            logger = _loggerFactory.CreateLogger(targetType);
-        }
-
-        if (logger != null)
-        {
-            args.Add(logger);
         }
 
         // 3. Instantiate the type using ActivatorUtilities.
@@ -134,5 +106,36 @@ public sealed class RepositoryFactory(
         );
 
         return (TRepository)newInstance;
+    }
+
+    private Type ResolveImplementation(Type contract)
+    {
+        object? registeredService = null;
+
+        // Safe lookup using a temporary scope to prevent "scoped service from root provider" exception
+        using (var scope = _serviceProvider.CreateScope())
+        {
+            registeredService = scope.ServiceProvider.GetService(contract);
+        }
+
+        if (registeredService != null)
+        {
+            return registeredService.GetType();
+        }
+
+        // Highly reliable scanning: Look for a concrete class implementing the contract
+        Type? resolvedType = contract
+            .Assembly.GetTypes()
+            .FirstOrDefault(t => contract.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+
+        resolvedType ??= AppDomain
+            .CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes())
+            .FirstOrDefault(t => contract.IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract);
+
+        return resolvedType
+            ?? throw new InvalidOperationException(
+                $"Could not automatically resolve a concrete implementation for '{contract.Name}'."
+            );
     }
 }

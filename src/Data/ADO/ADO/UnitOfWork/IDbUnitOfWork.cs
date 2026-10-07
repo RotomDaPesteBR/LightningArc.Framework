@@ -12,11 +12,14 @@ public interface IDbUnitOfWork : IUnitOfWork
     /// <summary>
     /// Gets the active database connection.
     /// </summary>
+    /// <exception cref="InvalidOperationException">The unit of work is not <see cref="UnitOfWorkState.Active"/>.</exception>
+    /// <exception cref="ObjectDisposedException">The unit of work is <see cref="UnitOfWorkState.Disposed"/>.</exception>
     DbConnection Connection { get; }
 
     /// <summary>
     /// Gets the active database transaction.
     /// </summary>
+    /// <exception cref="InvalidOperationException">The unit of work is not <see cref="UnitOfWorkState.Active"/>.</exception>
+    /// <exception cref="ObjectDisposedException">The unit of work is <see cref="UnitOfWorkState.Disposed"/>.</exception>
     DbTransaction Transaction { get; }
 }
-
