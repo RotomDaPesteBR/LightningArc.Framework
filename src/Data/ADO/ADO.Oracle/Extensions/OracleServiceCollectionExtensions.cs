@@ -1,5 +1,8 @@
+using System;
 using LightningArc.Data.ADO.Factories;
 using LightningArc.Data.ADO.Oracle.Factories;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -20,8 +23,13 @@ public static class OracleServiceCollectionExtensions
             string connectionName = "DatabaseConnection"
         ) =>
             services.AddSingleton<IConnectionFactory, OracleConnectionFactory>(sp =>
-                ActivatorUtilities.CreateInstance<OracleConnectionFactory>(sp, connectionName)
-            );
+            {
+                RequireConfiguration(sp, nameof(AddOracleConnectionFactory));
+                return ActivatorUtilities.CreateInstance<OracleConnectionFactory>(
+                    sp,
+                    connectionName
+                );
+            });
 
         /// <summary>
         /// Registers a Keyed <see cref="OracleConnectionFactory"/> for a secondary Oracle database.
@@ -36,7 +44,24 @@ public static class OracleServiceCollectionExtensions
             services.AddKeyedSingleton<IConnectionFactory, OracleConnectionFactory>(
                 serviceKey,
                 (sp, key) =>
-                    ActivatorUtilities.CreateInstance<OracleConnectionFactory>(sp, connectionName)
+                {
+                    RequireConfiguration(sp, nameof(AddKeyedOracleConnectionFactory));
+                    return ActivatorUtilities.CreateInstance<OracleConnectionFactory>(
+                        sp,
+                        connectionName
+                    );
+                }
             );
+    }
+
+    private static void RequireConfiguration(IServiceProvider provider, string caller)
+    {
+        if (provider.GetService<IConfiguration>() is null)
+        {
+            throw new InvalidOperationException(
+                $"IConfiguration is not registered. Register configuration before calling {caller}, "
+                    + "otherwise the connection string name is mistaken for a connection string."
+            );
+        }
     }
 }
