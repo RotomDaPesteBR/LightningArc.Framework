@@ -96,7 +96,7 @@ public abstract class SqlStatementBuilder
             SqlDialect.SqlServer => $"[{identifier}]",
             SqlDialect.PostgreSQL => $"\"{identifier}\"",
             SqlDialect.Oracle => $"\"{identifier}\"",
-            _ => identifier
+            _ => identifier,
         };
     }
 
@@ -130,7 +130,9 @@ public abstract class SqlStatementBuilder
     {
         string separator = Options.Indented ? $"{Environment.NewLine}{Indent}AND " : " AND ";
 
-        var conditions = keys.Select(key => $"{QuoteColumnName(key.ColumnName)} = {GetParameter(key.PropertyName)}")
+        var conditions = keys.Select(key =>
+                $"{QuoteColumnName(key.ColumnName)} = {GetParameter(key.PropertyName)}"
+            )
             .ToList();
 
         return conditions.Count == 0
@@ -140,4 +142,3 @@ public abstract class SqlStatementBuilder
             : string.Join(separator, conditions);
     }
 }
-

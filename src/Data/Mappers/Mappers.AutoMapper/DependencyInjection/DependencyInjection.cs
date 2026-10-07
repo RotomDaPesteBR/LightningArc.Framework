@@ -1,5 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using LightningArc.Mappers.AutoMapper.Adapters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LightningArc.Mappers.AutoMapper.DependencyInjection;
 
@@ -12,7 +12,7 @@ public static class DependencyInjection
     /// Registers AutoMapper adapter implementation of <see cref="LightningArc.Data.Abstractions.Mappers.IMapper"/>.
     /// </summary>
     /// <remarks>
-    /// Note: You still need to register AutoMapper itself using <c>AddAutoMapper</c> 
+    /// Note: You still need to register AutoMapper itself using <c>AddAutoMapper</c>
     /// from the <c>AutoMapper.Extensions.Microsoft.DependencyInjection</c> package.
     /// </remarks>
     /// <param name="services">The service collection.</param>
@@ -23,4 +23,3 @@ public static class DependencyInjection
         return services;
     }
 }
-

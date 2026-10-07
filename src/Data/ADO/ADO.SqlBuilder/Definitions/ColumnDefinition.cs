@@ -35,4 +35,3 @@ public class ColumnDefinition
     /// </summary>
     public OrderDefinition? Order { get; init; }
 }
-

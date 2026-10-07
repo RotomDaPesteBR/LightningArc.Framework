@@ -1,3 +1,5 @@
+* text=auto eol=crlf
+
 # CLAUDE.md is auto-generated from AGENTS.md by the pre-commit hook (.githooks/pre-commit).
 # It must stay tracked so a fresh clone has it, but its diffs are just noise —
 # collapse them on GitHub and hide them from CLI diffs.

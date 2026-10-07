@@ -25,4 +25,3 @@ public record SqlBuilderOptions
     /// </summary>
     public bool QuoteColumnNames { get; init; } = true;
 }
-

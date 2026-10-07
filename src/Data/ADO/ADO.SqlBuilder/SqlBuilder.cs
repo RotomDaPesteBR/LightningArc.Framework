@@ -40,4 +40,3 @@ public class SqlBuilder(
     /// </summary>
     public DeleteBuilder Delete => new(tableName, columns, dialect, _options);
 }
-

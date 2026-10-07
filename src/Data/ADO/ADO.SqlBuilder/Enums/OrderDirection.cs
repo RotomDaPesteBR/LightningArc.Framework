@@ -13,6 +13,5 @@ public enum OrderDirection
     /// <summary>
     /// Sorts in descending order (e.g., Z to A, 10 to 1).
     /// </summary>
-    Descending
+    Descending,
 }
-

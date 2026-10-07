@@ -32,4 +32,3 @@ public class DeleteBuilder(
         return $"DELETE FROM {QuoteTableName(TableName)}{NewLine}WHERE {whereClause}";
     }
 }
-
