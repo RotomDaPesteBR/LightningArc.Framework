@@ -31,10 +31,10 @@ public class PropertyRuleBuilderTests
         await Assert.That(result.TryGetError(out var error)).IsTrue();
         await Assert.That(error).IsTypeOf<AggregateError>();
 
-        AggregateError aggregate = (AggregateError)error;
+        AggregateError aggregate = (AggregateError)error!;
         await Assert.That(aggregate.Errors.Count).IsEqualTo(3);
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(ProfileCommand.Name), "Name must start with A"));
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(ProfileCommand.Nickname), "Nickname must not be null"));
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(ProfileCommand.Department), "Department must be empty in V1"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(ProfileCommand.Name), "Name must start with A"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(ProfileCommand.Nickname), "Nickname must not be null"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(ProfileCommand.Department), "Department must be empty in V1"));
     }
 }

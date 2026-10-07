@@ -91,7 +91,7 @@ public class CollectionRuleTests
         Result result = new OrderValidator().Validate(new OrderCommand([new OrderLineCommand(""), new OrderLineCommand("ABC")]));
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
-        await Assert.That(error.Details).Contains(new ErrorDetail("Items[0].Sku", "Sku must not be empty"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail("Items[0].Sku", "Sku must not be empty"));
     }
 
     [Test]
@@ -109,8 +109,8 @@ public class CollectionRuleTests
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
         await Assert.That(error).IsTypeOf<Error.Application.InvalidOperationError>();
-        await Assert.That(error.Code).IsEqualTo(Error.Application.InvalidOperation().Code);
-        await Assert.That(error.Message).IsEqualTo("Collection child validator failed without details");
+        await Assert.That(error!.Code).IsEqualTo(Error.Application.InvalidOperation().Code);
+        await Assert.That(error!.Message).IsEqualTo("Collection child validator failed without details");
     }
 
     [Test]
@@ -120,8 +120,8 @@ public class CollectionRuleTests
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
         await Assert.That(error).IsTypeOf<Error.Resource.NotFoundError>();
-        await Assert.That(error.Code).IsEqualTo(Error.Resource.NotFound().Code);
-        await Assert.That(error.Message).IsEqualTo("Order line resource was not found");
+        await Assert.That(error!.Code).IsEqualTo(Error.Resource.NotFound().Code);
+        await Assert.That(error!.Message).IsEqualTo("Order line resource was not found");
     }
 
     [Test]
@@ -131,6 +131,6 @@ public class CollectionRuleTests
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
         await Assert.That(error).IsTypeOf<Error.Resource.NotFoundError>();
-        await Assert.That(error.Details).Contains(new ErrorDetail("Items[0].Sku", "Sku could not be resolved"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail("Items[0].Sku", "Sku could not be resolved"));
     }
 }

@@ -31,7 +31,7 @@ internal sealed class NestedValidatorRule<T, TProperty>(
         }
 
         Result result = validator.Validate(value);
-        if (result.TryGetError(out Error error))
+        if (result.TryGetError(out Error? error))
         {
             yield return new ValidationFailure(
                 path,
@@ -60,7 +60,7 @@ internal sealed class NestedValidatorRule<T, TProperty>(
         }
 
         Result result = await validator.ValidateAsync(value, cancellationToken).ConfigureAwait(false);
-        if (result.TryGetError(out Error error))
+        if (result.TryGetError(out Error? error))
         {
             yield return new ValidationFailure(
                 path,

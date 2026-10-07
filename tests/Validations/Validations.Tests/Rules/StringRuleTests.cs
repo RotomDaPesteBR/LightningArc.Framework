@@ -36,7 +36,7 @@ public class StringRuleTests
         Result result = new StringRuleValidator().Validate(new StringRuleCommand("AB"));
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(StringRuleCommand.Name), "Name must have at least 3 characters"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(StringRuleCommand.Name), "Name must have at least 3 characters"));
     }
 
     [Test]
@@ -45,6 +45,6 @@ public class StringRuleTests
         Result result = new NullableStringRuleValidator().Validate(new NullableStringRuleCommand(null));
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(NullableStringRuleCommand.Nickname), "Nickname must have at least 2 characters"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(NullableStringRuleCommand.Nickname), "Nickname must have at least 2 characters"));
     }
 }

@@ -31,9 +31,9 @@ public class ComparisonRuleTests
         Result result = new ComparisonRuleValidator().Validate(new ComparisonRuleCommand(16, 0, new DateTime(2024, 12, 31)));
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(ComparisonRuleCommand.Age), "Age must be greater than 17"));
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(ComparisonRuleCommand.Score), "Score must be exactly 100"));
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(ComparisonRuleCommand.Score), "Score must not be zero"));
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(ComparisonRuleCommand.StartDate), "StartDate must be greater than 2025-01-01T00:00:00.0000000"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(ComparisonRuleCommand.Age), "Age must be greater than 17"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(ComparisonRuleCommand.Score), "Score must be exactly 100"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(ComparisonRuleCommand.Score), "Score must not be zero"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(ComparisonRuleCommand.StartDate), "StartDate must be greater than 2025-01-01T00:00:00.0000000"));
     }
 }
