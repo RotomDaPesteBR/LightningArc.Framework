@@ -13,28 +13,6 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  docs-sync:
-    name: Sync AGENTS.md to CLAUDE.md
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Configure Git
-        uses: ./.github/actions/configure-git
-        
-      - name: Sync CLAUDE.md
-        shell: pwsh
-        run: ./tools/Scripts/Sync-AgentsToClaude.ps1
-        
-      - name: Commit and Push
-        uses: ./.github/actions/commit-and-push
-        with:
-          path: 'CLAUDE.md'
-          message: 'docs: auto-sync CLAUDE.md with AGENTS.md [skip ci]'
-
   build-and-test:
     name: Build & Test
     runs-on: windows-latest

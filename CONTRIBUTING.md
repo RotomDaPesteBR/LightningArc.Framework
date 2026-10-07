@@ -21,7 +21,6 @@ You warrant that your contribution is your original work and that you have the l
 * Please open an Issue to discuss the implementation before writing the code.
 
 ### 3. Pull Requests
-0.  **One-time setup:** run `git config core.hooksPath .githooks` after cloning. This keeps `CLAUDE.md` automatically in sync with `AGENTS.md` (the canonical instructions file) whenever you commit.
 1.  **Fork** the repository.
 2.  Create a feature branch (`git checkout -b feature/amazing-improvement`).
 3.  Ensure your code follows the project's standards (Clean Architecture, C# naming conventions).
