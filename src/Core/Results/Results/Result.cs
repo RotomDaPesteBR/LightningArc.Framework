@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace LightningArc.Results;
 
 /// <summary>
@@ -527,11 +529,11 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     {
         if (IsSuccess)
         {
-            value = _success!.Value;
+            value = _success!.Value!;
             return true;
         }
 
-        value = default;
+        value = default!;
         return false;
     }
 

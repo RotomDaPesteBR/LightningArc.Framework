@@ -28,6 +28,9 @@ namespace LightningArc.Analyzers;
 /// connection between them) will false-positive here — this is a deliberate, documented
 /// trade-off for staying purely syntactic rather than attempting call-graph analysis, the same
 /// scoping choice made for <see cref="ResultAccessSafetyRecognizer.IsGuardedByPrecedingExit"/>.
+/// The directly-returned case (see <see cref="IsDirectlyReturned"/>) is one instance of this
+/// same limitation handled explicitly, since it shows up inside RepositoryBase's own forwarding
+/// overloads.
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class MissingReleaseConnectionAnalyzer : DiagnosticAnalyzer
@@ -99,6 +102,19 @@ public class MissingReleaseConnectionAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        // A call whose result is immediately returned (e.g. the zero-arg GetConnection()
+        // overload forwarding to GetConnection(IConnectionFactory?)) hands the connection to
+        // its own caller rather than consuming it here — there is nothing for *this* method to
+        // release. Flagging it would mean every forwarding/delegating overload of
+        // GetConnection/GetConnectionAsync permanently false-positives, including the ones
+        // declared on RepositoryBase itself. This is the same "can't trace across method
+        // boundaries" limitation already documented on this analyzer, applied to the specific
+        // case where the boundary is crossed via direct return rather than a stored variable.
+        if (IsDirectlyReturned(invocation))
+        {
+            return;
+        }
+
         MethodDeclarationSyntax? enclosingMethod = invocation
             .Ancestors()
             .OfType<MethodDeclarationSyntax>()
@@ -118,6 +134,26 @@ public class MissingReleaseConnectionAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(
             Diagnostic.Create(Rule, invocation.GetLocation(), methodSymbol.Name)
         );
+    }
+
+    /// <summary>
+    /// True when <paramref name="invocation"/>'s result flows directly into a <c>return</c>
+    /// (either <c>return GetConnection(...);</c> or an arrow-expression body
+    /// <c>=&gt; GetConnection(...);</c>), optionally through an <c>await</c>. In this shape the
+    /// enclosing method is forwarding the connection to its own caller, not acquiring one it
+    /// intends to use and release itself.
+    /// </summary>
+    private static bool IsDirectlyReturned(InvocationExpressionSyntax invocation)
+    {
+        SyntaxNode? parent = invocation.Parent;
+
+        // Unwrap `return await GetConnectionAsync(...);` / `=> await GetConnectionAsync(...);`
+        if (parent is AwaitExpressionSyntax awaitExpression)
+        {
+            parent = awaitExpression.Parent;
+        }
+
+        return parent is ReturnStatementSyntax or ArrowExpressionClauseSyntax;
     }
 
     private static bool IsRepositoryBaseMethod(
