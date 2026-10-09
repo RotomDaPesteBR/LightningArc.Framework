@@ -1,5 +1,12 @@
+using System.Linq;
+using System.Threading;
 using LightningArc.Analyzers;
+using LightningArc.Analyzers.CodeFixes;
 using LightningArc.Analyzers.Tests.Verifiers;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using TUnit.Core;
 
 namespace LightningArc.Analyzers.Tests.Analyzers;
@@ -261,5 +268,100 @@ public class EmptyResultAggregatorChainTests
             """;
 
         await AnalyzerVerifier<EmptyResultAggregatorChainAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task Empty_Sync_Chain_CodeFix_Should_Replace_With_Success()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class C
+            {
+                void M()
+                {
+                    var r = [|Result.Aggregate().Build()|];
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class C
+            {
+                void M()
+                {
+                    var r = Result.Success();
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            EmptyResultAggregatorChainAnalyzer,
+            EmptyResultAggregatorChainCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
+    public async Task CodeFix_With_BuildAsync_Offers_No_Fix()
+    {
+        // The provider must never offer the sync-only rewrite for BuildAsync.
+        // No API path produces a check-less Task<ResultAggregator>, so drive
+        // the provider directly with a diagnostic on a real BuildAsync chain.
+        const string source = """
+            using System.Threading.Tasks;
+            using LightningArc.Results;
+
+            class C
+            {
+                async Task M()
+                {
+                    var r = await Result.Aggregate().CheckAsync(() => Task.FromResult(Result.Success())).BuildAsync();
+                }
+            }
+            """;
+
+        using AdhocWorkspace workspace = new();
+        var project = workspace
+            .AddProject("Guards", LanguageNames.CSharp)
+            .AddMetadataReference(
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
+            )
+            .AddMetadataReference(
+                MetadataReference.CreateFromFile(
+                    typeof(LightningArc.Results.Result).Assembly.Location
+                )
+            );
+        Document document = project.AddDocument("Guard.cs", source);
+
+        SyntaxTree? tree = await document.GetSyntaxTreeAsync(CancellationToken.None);
+        await Assert.That(tree).IsNotNull();
+
+        var root = await tree!.GetRootAsync(CancellationToken.None);
+        var buildAsync = root
+            .DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .First(i =>
+                i.Expression is MemberAccessExpressionSyntax member
+                && member.Name.Identifier.ValueText == "BuildAsync"
+            );
+
+        Diagnostic diagnostic = Diagnostic.Create(
+            EmptyResultAggregatorChainAnalyzer.Rule,
+            Location.Create(tree, buildAsync.Span)
+        );
+
+        int fixesOffered = 0;
+        var context = new CodeFixContext(
+            document,
+            diagnostic,
+            (action, diagnostics) => fixesOffered++,
+            CancellationToken.None
+        );
+
+        await new EmptyResultAggregatorChainCodeFixProvider().RegisterCodeFixesAsync(context);
+
+        await Assert.That(fixesOffered).IsEqualTo(0);
     }
 }
