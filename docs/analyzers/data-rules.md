@@ -1,6 +1,6 @@
 # Data Rules
 
-Rules LARC040–LARC044 cover the repository connection lifecycle and transactions in `RepositoryBase`-derived classes. Each section below summarizes the rule — follow the link for the full description, examples, suppression, and limitations.
+Rules LARC040–LARC045 cover the repository connection lifecycle and transactions in `RepositoryBase`-derived classes. Each section below summarizes the rule — follow the link for the full description, examples, suppression, and limitations.
 
 ---
 
@@ -51,3 +51,13 @@ Details: [LARC043](LARC043.md)
 A `GetConnection()`/`GetConnectionAsync()` call with no matching `ReleaseConnection(...)` in a `finally` block of the same method. `ReleaseConnection` no-ops when the connection came from an externally-provided `DbConnection` or an active `DbTransaction`, so it is the one correct disposal path in both self-managed and unit-of-work modes — a bare `using` would close a connection the repository does not own.
 
 Details: [LARC044](LARC044.md)
+
+---
+
+## LARC045
+
+**Repository never uses `Transaction`** — Info — Code fix: no
+
+A non-abstract `RepositoryBase`-derived class that makes at least one database-operation call but never references the `Transaction` property anywhere in the type. Such a repository cannot participate in unit-of-work mode. The per-call version of this check is LARC041.
+
+Details: [LARC045](LARC045.md)

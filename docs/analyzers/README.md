@@ -14,7 +14,7 @@ To use analyzers in an **external** project consuming LightningArc via NuGet, yo
 |---|---|---|---|
 | **Result** | Safe usage of the Result pattern | LARC001–LARC008 | [result-rules.md](result-rules.md) |
 | **ValueObject** | ValueObject creation, conversion, and shape | LARC020–LARC023 | [value-object-rules.md](value-object-rules.md) |
-| **Data** | Repository connection lifecycle and transactions | LARC040–LARC044 | [data-rules.md](data-rules.md) |
+| **Data** | Repository connection lifecycle and transactions | LARC040–LARC045 | [data-rules.md](data-rules.md) |
 | **Web** | Minimal API Result mapping | LARC060 | [web-rules.md](web-rules.md) |
 | **Infra** | Hosted-service scaffolding | LARC080 | [hosting-rules.md](hosting-rules.md) |
 
@@ -51,6 +51,7 @@ To use analyzers in an **external** project consuming LightningArc via NuGet, yo
 | [LARC042](./LARC042.md) | Direct `DbConnection` instantiation in repository | Warning |
 | [LARC043](./LARC043.md) | `ReleaseConnection` called with null argument | Warning |
 | [LARC044](./LARC044.md) | Missing `ReleaseConnection` after `GetConnection` | Warning |
+| [LARC045](./LARC045.md) | Repository never uses `Transaction` | Info |
 
 ### Web Rules
 

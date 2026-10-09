@@ -20,5 +20,6 @@
 | LARC042 | Reliability | Warning  | Direct DbConnection instantiation in repository (renumbered from LARC023) |
 | LARC043 | Reliability | Warning  | ReleaseConnection called with null argument (renumbered from LARC030) |
 | LARC044 | Reliability | Warning  | Missing ReleaseConnection after GetConnection/GetConnectionAsync |
+| LARC045 | Reliability | Info     | Repository never passes Transaction, so it cannot participate in unit-of-work mode |
 | LARC060 | Usage       | Warning  | Missing .ToEndpointResult() in Minimal APIs (renumbered from LARC031) |
 | LARC080 | Reliability | Info     | HostedService StartAsync performs no work (renumbered from LARC022) |
