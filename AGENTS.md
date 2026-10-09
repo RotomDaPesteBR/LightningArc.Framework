@@ -43,7 +43,7 @@ Working conventions for AI assistants operating in this repository.
 - **Metalama.Results** — Result-related Metalama utilities
 
 ### Analyzers (`src/Analyzers/`)
-- **19 rules** across domain bands (Result `LARC001–008`, ValueObject `LARC020–023`, Data `LARC040–044`, Web `LARC060`, Infra `LARC080`) + 9 code fix providers
+- **20 rules** across domain bands (Result `LARC001–008`, ValueObject `LARC020–023`, Data `LARC040–045`, Web `LARC060`, Infra `LARC080`) + 15 code fix providers
 - Auto-referenced by all library projects via `src/Directory.Build.props`
 - See `docs/analyzers/README.md` for rule details
 
