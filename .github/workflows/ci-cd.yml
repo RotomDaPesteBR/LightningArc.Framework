@@ -66,7 +66,7 @@ jobs:
               
   generate-api-docs:
     name: Generate & Sync API Docs
-    needs: [build-and-test, docs-sync, check-changes]
+    needs: [build-and-test, check-changes]
     if: |
       github.event_name == 'push' && 
       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') &&

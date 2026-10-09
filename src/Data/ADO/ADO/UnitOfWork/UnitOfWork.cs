@@ -288,7 +288,23 @@ public sealed class UnitOfWork(IConnectionFactory connectionFactory) : IDbUnitOf
 
         try
         {
-            // Disposing the connection also closes it.
+            // Close explicitly before disposing: real providers close on
+            // dispose, but the observable Close + Dispose contract is part
+            // of this type's behavior (and its tests). Guarded like the
+            // previous implementation so an already-closed connection is
+            // left untouched.
+            if (connection is not null && connection.State != ConnectionState.Closed)
+            {
+                connection.Close();
+            }
+        }
+        catch (Exception)
+        {
+            // Prevent exceptions from bubbling up during disposal phases
+        }
+
+        try
+        {
             connection?.Dispose();
         }
         catch (Exception)
@@ -339,7 +355,19 @@ public sealed class UnitOfWork(IConnectionFactory connectionFactory) : IDbUnitOf
         {
             try
             {
-                // Disposing the connection also closes it.
+                // Close explicitly before disposing (see ReleaseResources).
+                if (connection.State != ConnectionState.Closed)
+                {
+                    await connection.CloseAsync().ConfigureAwait(false);
+                }
+            }
+            catch (Exception)
+            {
+                // Prevent exceptions from bubbling up during asynchronous disposal
+            }
+
+            try
+            {
                 await connection.DisposeAsync().ConfigureAwait(false);
             }
             catch (Exception)
