@@ -28,7 +28,6 @@ namespace LightningArc.Analyzers.CodeFixes;
 public class SyncConnectionInAsyncMethodCodeFixProvider : CodeFixProvider
 {
     private const string _title = "Use GetConnectionAsync()";
-    private const string CancellationTokenMetadataName = "System.Threading.CancellationToken";
 
     public sealed override ImmutableArray<string> FixableDiagnosticIds =>
         [SyncConnectionInAsyncMethodAnalyzer.DiagnosticId];
@@ -101,9 +100,10 @@ public class SyncConnectionInAsyncMethodCodeFixProvider : CodeFixProvider
                 cancellationToken
             );
 
+            INamedTypeSymbol? tokenType = semanticModel.Compilation
+                .GetTypeByMetadataName("System.Threading.CancellationToken");
             IParameterSymbol? tokenParameter = methodSymbol?.Parameters.FirstOrDefault(p =>
-                p.Type.ToDisplayString() == CancellationTokenMetadataName
-            );
+                tokenType is not null && SymbolEqualityComparer.Default.Equals(p.Type, tokenType));
 
             if (tokenParameter != null)
             {
