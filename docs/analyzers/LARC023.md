@@ -26,7 +26,7 @@ public record Money : IValueObject<decimal>
 
 ## Code fix
 
-Rewrites `class` to `record`. Per GAP-8, guards will be added so the fix is skipped when the type declares an `Equals`/`GetHashCode` override, `==`/`!=` operators, or a user-written constructor body — cases where the swap would change equality semantics.
+Rewrites `class` to `record`. The fix is withheld when the type hand-writes equality or construction semantics — an `Equals`/`GetHashCode` override, an `==`/`!=` operator, or a constructor with a body (block or `=>`) — where the swap would change runtime behavior. A plain type with none of these still offers the fix.
 
 ## Suppression
 
@@ -43,7 +43,7 @@ dotnet_diagnostic.LARC023.severity = none
 
 ## Scope & limitations
 
-Only `class` declarations are examined; anything already a `record` is out of scope. Recognition is structural (any `IValueObject` implementer, not just built-in types). The current fix is a blind class→record swap — review the type for hand-written equality members before applying it (see GAP-8).
+Only `class` declarations are examined; anything already a `record` is out of scope. Recognition is structural (any `IValueObject` implementer, not just built-in types). The fix declines hand-written equality/construction cases (see Code fix); otherwise review the type before applying it.
 
 ## Related
 

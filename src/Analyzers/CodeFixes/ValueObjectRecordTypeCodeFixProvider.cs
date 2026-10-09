@@ -50,6 +50,26 @@ public class ValueObjectRecordTypeCodeFixProvider : CodeFixProvider
             return;
         }
 
+        // GAP-8: withhold the class->record swap when the type hand-writes
+        // equality or construction semantics — converting to a record would
+        // silently change runtime behavior. Syntax-only check (no
+        // SemanticModel needed).
+        // Constructor-shape decision: both block-bodied (`{ ... }`, including
+        // an empty block) and expression-bodied (`=> ...`) constructors count
+        // as user-written bodies and withhold the fix. A declaration with
+        // neither (e.g. an `extern`/partial stub) still offers the fix.
+        // Initializers alone (`: this(...)` / `: base(...)`) do not exempt:
+        // every legal in-source constructor with an initializer also carries
+        // a body or arrow, so it is already guarded by the body check below.
+        bool hasCustomEquality = declaration.Members.Any(m =>
+            (m is MethodDeclarationSyntax md && (md.Identifier.Text is "Equals" or "GetHashCode"))
+            || (m is OperatorDeclarationSyntax od && od.OperatorToken.Text is "==" or "!=")
+            || (m is ConstructorDeclarationSyntax cd && (cd.Body is not null || cd.ExpressionBody is not null)));
+        if (hasCustomEquality)
+        {
+            return;
+        }
+
         context.RegisterCodeFix(
             CodeAction.Create(
                 title: "Convert to record",

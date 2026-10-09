@@ -1,9 +1,12 @@
+using System.Linq;
 using System.Threading;
 using LightningArc.Analyzers;
 using LightningArc.Analyzers.CodeFixes;
 using LightningArc.Analyzers.Tests.Verifiers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using TUnit.Core;
 
@@ -105,5 +108,97 @@ public class ValueObjectRecordTypeTests
         await new ValueObjectRecordTypeCodeFixProvider().RegisterCodeFixesAsync(context);
 
         await Assert.That(fixesOffered).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task CodeFix_With_Equals_Override_Offers_No_Fix()
+    {
+        const string source = """
+            public class MyValueObject
+            {
+                public string Value => "test";
+                public override bool Equals(object? obj) => obj is MyValueObject other && other.Value == Value;
+            }
+            """;
+
+        await Assert.That(await CountFixesOfferedAsync(source)).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task CodeFix_With_GetHashCode_Override_Offers_No_Fix()
+    {
+        const string source = """
+            public class MyValueObject
+            {
+                public string Value => "test";
+                public override int GetHashCode() => Value.GetHashCode();
+            }
+            """;
+
+        await Assert.That(await CountFixesOfferedAsync(source)).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task CodeFix_With_Equality_Operators_Offers_No_Fix()
+    {
+        const string source = """
+            public class MyValueObject
+            {
+                public string Value => "test";
+                public static bool operator ==(MyValueObject a, MyValueObject b) => true;
+                public static bool operator !=(MyValueObject a, MyValueObject b) => false;
+            }
+            """;
+
+        await Assert.That(await CountFixesOfferedAsync(source)).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task CodeFix_With_Constructor_Body_Offers_No_Fix()
+    {
+        const string source = """
+            public class MyValueObject
+            {
+                public MyValueObject() { Value = "test"; }
+                public string Value { get; }
+            }
+            """;
+
+        await Assert.That(await CountFixesOfferedAsync(source)).IsEqualTo(0);
+    }
+
+    private static async Task<int> CountFixesOfferedAsync(string source)
+    {
+        // GAP-8 guard pins: the diagnostic still fires on these types, but the
+        // provider must decline to offer the class->record swap. Drive the
+        // provider directly with a diagnostic on the class identifier, since
+        // CodeFixVerifier cannot express "diagnostic present, no fix offered".
+        using AdhocWorkspace workspace = new();
+        Document document = workspace
+            .AddProject("Guards", LanguageNames.CSharp)
+            .AddDocument("Guard.cs", source);
+
+        SyntaxTree? tree = await document.GetSyntaxTreeAsync(CancellationToken.None);
+        await Assert.That(tree).IsNotNull();
+
+        var root = await tree!.GetRootAsync(CancellationToken.None);
+        var classDeclaration = root.DescendantNodes().OfType<ClassDeclarationSyntax>().First();
+
+        Diagnostic diagnostic = Diagnostic.Create(
+            ValueObjectRecordTypeAnalyzer.Rule,
+            Location.Create(tree, classDeclaration.Identifier.Span)
+        );
+
+        int fixesOffered = 0;
+        var context = new CodeFixContext(
+            document,
+            diagnostic,
+            (action, diagnostics) => fixesOffered++,
+            CancellationToken.None
+        );
+
+        await new ValueObjectRecordTypeCodeFixProvider().RegisterCodeFixesAsync(context);
+
+        return fixesOffered;
     }
 }
