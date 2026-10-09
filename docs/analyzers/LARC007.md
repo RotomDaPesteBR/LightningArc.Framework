@@ -1,6 +1,6 @@
 # LARC007 — ResultAggregator built with no checks
 
-**Severity:** Info  **Domain:** Result  **Code fix:** No
+**Severity:** Info  **Domain:** Result  **Code fix:** Yes (sync only)
 
 ## What it detects
 
@@ -23,7 +23,7 @@ Result result = Result.Aggregate()
 
 ## Code fix
 
-None (a sync-only `Aggregate().Build()` → `Result.Success()` rewrite is a backlog item; no fix is offered for `BuildAsync()` — see GAP-11).
+Available for the sync case only: a check-less `Result.Aggregate().Build()` chain is replaced with `Result.Success()`, which is what the empty chain always evaluates to. No fix is ever offered for `BuildAsync()` — the async chain cannot be proven empty from syntax alone, so rewriting it would risk discarding asynchronous work.
 
 ## Suppression
 

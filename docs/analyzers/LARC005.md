@@ -1,6 +1,6 @@
 # LARC005 — Result error is shadowed
 
-**Severity:** Warning  **Domain:** Result  **Code fix:** No
+**Severity:** Warning  **Domain:** Result  **Code fix:** Yes
 
 ## What it detects
 
@@ -27,7 +27,7 @@ if (result.IsFailure)
 
 ## Code fix
 
-None yet. A future fix may rewrite `return <newError>;` to `return <guard>.Error + <newError>;` (or `Error.Aggregate(...)`), reusing the guard-resolution logic already in the analyzer (see GAP-11).
+Available. The fix rewrites `return <newError>;` to `return <guard>.Error + <newError>;`, using the `Error` `+` accumulation idiom (a guard that already *is* an `Error` is combined bare, without `.Error`). The guard is resolved with the same logic the analyzer uses — never re-derived. Withholding conditions (no fix is offered): when no failure guard resolves at the return, or when the returned expression is itself a `Result` (e.g. `Result.Failure(...)`) rather than an `Error`, since `Error + Result` has no operator overload.
 
 ## Suppression
 

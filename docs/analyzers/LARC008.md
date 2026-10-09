@@ -1,6 +1,6 @@
 # LARC008 — Error accumulated via '+=' inside a loop
 
-**Severity:** Info  **Domain:** Result  **Code fix:** No
+**Severity:** Info  **Domain:** Result  **Code fix:** Yes (no Fix-All)
 
 ## What it detects
 
@@ -35,7 +35,19 @@ Or use the `ResultAggregator` fluent API (`Check`/`Ensure`/`When`/`CheckAll`/`Wh
 
 ## Code fix
 
-None yet. A future fix may rewrite the loop to collect into a `List<Error>` and call `Error.Aggregate(list)` after the loop — only when the accumulator is a local declared outside the loop and used only after it (see GAP-11).
+Available. The fix rewrites the loop into the single-pass batch form — a `List<Error>` declared before the loop, `Add` calls inside it, and one `Error.Aggregate(list)` assignment after the loop (adding `using System.Collections.Generic;` when the file lacks it):
+
+```csharp
+Error? errors = null;
+var errorsList = new List<Error>();
+foreach (var item in items)
+{
+    errorsList.Add(Validate(item));
+}
+errors = Error.Aggregate(errorsList);
+```
+
+Withholding conditions (no fix is offered): the accumulator must be a local declared outside (and before) the loop — fields/properties/parameters never qualify; every other reference to it must sit after the loop (reads before or inside the loop, or any second write such as another loop's `+=`, decline the fix); the `+=` must be a standalone statement in the loop's own flow (not deferred inside a nested lambda/local function); and the loop must sit directly in a block. Fix-All is deliberately disabled for this rule: each multi-statement loop rewrite needs its own review.
 
 ## Suppression
 

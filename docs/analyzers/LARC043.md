@@ -1,6 +1,6 @@
 # LARC043 — ReleaseConnection called with null argument
 
-**Severity:** Warning  **Domain:** Data  **Code fix:** No
+**Severity:** Warning  **Domain:** Data  **Code fix:** Yes
 
 ## What it detects
 
@@ -24,7 +24,13 @@ finally { ReleaseConnection(conn); } // no warning
 
 ## Code fix
 
-None yet. A future fix may replace the null/default argument with the single local assigned from `GetConnection()`/`await GetConnectionAsync(...)` in the enclosing method — offered only when exactly one such candidate exists (see GAP-11).
+Available. The fix replaces the null/default argument with the single local variable assigned from `GetConnection()` / `await GetConnectionAsync(...)` in the enclosing method:
+
+```csharp
+finally { ReleaseConnection(conn); } // fixed: releases the acquired connection
+```
+
+Withholding conditions (no fix is offered): when zero such locals exist, or when more than one exists (guessing would risk releasing the wrong connection). The candidate call must produce a `DbConnection` (unwrapping `Task`/`ValueTask` for the async overload), so an unrelated same-named method returning something else never qualifies.
 
 ## Suppression
 

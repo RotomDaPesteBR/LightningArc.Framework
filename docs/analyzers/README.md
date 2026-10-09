@@ -67,7 +67,7 @@ To use analyzers in an **external** project consuming LightningArc via NuGet, yo
 
 ## Code Fixes
 
-Nine rules have automatic code fixes available in supported IDEs (Visual Studio, VS Code with C# Dev Kit):
+Fifteen rules have automatic code fixes available in supported IDEs (Visual Studio, VS Code with C# Dev Kit):
 
 | Rule | Fix Action |
 |---|---|
@@ -80,3 +80,9 @@ Nine rules have automatic code fixes available in supported IDEs (Visual Studio,
 | LARC023 | Rewrites `class` to `record` |
 | LARC040 | Rewrites to `await GetConnectionAsync(...).ConfigureAwait(false)` |
 | LARC041 | Appends `transaction: Transaction` to the call |
+| LARC005 | Rewrites `return <newError>;` to `return <guard>.Error + <newError>;` |
+| LARC007 | Replaces check-less `Result.Aggregate().Build()` with `Result.Success()` (sync only) |
+| LARC008 | Collects into a `List<Error>` and calls `Error.Aggregate(list)` once (no Fix-All) |
+| LARC020 | Wraps the literal as `<VO>.Create("literal")` |
+| LARC043 | Replaces the null argument with the single `GetConnection`-assigned local |
+| LARC060 | Appends `.ToEndpointResult()` to the lambda's returned expression(s) |

@@ -1,6 +1,6 @@
 # LARC020 — Implicit conversion from string to ValueObject
 
-**Severity:** Warning  **Domain:** ValueObject  **Code fix:** No
+**Severity:** Warning  **Domain:** ValueObject  **Code fix:** Yes
 
 ## What it detects
 
@@ -24,7 +24,13 @@ if (result.TryGetValue(out var email))
 
 ## Code fix
 
-None yet. A future fix may wrap the literal as `<VO>.Create("literal")`, optionally with a second action using `TryCreate(..., out var x)` (see GAP-11).
+Available (single action). The fix wraps the literal as `<VO>.Create("literal")`:
+
+```csharp
+Email email = Email.Create("not-an-email"); // fixed: explicit validation call
+```
+
+It applies to all three flagged shapes (variable declarator, assignment, call argument), resolving the destination ValueObject type the same way the analyzer does. A `TryCreate`-based reshape is deliberately out of scope — that would restructure the surrounding statement and remains a separate backlog item.
 
 ## Suppression
 

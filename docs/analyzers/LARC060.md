@@ -1,6 +1,6 @@
 # LARC060 — Missing .ToEndpointResult() in Minimal API
 
-**Severity:** Warning  **Domain:** Web  **Code fix:** No
+**Severity:** Warning  **Domain:** Web  **Code fix:** Yes
 
 ## What it detects
 
@@ -20,7 +20,7 @@ app.MapGet("/users/{id}", (Guid id) => GetUser(id).ToEndpointResult()); // no wa
 
 ## Code fix
 
-None yet. A future fix may append `.ToEndpointResult()` to the lambda's returned expression (one edit for expression-bodied lambdas, one edit per `return` for block-bodied ones — see GAP-11).
+Available (single action). The fix appends `.ToEndpointResult()` to the lambda's returned expression — one edit for expression-bodied lambdas, one edit per `return` for block-bodied ones (returns inside a nested lambda are left alone, since they map a different `Result`).
 
 ## Suppression
 
