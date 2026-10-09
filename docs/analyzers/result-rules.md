@@ -1,77 +1,83 @@
 # Result Rules
 
-Rules LARC001–LARC003 enforce safe usage of the Result pattern.
+Rules LARC001–LARC008 enforce safe usage of the Result pattern. Each section below summarizes the rule — follow the link for the full description, examples, suppression, and limitations.
 
 ---
 
 ## LARC001
 
-**Unsafe `.Value` access without `IsSuccess` check**
+**Unsafe access to `Result.Value`** — Warning — Code fix: yes
 
-Accessing `Result<T>.Value` when the result is a failure throws `ResultAccessFailedException`.
+Reads of `.Value` on a `Result`/`Result<T>` that is not proven to be a success at that point. Accessing `.Value` on a failure throws, so a success guard or a `TryGetValue` call is required first. The fix wraps the access in a `TryGetValue` check.
 
-### ❌ Bad
-
-```csharp
-int val = result.Value; // throws if IsFailure
-```
-
-### ✅ Good
-
-```csharp
-if (result.TryGetValue(out int val))
-{
-    // use val
-}
-```
-
-A code fix is available that automatically wraps the unsafe access in a `TryGetValue` check.
+Details: [LARC001](LARC001.md)
 
 ---
 
 ## LARC002
 
-**Unsafe `.Error` access without `IsFailure` check**
+**Unsafe access to `Result.Error`** — Warning — Code fix: yes
 
-Accessing `Result.Error` when the result is a success throws `ResultAccessFailedException`.
+Reads of `.Error` on a `Result`/`Result<T>` that is not proven to be a failure at that point. Accessing `.Error` on a success throws, so a failure guard or a `TryGetError` call is required first. The fix wraps the access in a `TryGetError` check.
 
-### ❌ Bad
-
-```csharp
-var err = result.Error; // throws if IsSuccess
-```
-
-### ✅ Good
-
-```csharp
-if (result.TryGetError(out var err))
-{
-    // handle err
-}
-```
-
-A code fix is available that automatically wraps the unsafe access in a `TryGetError` check.
+Details: [LARC002](LARC002.md)
 
 ---
 
 ## LARC003
 
-**Result return value discarded**
+**Result value is discarded** — Info — Code fix: yes
 
-Calling a method that returns `Result` or `Result<T>` without using the return value silently ignores potential failures.
+An expression-statement invocation whose return value is a `Result`/`Result<T>` and is silently dropped. A discarded `Result` means a potential failure is never observed. The fix prefixes the statement with `_ = ` when the discard is deliberate.
 
-### ❌ Bad
+Details: [LARC003](LARC003.md)
 
-```csharp
-DoWork();  // Result returned but ignored
-```
+---
 
-### ✅ Good
+## LARC004
 
-```csharp
-var result = DoWork();
-if (result.IsFailure) { /* handle */ }
+**`Result.Success(null)` for non-nullable type** — Warning — Code fix: no
 
-// Or discard explicitly with _
-_ = DoWork();  // intentional
-```
+`Result.Success(null)` (or `Result.Ok(null)`, including `default`/`default(T)` and `null!`) where the success type `T` is a non-nullable reference type. The resulting `Result<T>` claims a non-null value but holds null, defeating nullable-reference-type guarantees downstream. Only the author knows the real value (or whether `T` should be nullable), so no fix is offered.
+
+Details: [LARC004](LARC004.md)
+
+---
+
+## LARC005
+
+**Result error is shadowed** — Warning — Code fix: no
+
+A `return` that produces a new `Error`/`Result.Failure(...)` from inside an `if (x.IsFailure)` guard without ever consuming `x.Error`. The original error — and its traceability — is silently replaced. Consume the original error (log it or combine it with `+`) instead.
+
+Details: [LARC005](LARC005.md)
+
+---
+
+## LARC006
+
+**Redundant try-catch for Result mapping** — Warning — Code fix: yes
+
+A `try` with a single broad `catch` whose body contains exactly one statement returning an `Error`/`Result` factory. In a compilation that references `LightningArc.Results.AspNetCore.ResultExceptionHandler`, the global middleware already maps unhandled exceptions to standardized errors, so this local mapping is redundant. Only active in compilations referencing that middleware. The fix removes the try/catch and splices the try body in its place.
+
+Details: [LARC006](LARC006.md)
+
+---
+
+## LARC007
+
+**`ResultAggregator` built with no checks** — Info — Code fix: no
+
+A `Result.Aggregate()` fluent chain that goes straight to `Build()`/`BuildAsync()` with no `Check`/`CheckEach`/`CheckAsync`/`CheckAll`/`Ensure`/`When`/`WhenAsync`/`WhenAll` call in between. Such a chain always succeeds — it is either dead code or a check that was removed or forgotten.
+
+Details: [LARC007](LARC007.md)
+
+---
+
+## LARC008
+
+**`Error` accumulated via `+=` inside a loop** — Info — Code fix: no
+
+An `errors += e;` where the target is `Error`-typed and sits inside a loop. Each `+=` re-flattens the accumulated `AggregateError` from scratch, making N accumulations roughly O(N²) work. Collect failures in a list and combine once with `Error.Aggregate`, or use `ResultAggregator.CheckAll` for concurrent checks.
+
+Details: [LARC008](LARC008.md)

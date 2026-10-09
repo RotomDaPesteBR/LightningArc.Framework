@@ -1,76 +1,43 @@
 # ValueObject Rules
 
-Rules LARC020–LARC022 enforce explicit handling of ValueObject creation and string conversions.
+Rules LARC020–LARC023 enforce explicit handling of ValueObject creation and string conversions, plus record shape. Each section below summarizes the rule — follow the link for the full description, examples, suppression, and limitations.
 
 ---
 
 ## LARC020
 
-**Implicit string → ValueObject conversion may throw**
+**Implicit conversion from `string` to ValueObject** — Warning — Code fix: no
 
-ValueObjects like `Email`, `Cpf`, `Cnpj`, `PhoneNumber`, and `Url` have implicit conversions from `string` that throw on invalid input. This rule flags those conversions so you are aware of the exception risk.
+A string literal implicitly converted to a ValueObject (`Email`, `Cpf`, `Cnpj`, `PhoneNumber`, `Url`, or any `IValueObject`/`IValueObject<T>`) in a variable declarator, an assignment, or a call argument. The implicit conversion can throw on invalid input; prefer explicit `Create`/`TryCreate` validation.
 
-### ❌ Bad
-
-```csharp
-Email email = "invalid-email"; // throws ArgumentException
-```
-
-### ✅ Good
-
-```csharp
-// Option 1: Use TryCreate
-Email.TryCreate("user@example.com", out var email);
-
-// Option 2: Use Result extensions
-var result = "invalid-email".AsEmail();
-if (result.IsFailure) { /* handle */ }
-
-// Option 3: Use Create explicitly (knowing it throws)
-var email = Email.Create("user@example.com");
-```
+Details: [LARC020](LARC020.md)
 
 ---
 
 ## LARC021
 
-**Potential null ValueObject → string conversion may throw**
+**Potential null ValueObject conversion to `string`** — Warning — Code fix: yes
 
-Null reference ValueObjects can throw `NullReferenceException` when implicitly converted to `string`.
+A nullable-annotated ValueObject used where a `string` is expected — in a `string` variable declarator, a `string` assignment target, or a `string` call parameter. The implicit conversion to string can throw on null. The fix rewrites the expression to `expr?.Value ?? string.Empty`.
 
-### ❌ Bad
-
-```csharp
-Email? email = null;
-string s = email; // NullReferenceException
-```
-
-### ✅ Good
-
-```csharp
-string s = email?.Value ?? string.Empty;
-// or
-string s = email?.ToString() ?? string.Empty;
-```
+Details: [LARC021](LARC021.md)
 
 ---
 
 ## LARC022
 
-**ValueObject creation result discarded**
+**ValueObject creation result is discarded** — Info — Code fix: yes
 
-Calling `Create()` or `TryCreate()` on a ValueObject without capturing or checking the result means the work is wasted.
+A `Create(...)`/`TryCreate(...)` call on a ValueObject type used as a bare statement. The validated value (or validation failure) is thrown away, so the validation never takes effect. The fix prefixes the statement with `_ = ` when the discard is deliberate.
 
-### ❌ Bad
+Details: [LARC022](LARC022.md)
 
-```csharp
-Email.Create("user@example.com"); // Result ignored
-Email.TryCreate("user@example.com", out _); // Discarded
-```
+---
 
-### ✅ Good
+## LARC023
 
-```csharp
-var email = Email.Create("user@example.com"); // used
-Email.TryCreate("user@example.com", out var email); // captures result
-```
+**ValueObject should be a record** — Warning — Code fix: yes
+
+A ValueObject (a type implementing `IValueObject`/`IValueObject<T>` or inheriting a known ValueObject type) declared as a `class`. ValueObjects need value-based equality, which records provide by default. The fix converts the `class` to a `record` — review the type for hand-written equality members before applying it.
+
+Details: [LARC023](LARC023.md)
