@@ -6,6 +6,10 @@ Rolls back the changes made during the transaction.
 public void Rollback()
 ```
 
+## Remarks
+
+This operation is idempotent: when the unit of work is not Active, the call does nothing.
+
 ## See Also
 
 * interface [IUnitOfWork](../IUnitOfWork.md)

@@ -6,6 +6,13 @@ Asynchronously starts a new business transaction.
 public Task BeginAsync(CancellationToken cancellationToken = default)
 ```
 
+## Exceptions
+
+| exception | condition |
+| --- | --- |
+| InvalidOperationException | The unit of work is already Active. |
+| ObjectDisposedException | The unit of work is Disposed. |
+
 ## See Also
 
 * interface [IUnitOfWork](../IUnitOfWork.md)

@@ -3,7 +3,7 @@
 Attempts to retrieve the error, returning true if the result is a failure.
 
 ```csharp
-public bool TryGetError(out Error error)
+public bool TryGetError(out Error? error)
 ```
 
 | parameter | description |

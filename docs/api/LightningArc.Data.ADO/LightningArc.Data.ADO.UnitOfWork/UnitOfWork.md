@@ -16,6 +16,7 @@ public sealed class UnitOfWork : IDbUnitOfWork
 | --- | --- |
 | [UnitOfWork](UnitOfWork/UnitOfWork.md)(…) | Implementation of the Unit of Work pattern for database operations using ADO.NET. Manages the lifecycle of a DbConnection and its associated DbTransaction. |
 | [Connection](UnitOfWork/Connection.md) { get; } |  |
+| [State](UnitOfWork/State.md) { get; } |  |
 | [Transaction](UnitOfWork/Transaction.md) { get; } |  |
 | [Begin](UnitOfWork/Begin.md)() |  |
 | [BeginAsync](UnitOfWork/BeginAsync.md)(…) |  |
@@ -25,6 +26,10 @@ public sealed class UnitOfWork : IDbUnitOfWork
 | [DisposeAsync](UnitOfWork/DisposeAsync.md)() | Performs asynchronous disposal of managed resources. |
 | [Rollback](UnitOfWork/Rollback.md)() |  |
 | [RollbackAsync](UnitOfWork/RollbackAsync.md)(…) |  |
+
+## Remarks
+
+Instances are reusable: after a commit or rollback the underlying resources are released and a new transaction can be started with [`Begin`](./UnitOfWork/Begin.md) or [`BeginAsync`](./UnitOfWork/BeginAsync.md). Only [`Dispose`](./UnitOfWork/Dispose.md) and [`DisposeAsync`](./UnitOfWork/DisposeAsync.md) make the instance permanently unusable. This type is not thread-safe.
 
 ## See Also
 

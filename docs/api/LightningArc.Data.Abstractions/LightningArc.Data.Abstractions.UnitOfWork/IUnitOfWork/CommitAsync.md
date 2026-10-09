@@ -6,6 +6,13 @@ Asynchronously commits the changes made during the transaction.
 public Task CommitAsync(CancellationToken cancellationToken = default)
 ```
 
+## Exceptions
+
+| exception | condition |
+| --- | --- |
+| InvalidOperationException | The unit of work is not Active. |
+| ObjectDisposedException | The unit of work is Disposed. |
+
 ## See Also
 
 * interface [IUnitOfWork](../IUnitOfWork.md)

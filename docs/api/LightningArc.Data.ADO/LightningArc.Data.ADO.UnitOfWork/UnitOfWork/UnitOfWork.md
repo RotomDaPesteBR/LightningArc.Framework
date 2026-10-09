@@ -10,6 +10,10 @@ public UnitOfWork(IConnectionFactory connectionFactory)
 | --- | --- |
 | connectionFactory | The factory responsible for providing database connections. |
 
+## Remarks
+
+Instances are reusable: after a commit or rollback the underlying resources are released and a new transaction can be started with [`Begin`](./Begin.md) or [`BeginAsync`](./BeginAsync.md). Only [`Dispose`](./Dispose.md) and [`DisposeAsync`](./DisposeAsync.md) make the instance permanently unusable. This type is not thread-safe.
+
 ## See Also
 
 * interface [IConnectionFactory](../../LightningArc.Data.ADO.Factories/IConnectionFactory.md)

@@ -10,6 +10,7 @@ public interface IUnitOfWork : IAsyncDisposable, IDisposable
 
 | name | description |
 | --- | --- |
+| [State](IUnitOfWork/State.md) { get; } | Gets the current lifecycle state of the unit of work. |
 | [Begin](IUnitOfWork/Begin.md)() | Starts a new business transaction. |
 | [BeginAsync](IUnitOfWork/BeginAsync.md)(…) | Asynchronously starts a new business transaction. |
 | [Commit](IUnitOfWork/Commit.md)() | Commits the changes made during the transaction. |

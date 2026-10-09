@@ -6,6 +6,13 @@ Gets the active database connection.
 public DbConnection Connection { get; }
 ```
 
+## Exceptions
+
+| exception | condition |
+| --- | --- |
+| InvalidOperationException | The unit of work is not Active. |
+| ObjectDisposedException | The unit of work is Disposed. |
+
 ## See Also
 
 * interface [IDbUnitOfWork](../IDbUnitOfWork.md)

@@ -6,6 +6,13 @@ Commits the changes made during the transaction.
 public void Commit()
 ```
 
+## Exceptions
+
+| exception | condition |
+| --- | --- |
+| InvalidOperationException | The unit of work is not Active. |
+| ObjectDisposedException | The unit of work is Disposed. |
+
 ## See Also
 
 * interface [IUnitOfWork](../IUnitOfWork.md)

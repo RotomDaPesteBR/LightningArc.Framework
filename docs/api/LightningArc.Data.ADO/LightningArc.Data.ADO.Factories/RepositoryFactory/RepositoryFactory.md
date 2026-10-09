@@ -4,7 +4,7 @@ A concrete, generic implementation of IRepositoryFactory for ADO.NET/Dapper repo
 
 ```csharp
 public RepositoryFactory(IServiceProvider serviceProvider, IConnectionFactory connectionFactory, 
-    IMapper? mapper = null, ILoggerFactory? loggerFactory = null)
+    IMapper? mapper = null)
 ```
 
 ## See Also
