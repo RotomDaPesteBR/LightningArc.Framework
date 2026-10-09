@@ -16,7 +16,10 @@ namespace LightningArc.Analyzers.CodeFixes;
 
 /// <summary>
 /// Code fix for LARC021 - rewrites <c>nullableValueObject</c> (in a string-typed context) into
-/// <c>nullableValueObject?.Value ?? string.Empty</c>.
+/// <c>nullableValueObject?.Value ?? string.Empty</c> when the ValueObject's <c>Value</c> is a
+/// <c>string</c>, or <c>nullableValueObject?.ToString() ?? string.Empty</c> otherwise (e.g.
+/// <c>Currency</c>, whose <c>Value</c> is <c>decimal</c> and would not compile with the
+/// <c>?.Value</c> form).
 /// </summary>
 [ExportCodeFixProvider(
     LanguageNames.CSharp,
@@ -77,6 +80,9 @@ public class NullValueObjectToStringConversionCodeFixProvider : CodeFixProvider
         CancellationToken cancellationToken
     )
     {
+        SemanticModel? semanticModel = await document
+            .GetSemanticModelAsync(cancellationToken)
+            .ConfigureAwait(false);
         SyntaxNode? root = await document
             .GetSyntaxRootAsync(cancellationToken)
             .ConfigureAwait(false);
@@ -85,11 +91,18 @@ public class NullValueObjectToStringConversionCodeFixProvider : CodeFixProvider
             return document;
         }
 
-        // original?.Value
-        ConditionalAccessExpressionSyntax conditionalAccess = ConditionalAccessExpression(
-            original.WithoutTrivia(),
-            MemberBindingExpression(IdentifierName("Value"))
-        );
+        ExpressionSyntax nullSafeAccess = UsesStringValue(semanticModel, original)
+            // original?.Value
+            ? (ExpressionSyntax)
+                ConditionalAccessExpression(
+                    original.WithoutTrivia(),
+                    MemberBindingExpression(IdentifierName("Value"))
+                )
+            // original?.ToString()
+            : ConditionalAccessExpression(
+                original.WithoutTrivia(),
+                InvocationExpression(MemberBindingExpression(IdentifierName("ToString")))
+            );
 
         // string.Empty
         MemberAccessExpressionSyntax stringEmpty = MemberAccessExpression(
@@ -98,10 +111,10 @@ public class NullValueObjectToStringConversionCodeFixProvider : CodeFixProvider
             IdentifierName("Empty")
         );
 
-        // original?.Value ?? string.Empty
+        // nullSafeAccess ?? string.Empty
         BinaryExpressionSyntax coalesce = BinaryExpression(
                 SyntaxKind.CoalesceExpression,
-                conditionalAccess,
+                nullSafeAccess,
                 stringEmpty
             )
             .WithTriviaFrom(original)
@@ -109,5 +122,25 @@ public class NullValueObjectToStringConversionCodeFixProvider : CodeFixProvider
 
         SyntaxNode newRoot = root.ReplaceNode(original, coalesce);
         return document.WithSyntaxRoot(newRoot);
+    }
+
+    /// <summary>
+    /// Resolves the expression's ValueObject type through the semantic model and reports
+    /// whether its <c>Value</c> property is a <c>string</c>. A missing model, an unresolvable
+    /// type, or a missing/non-string <c>Value</c> all yield <c>false</c>, selecting the
+    /// always-compilable <c>?.ToString()</c> form.
+    /// </summary>
+    private static bool UsesStringValue(
+        SemanticModel? semanticModel,
+        ExpressionSyntax original
+    )
+    {
+        ITypeSymbol? type = semanticModel?.GetTypeInfo(original).Type;
+        ITypeSymbol? valueType = type
+            ?.GetMembers("Value")
+            .OfType<IPropertySymbol>()
+            .FirstOrDefault()
+            ?.Type;
+        return valueType?.SpecialType == SpecialType.System_String;
     }
 }

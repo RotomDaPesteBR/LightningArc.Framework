@@ -120,6 +120,57 @@ public class RepositoryTransactionTests
     }
 
     [Test]
+    public async Task Missing_Transaction_Generic_Call_CodeFix_Should_Append_Transaction_Argument()
+    {
+        const string genericStub = """
+            public static class DbGenericStubs
+            {
+                public static Task<IEnumerable<int>> QueryAsync<T>(this IDbConnection connection, string sql, IDbTransaction? transaction = null)
+                {
+                    return Task.FromResult<IEnumerable<int>>(new List<int>());
+                }
+            }
+            """;
+
+        const string code = $$"""
+            {{FixUsings}}
+
+            {{genericStub}}
+
+            public class MyRepository : RepositoryBase
+            {
+                public MyRepository(DbConnection conn, DbTransaction trans) : base(conn, trans) {}
+
+                public async Task DoWork(IDbConnection conn)
+                {
+                    await [|conn.QueryAsync<int>("SELECT 1")|];
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{FixUsings}}
+
+            {{genericStub}}
+
+            public class MyRepository : RepositoryBase
+            {
+                public MyRepository(DbConnection conn, DbTransaction trans) : base(conn, trans) {}
+
+                public async Task DoWork(IDbConnection conn)
+                {
+                    await conn.QueryAsync<int>("SELECT 1", transaction: Transaction);
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            RepositoryTransactionAnalyzer,
+            RepositoryTransactionCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
     public async Task Missing_Transaction_FixAll_Should_Fix_Both_Occurrences()
     {
         const string code = $$"""
