@@ -66,4 +66,52 @@ public class SyncConnectionInAsyncMethodTests
 
         await AnalyzerVerifier<SyncConnectionInAsyncMethodAnalyzer>.VerifyAnalyzerAsync(code);
     }
+
+    [Test]
+    public async Task FakeRepositoryBaseForTests_Without_Inheritance_NoDiagnostic()
+    {
+        // Regression pin (renumbering fix): LARC040 used a .Contains("RepositoryBase")
+        // substring match and false-matched any class with that substring in its
+        // name. The fixture defines its own GetConnection in an async method so a
+        // reverted check still reaches the name match, reports, and fails.
+        const string code = $$"""
+            {{Usings}}
+
+            class FakeRepositoryBaseForTests
+            {
+                public object GetConnection() => new object();
+
+                public async Task DoWorkAsync()
+                {
+                    var conn = GetConnection();
+                    await Task.Delay(1);
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<SyncConnectionInAsyncMethodAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task MyRepositoryBaseClass_Without_Inheritance_NoDiagnostic()
+    {
+        // Regression pin (renumbering fix): second representative name carrying
+        // the "RepositoryBase" substring without deriving from RepositoryBase.
+        const string code = $$"""
+            {{Usings}}
+
+            class MyRepositoryBaseClass
+            {
+                public object GetConnection() => new object();
+
+                public async Task DoWorkAsync()
+                {
+                    var conn = GetConnection();
+                    await Task.Delay(1);
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<SyncConnectionInAsyncMethodAnalyzer>.VerifyAnalyzerAsync(code);
+    }
 }

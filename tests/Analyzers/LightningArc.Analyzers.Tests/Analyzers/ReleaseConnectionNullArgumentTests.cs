@@ -66,4 +66,49 @@ public class ReleaseConnectionNullArgumentTests
 
         await AnalyzerVerifier<ReleaseConnectionNullArgumentAnalyzer>.VerifyAnalyzerAsync(code);
     }
+
+    [Test]
+    public async Task ReleaseConnection_Null_From_Derived_Class_Reports()
+    {
+        // Regression pin (renumbering fix): ReleaseConnection is declared on
+        // RepositoryBase itself, so methodSymbol.ContainingType IS RepositoryBase.
+        // A naive InheritsFromRepositoryBase-only check walks ancestors and misses
+        // this exact case; reverting it drops the diagnostic and fails.
+        string code = $$"""
+            {{Usings}}
+
+            class MyRepository() : RepositoryBase(null!)
+            {
+                public void DoWork()
+                {
+                    [|ReleaseConnection(null)|];
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<ReleaseConnectionNullArgumentAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task Unrelated_ReleaseConnection_Method_With_Null_NoDiagnostic()
+    {
+        // Regression pin (renumbering fix): the call must resolve to
+        // RepositoryBase.ReleaseConnection. A bare name match flags this
+        // unrelated same-named method; reverting the check reports and fails.
+        string code = $$"""
+            {{Usings}}
+
+            class Plain
+            {
+                public void ReleaseConnection(DbConnection conn) { }
+
+                public void DoWork()
+                {
+                    ReleaseConnection(null);
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<ReleaseConnectionNullArgumentAnalyzer>.VerifyAnalyzerAsync(code);
+    }
 }

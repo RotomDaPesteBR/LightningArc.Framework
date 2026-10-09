@@ -84,4 +84,29 @@ public class ResultValueUnsafeAccessTests
 
         await AnalyzerVerifier<ResultValueUnsafeAccessAnalyzer>.VerifyAnalyzerAsync(code);
     }
+
+    [Test]
+    public async Task Value_After_IsFailure_Early_Return_NoDiagnostic()
+    {
+        // Regression pin (renumbering fix): ResultAccessSafetyRecognizer.IsGuardedByPrecedingExit
+        // recognizes the early-return guard-clause idiom. A wrapping-guard-only check
+        // false-positives here, so reverting the fix makes this report and fail.
+        string code = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                int Main(Result<int> result)
+                {
+                    if (result.IsFailure)
+                    {
+                        return -1;
+                    }
+                    return result.Value;
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<ResultValueUnsafeAccessAnalyzer>.VerifyAnalyzerAsync(code);
+    }
 }

@@ -69,4 +69,57 @@ public class ResultDiscardedTests
 
         await AnalyzerVerifier<ResultDiscardedAnalyzer>.VerifyAnalyzerAsync(code);
     }
+
+    [Test]
+    public async Task Discarded_SearchResult_Invocation_NoDiagnostic()
+    {
+        // Regression pin (renumbering fix): LARC003 used a .Contains("Result")
+        // substring match and false-matched any consumer type with "Result" in
+        // its name. Symbol equality must reject this; reverting reports and fails.
+        const string code = $$"""
+            {{Usings}}
+
+            class SearchResult
+            {
+            }
+
+            class Program
+            {
+                SearchResult DoWork() => new SearchResult();
+
+                void Main()
+                {
+                    DoWork();
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<ResultDiscardedAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task Discarded_ApiResult_Invocation_NoDiagnostic()
+    {
+        // Regression pin (renumbering fix): same substring trap as SearchResult
+        // above, with a second representative consumer-type name.
+        const string code = $$"""
+            {{Usings}}
+
+            class ApiResult
+            {
+            }
+
+            class Program
+            {
+                ApiResult DoWork() => new ApiResult();
+
+                void Main()
+                {
+                    DoWork();
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<ResultDiscardedAnalyzer>.VerifyAnalyzerAsync(code);
+    }
 }
