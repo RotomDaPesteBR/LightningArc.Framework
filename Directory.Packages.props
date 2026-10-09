@@ -34,7 +34,7 @@
 
   <!-- Mappers -->
   <PropertyGroup>
-    <MapsterPackagesVersion>[10.0.0,)</MapsterPackagesVersion> 
+    <MapsterPackagesVersion>10.0.13</MapsterPackagesVersion> 
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="AutoMapper" Version="[16.2.0,)" />
