@@ -36,9 +36,9 @@ Details: [LARC042](LARC042.md)
 
 ## LARC043
 
-**`ReleaseConnection` called with null argument** — Warning — Code fix: no
+**ReleaseConnection called with null argument** — Warning — Code fix: yes
 
-A `ReleaseConnection(null)` (or `default`) call on `RepositoryBase`. Releasing null is a no-op that usually means the acquired connection variable was lost or never assigned — pass the actual connection variable instead.
+A `ReleaseConnection(null)` (or `ReleaseConnection(default)`/`ReleaseConnection(default(...))`) call on `RepositoryBase`. Releasing null is a no-op that usually means the acquired connection variable was lost or never assigned. The fix replaces the null/default argument with the single local variable assigned from `GetConnection()`/`GetConnectionAsync(...)` in the enclosing method.
 
 Details: [LARC043](LARC043.md)
 
@@ -58,6 +58,6 @@ Details: [LARC044](LARC044.md)
 
 **Repository never uses `Transaction`** — Info — Code fix: no
 
-A non-abstract `RepositoryBase`-derived class that makes at least one database-operation call but never references the `Transaction` property anywhere in the type. Such a repository cannot participate in unit-of-work mode. The per-call version of this check is LARC041.
+A non-abstract `RepositoryBase`-derived class that makes at least one database-operation call but never references the `Transaction` member anywhere in the type. Such a repository cannot participate in unit-of-work mode. The per-call version of this check is LARC041.
 
 Details: [LARC045](LARC045.md)

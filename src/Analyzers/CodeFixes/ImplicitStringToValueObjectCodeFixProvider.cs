@@ -110,7 +110,7 @@ public class ImplicitStringToValueObjectCodeFixProvider : CodeFixProvider
 
             if (type != null && ValueObjectTypeRecognizer.IsValueObjectType(type))
             {
-                return type.Name;
+                return type.ToMinimalDisplayString(semanticModel, literal.SpanStart);
             }
 
             return null;
@@ -125,7 +125,7 @@ public class ImplicitStringToValueObjectCodeFixProvider : CodeFixProvider
             ITypeSymbol? converted = semanticModel.GetTypeInfo(assignment.Left).ConvertedType;
             if (converted != null && ValueObjectTypeRecognizer.IsValueObjectType(converted))
             {
-                return converted.Name;
+                return converted.ToMinimalDisplayString(semanticModel, literal.SpanStart);
             }
 
             return null;
@@ -137,7 +137,7 @@ public class ImplicitStringToValueObjectCodeFixProvider : CodeFixProvider
             ITypeSymbol? converted = semanticModel.GetTypeInfo(literal).ConvertedType;
             if (converted != null && ValueObjectTypeRecognizer.IsValueObjectType(converted))
             {
-                return converted.Name;
+                return converted.ToMinimalDisplayString(semanticModel, literal.SpanStart);
             }
 
             return null;

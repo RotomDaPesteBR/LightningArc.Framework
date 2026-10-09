@@ -81,16 +81,18 @@ public class MinimalApiResultMappingCodeFixProvider : CodeFixProvider
         }
 
         // Only returns that belong to this lambda count — returns inside a
-        // nested lambda/method would map a different Result. Ancestor
-        // comparison is by instance: these nodes all come from the same root
-        // the lambda was located in, so the parent chain reaches that exact
-        // lambda instance.
+        // nested lambda, anonymous method, or local function declared in the
+        // handler would map a different Result. The owner is the nearest
+        // enclosing function: when it is not this exact lambda instance, the
+        // return belongs to a nested function and is left untouched.
+        // Ancestor comparison is by instance: these nodes all come from the
+        // same root the lambda was located in, so the parent chain reaches
+        // that exact lambda instance.
         List<ExpressionSyntax> returnedExpressions = lambda
             .Block.DescendantNodes()
             .OfType<ReturnStatementSyntax>()
             .Where(r =>
-                r.Expression != null
-                && r.Ancestors().OfType<LambdaExpressionSyntax>().FirstOrDefault() == lambda
+                r.Expression != null && OwningFunction(r) == (SyntaxNode)lambda
             )
             .Select(r => r.Expression!)
             .ToList();
@@ -110,6 +112,15 @@ public class MinimalApiResultMappingCodeFixProvider : CodeFixProvider
             context.Diagnostics[0]
         );
     }
+
+    private static SyntaxNode? OwningFunction(ReturnStatementSyntax r) =>
+        r.Ancestors().FirstOrDefault(a =>
+            a
+                is LambdaExpressionSyntax
+                    or AnonymousMethodExpressionSyntax
+                    or LocalFunctionStatementSyntax
+                    or MethodDeclarationSyntax
+        );
 
     private static InvocationExpressionSyntax ToEndpointResult(ExpressionSyntax expression) =>
         InvocationExpression(

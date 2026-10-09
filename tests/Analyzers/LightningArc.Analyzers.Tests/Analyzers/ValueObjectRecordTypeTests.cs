@@ -167,6 +167,23 @@ public class ValueObjectRecordTypeTests
         await Assert.That(await CountFixesOfferedAsync(source)).IsEqualTo(0);
     }
 
+    [Test]
+    public async Task CodeFix_With_Typed_Equals_Overload_Offers_Fix()
+    {
+        // Pin: a typed `Equals(T)` overload (e.g. `IEquatable<T>`) is
+        // record-compatible — only `Equals(object)` / `GetHashCode()`
+        // overrides withhold the swap.
+        const string source = """
+            public class MyValueObject
+            {
+                public string Value => "test";
+                public bool Equals(MyValueObject? other) => other is not null && other.Value == Value;
+            }
+            """;
+
+        await Assert.That(await CountFixesOfferedAsync(source)).IsEqualTo(1);
+    }
+
     private static async Task<int> CountFixesOfferedAsync(string source)
     {
         // GAP-8 guard pins: the diagnostic still fires on these types, but the

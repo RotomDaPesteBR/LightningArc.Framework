@@ -1,6 +1,6 @@
 # LARC021 — Potential null ValueObject conversion to string
 
-**Severity:** Warning  **Domain:** ValueObject  **Code fix:** Yes: rewrites the expression to `expr?.Value ?? string.Empty`
+**Severity:** Warning  **Domain:** ValueObject  **Code fix:** Yes: rewrites the expression to `expr?.Value ?? string.Empty` (or `expr?.ToString() ?? string.Empty` when the ValueObject's `Value` is not a `string`, e.g. `Currency`)
 
 ## What it detects
 
@@ -22,7 +22,7 @@ string s = maybeEmail?.Value ?? string.Empty; // no warning
 
 ## Code fix
 
-Rewrites each of the three call-site shapes (declarator initializer, assignment right-hand side, call argument) to `expr?.Value ?? string.Empty`. The fix assumes every ValueObject exposes a string `Value` — verified against the `LightningArc.Primitives` types.
+Rewrites each of the three call-site shapes (declarator initializer, assignment right-hand side, call argument) to `expr?.Value ?? string.Empty`. When the ValueObject's `Value` is not a `string` (e.g. `Currency.Value` is `decimal`, for which `?.Value ?? string.Empty` would not compile), the fix falls back to `expr?.ToString() ?? string.Empty` instead.
 
 ## Suppression
 

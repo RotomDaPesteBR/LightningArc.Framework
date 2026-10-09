@@ -46,9 +46,9 @@ Details: [LARC004](LARC004.md)
 
 ## LARC005
 
-**Result error is shadowed** — Warning — Code fix: no
+**Result error is shadowed** — Warning — Code fix: yes
 
-A `return` that produces a new `Error`/`Result.Failure(...)` from inside an `if (x.IsFailure)` guard without ever consuming `x.Error`. The original error — and its traceability — is silently replaced. Consume the original error (log it or combine it with `+`) instead.
+A `return` that produces a new `Error`/`Result.Failure(...)` from inside an `if (x.IsFailure)` guard without ever consuming `x.Error`. The original error — and its traceability — is silently replaced. Consume the original error (log it or combine it with `+`) instead. The fix rewrites `return <newError>;` to `return <guard>.Error + <newError>;`.
 
 Details: [LARC005](LARC005.md)
 
@@ -66,9 +66,9 @@ Details: [LARC006](LARC006.md)
 
 ## LARC007
 
-**`ResultAggregator` built with no checks** — Info — Code fix: no
+**`ResultAggregator` built with no checks** — Info — Code fix: yes (sync only)
 
-A `Result.Aggregate()` fluent chain that goes straight to `Build()`/`BuildAsync()` with no `Check`/`CheckEach`/`CheckAsync`/`CheckAll`/`Ensure`/`When`/`WhenAsync`/`WhenAll` call in between. Such a chain always succeeds — it is either dead code or a check that was removed or forgotten.
+A `Result.Aggregate()` fluent chain that goes straight to `Build()`/`BuildAsync()` with no `Check`/`CheckEach`/`CheckAsync`/`CheckAll`/`Ensure`/`When`/`WhenAsync`/`WhenAll` call in between. Such a chain always succeeds — it is either dead code or a check that was removed or forgotten. The fix replaces the check-less sync `Result.Aggregate().Build()` chain with `Result.Success()`.
 
 Details: [LARC007](LARC007.md)
 
@@ -76,8 +76,8 @@ Details: [LARC007](LARC007.md)
 
 ## LARC008
 
-**`Error` accumulated via `+=` inside a loop** — Info — Code fix: no
+**`Error` accumulated via `+=` inside a loop** — Info — Code fix: yes (no Fix-All)
 
-An `errors += e;` where the target is `Error`-typed and sits inside a loop. Each `+=` re-flattens the accumulated `AggregateError` from scratch, making N accumulations roughly O(N²) work. Collect failures in a list and combine once with `Error.Aggregate`, or use `ResultAggregator.CheckAll` for concurrent checks.
+An `errors += e;` where the target is `Error`-typed and sits inside a loop. Each `+=` re-flattens the accumulated `AggregateError` from scratch, making N accumulations roughly O(N²) work. Collect failures in a list and combine once with `Error.Aggregate`, or use `ResultAggregator.CheckAll` for concurrent checks. The fix rewrites the loop into that single-pass batch form (a `List<Error>` plus one `Error.Aggregate` call).
 
 Details: [LARC008](LARC008.md)

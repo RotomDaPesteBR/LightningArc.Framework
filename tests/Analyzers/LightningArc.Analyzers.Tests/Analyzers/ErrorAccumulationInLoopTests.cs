@@ -3,6 +3,7 @@ using System.Threading;
 using LightningArc.Analyzers;
 using LightningArc.Analyzers.CodeFixes;
 using LightningArc.Analyzers.Tests.Verifiers;
+using LightningArc.Results;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -283,6 +284,60 @@ public class ErrorAccumulationInLoopTests
     }
 
     [Test]
+    public async Task While_Loop_That_May_Run_Zero_Times_CodeFix_Should_Keep_Unconditional_Aggregate()
+    {
+        // Zero-iteration semantics pin: `Error.Aggregate` returns null for an
+        // empty list (see ErrorTests / Error.Aggregate contract), so the
+        // unconditional `errors = Error.Aggregate(errorsList);` preserves the
+        // accumulator's null value when the loop body never runs. No
+        // count-guard is needed, and none must appear.
+        const string code = $$"""
+            {{Usings}}
+
+            class C
+            {
+                void M(List<Error> es)
+                {
+                    Error? errors = null;
+                    int i = 0;
+                    while (i < es.Count) { [|errors += es[i++]|]; }
+                    if (errors is not null) { throw new System.InvalidOperationException(errors.Message); }
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class C
+            {
+                void M(List<Error> es)
+                {
+                    Error? errors = null;
+                    int i = 0;
+                    var errorsList = new List<Error>();
+                    while (i < es.Count) { errorsList.Add(es[i++]); }
+                    errors = Error.Aggregate(errorsList);
+                    if (errors is not null) { throw new System.InvalidOperationException(errors.Message); }
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            ErrorAccumulationInLoopAnalyzer,
+            ErrorAccumulationInLoopCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
+    public async Task Aggregate_Empty_List_Returns_Null_Preserving_Zero_Iteration_Semantics()
+    {
+        // Runtime half of the zero-iteration pin above: the unconditional
+        // assignment the fix emits is semantics-preserving only because
+        // `Error.Aggregate` maps an empty list back to null.
+        await Assert.That(Error.Aggregate([])).IsNull();    }
+
+    [Test]
     public async Task CodeFix_With_Field_Accumulator_Offers_No_Fix()
     {
         const string source = """
@@ -345,6 +400,31 @@ public class ErrorAccumulationInLoopTests
                         errors += e;
                         System.Console.WriteLine(errors is null);
                     }
+                    System.Console.WriteLine(errors is null);
+                }
+            }
+            """;
+
+        await Assert.That(await CountFixesOfferedAsync(source)).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task CodeFix_With_Second_Loop_Accumulation_Offers_No_Fix()
+    {
+        // A second loop's `+=` is an outside write the rewrite cannot absorb,
+        // so the provider must decline even though each loop alone is fine.
+        const string source = """
+            #nullable enable
+            using System.Collections.Generic;
+            using LightningArc.Results;
+
+            class C
+            {
+                void M(List<Error> es)
+                {
+                    Error? errors = null;
+                    foreach (var e in es) { errors += e; }
+                    foreach (var e in es) { errors += e; }
                     System.Console.WriteLine(errors is null);
                 }
             }

@@ -3,9 +3,12 @@ using System.Threading;
 using LightningArc.Analyzers;
 using LightningArc.Analyzers.CodeFixes;
 using LightningArc.Analyzers.Tests.Verifiers;
+using LightningArc.Results;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
 using TUnit.Core;
 
@@ -229,6 +232,136 @@ public class ResultErrorShadowingTests
             ResultErrorShadowingAnalyzer,
             ResultErrorShadowingCodeFixProvider
         >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
+    public async Task Nested_Guards_Report_One_Diagnostic_Per_Unconsumed_Guard()
+    {
+        // The analyzer reports one diagnostic per unconsumed guard on the
+        // same return expression (outer `a`, then inner `b`).
+        const string code = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result Main(Result a, Result b)
+                {
+                    if (a.IsFailure)
+                    {
+                        if (b.IsFailure)
+                        {
+                            return Error.Validation.InvalidParameter("Shadowed");
+                        }
+                    }
+                    return Result.Success();
+                }
+            }
+            """;
+
+        DiagnosticResult a = AnalyzerVerifier<ResultErrorShadowingAnalyzer>
+            .Diagnostic("LARC005")
+            .WithSpan(11, 24, 11, 69)
+            .WithArguments("a");
+        DiagnosticResult b = AnalyzerVerifier<ResultErrorShadowingAnalyzer>
+            .Diagnostic("LARC005")
+            .WithSpan(11, 24, 11, 69)
+            .WithArguments("b");
+
+        await AnalyzerVerifier<ResultErrorShadowingAnalyzer>.VerifyAnalyzerAsync(code, a, b);
+    }
+
+    [Test]
+    public async Task Shadowing_CodeFix_With_Nested_Guards_Should_Combine_Left_Associatively()
+    {
+        // Pin: with several active failure guards the fix chains every
+        // unconsumed guard left-associatively, innermost first
+        // (`b.Error + a.Error + <newError>`), rather than restricting the
+        // fix to a single guard. Driven directly: the analyzer reports two
+        // same-span diagnostics here, which the code-fix harness cannot
+        // express.
+        const string source = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result Main(Result a, Result b)
+                {
+                    if (a.IsFailure)
+                    {
+                        if (b.IsFailure)
+                        {
+                            return Error.Validation.InvalidParameter("Shadowed");
+                        }
+                    }
+                    return Result.Success();
+                }
+            }
+            """;
+
+        const string expectedFixed = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result Main(Result a, Result b)
+                {
+                    if (a.IsFailure)
+                    {
+                        if (b.IsFailure)
+                        {
+                            return b.Error + a.Error + Error.Validation.InvalidParameter("Shadowed");
+                        }
+                    }
+                    return Result.Success();
+                }
+            }
+            """;
+
+        await Assert.That(await ApplyFixAsync(source)).IsEqualTo(expectedFixed);
+    }
+
+    private static async Task<string> ApplyFixAsync(string source)
+    {
+        using AdhocWorkspace workspace = new();
+        var project = workspace
+            .AddProject("Pins", LanguageNames.CSharp)
+            .AddMetadataReference(
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
+            )
+            .AddMetadataReference(
+                MetadataReference.CreateFromFile(typeof(Result).Assembly.Location)
+            );
+        Document document = project.AddDocument("Pin.cs", source);
+
+        SyntaxTree? tree = await document.GetSyntaxTreeAsync(CancellationToken.None);
+        await Assert.That(tree).IsNotNull();
+
+        var root = await tree!.GetRootAsync(CancellationToken.None);
+        var ret = root.DescendantNodes().OfType<ReturnStatementSyntax>().First(r =>
+            r.Expression?.ToString().Contains("Shadowed") == true
+        );
+
+        Diagnostic diagnostic = Diagnostic.Create(
+            ResultErrorShadowingAnalyzer.Rule,
+            Location.Create(tree, ret.Expression!.Span)
+        );
+
+        CodeAction? action = null;
+        var context = new CodeFixContext(
+            document,
+            diagnostic,
+            (a, diagnostics) => action = a,
+            CancellationToken.None
+        );
+
+        await new ResultErrorShadowingCodeFixProvider().RegisterCodeFixesAsync(context);
+        await Assert.That(action).IsNotNull();
+
+        var operations = await action!.GetOperationsAsync(CancellationToken.None);
+        var applyChanges = operations.OfType<ApplyChangesOperation>().Single();
+        Document fixedDocument = applyChanges.ChangedSolution.GetDocument(document.Id)!;
+        var text = await fixedDocument.GetTextAsync(CancellationToken.None);
+        return text.ToString();
     }
 
     [Test]

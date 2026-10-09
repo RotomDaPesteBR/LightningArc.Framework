@@ -56,7 +56,7 @@ dotnet_diagnostic.LARC044.severity = none
 
 ## Scope & limitations
 
-A directly-returned acquisition (`return GetConnection(...);`, `=> GetConnection(...)`, optionally awaited) is treated as forwarding to the caller's ownership and skipped — this keeps `RepositoryBase`'s own forwarding overloads quiet. Only regular method bodies are examined (constructors, field initializers, and local functions are out of scope). Acquire-in-one-method/release-in-another false-positives by design: the check is purely syntactic within one method and never does call-graph analysis. A `finally` calling an unrelated same-named `ReleaseConnection` does not satisfy the rule (the call must resolve to `RepositoryBase.ReleaseConnection`).
+A directly-returned acquisition (`return GetConnection(...);`, `=> GetConnection(...)`, optionally awaited) is treated as forwarding to the caller's ownership and skipped — this keeps `RepositoryBase`'s own forwarding overloads quiet. Only regular method bodies are examined (constructors, field initializers, and local functions are out of scope). Acquire-in-one-method/release-in-another false-positives by design: the check is purely syntactic within one method and never does call-graph analysis. A `finally` calling an unrelated same-named `ReleaseConnection` does not satisfy the rule (the call must resolve to `RepositoryBase.ReleaseConnection`). Parenthesized or null-forgiving forwarding (`return (c);`, `return c!;`) still reports: the forwarding exclusion matches only the exact forwarding operand.
 
 ## Related
 

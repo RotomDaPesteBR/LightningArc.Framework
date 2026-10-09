@@ -155,6 +155,41 @@ public class ImplicitStringToValueObjectTests
     }
 
     [Test]
+    public async Task String_Literal_Aliased_Declaration_CodeFix_Should_Use_Alias_Spelling()
+    {
+        // Pin: the fix must reuse the declaration's own type spelling (alias
+        // `E`), not the underlying type name (`Email`).
+        string code = """
+            using E = LightningArc.Primitives.ValueObjects.Email;
+
+            class Program
+            {
+                void Main()
+                {
+                    E email = [|"test@example.com"|];
+                }
+            }
+            """;
+
+        string fixedCode = """
+            using E = LightningArc.Primitives.ValueObjects.Email;
+
+            class Program
+            {
+                void Main()
+                {
+                    E email = E.Create("test@example.com");
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            ImplicitStringToValueObjectAnalyzer,
+            ImplicitStringToValueObjectCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
     public async Task Explicit_Creation_Should_Not_Report_Diagnostic()
     {
         string code = $$"""

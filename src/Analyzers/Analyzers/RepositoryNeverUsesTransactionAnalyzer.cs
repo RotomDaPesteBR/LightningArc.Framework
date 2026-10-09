@@ -113,7 +113,10 @@ public class RepositoryNeverUsesTransactionAnalyzer : DiagnosticAnalyzer
             .FirstOrDefault();
         if (transactionField == null)
         {
-            return false;
+            // Fail open: without a resolvable Transaction member there is
+            // nothing to compare references against, so stay silent rather
+            // than flagging every repository in the compilation.
+            return true;
         }
 
         foreach (IdentifierNameSyntax identifier in classDecl

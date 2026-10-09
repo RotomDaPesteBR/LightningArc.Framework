@@ -6,9 +6,9 @@ Rules LARC020–LARC023 enforce explicit handling of ValueObject creation and st
 
 ## LARC020
 
-**Implicit conversion from `string` to ValueObject** — Warning — Code fix: no
+**Implicit conversion from `string` to ValueObject** — Warning — Code fix: yes
 
-A string literal implicitly converted to a ValueObject (`Email`, `Cpf`, `Cnpj`, `PhoneNumber`, `Url`, or any `IValueObject`/`IValueObject<T>`) in a variable declarator, an assignment, or a call argument. The implicit conversion can throw on invalid input; prefer explicit `Create`/`TryCreate` validation.
+A string literal implicitly converted to a ValueObject (`Email`, `Cpf`, `Cnpj`, `PhoneNumber`, `Url`, or any `IValueObject`/`IValueObject<T>`) in a variable declarator, an assignment, or a call argument. The implicit conversion can throw on invalid input; prefer explicit `Create`/`TryCreate` validation. The fix wraps the literal as `<VO>.Create("literal")`.
 
 Details: [LARC020](LARC020.md)
 

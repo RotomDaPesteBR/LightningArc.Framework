@@ -42,7 +42,7 @@ public class ValueObjectTypeRecognizerTests
             public class BareMarker { }
         }
 
-        public class Money : IValueObject<decimal>
+        public class Money : Consumer.IValueObject<decimal>
         {
             public decimal Value => 0;
         }
@@ -92,7 +92,7 @@ public class ValueObjectTypeRecognizerTests
     }
 
     [Test]
-    public async Task Consumer_Generic_Library_Interface_True()
+    public async Task Consumer_Generic_Interface_True()
     {
         await Assert.That(IsValueObject("MoneyField")).IsTrue();
     }

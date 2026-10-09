@@ -4,7 +4,7 @@
 
 ## What it detects
 
-A non-abstract `RepositoryBase`-derived class that makes at least one database-operation call (Dapper or `DbConnection`, same predicate as [LARC041](LARC041.md)) but never references the `Transaction` property anywhere in the type. Such a repository can never participate in unit-of-work mode: every operation runs outside the ambient transaction.
+A non-abstract `RepositoryBase`-derived class that makes at least one database-operation call (Dapper or `DbConnection`, same predicate as [LARC041](LARC041.md)) but never references the `Transaction` member anywhere in the type. Such a repository can never participate in unit-of-work mode: every operation runs outside the ambient transaction.
 
 ## ❌ Bad
 
@@ -49,7 +49,7 @@ dotnet_diagnostic.LARC045.severity = none
 
 ## Scope & limitations
 
-Only non-abstract classes deriving from `RepositoryBase` are examined; abstract classes and classes with no database-operation calls are skipped. A single `Transaction` reference anywhere in the type satisfies the rule — this is a presence check only, the same dual self-managed/unit-of-work model as [LARC041](LARC041.md). For why `ReleaseConnection` (not `using`) is the one correct disposal path in both modes, see [LARC044](LARC044.md).
+Only non-abstract classes deriving from `RepositoryBase` are examined; abstract classes and classes with no database-operation calls are skipped. A single `Transaction` reference anywhere in the type satisfies the rule — this is a presence check only, the same dual self-managed/unit-of-work model as [LARC041](LARC041.md). The reference must resolve to `RepositoryBase.Transaction` itself: a `new`-shadowed `Transaction` member declared on the repository does not satisfy the rule, so such a repository still (correctly) reports — the shadow hides the unit-of-work transaction. For why `ReleaseConnection` (not `using`) is the one correct disposal path in both modes, see [LARC044](LARC044.md).
 
 ## Related
 

@@ -177,6 +177,51 @@ public class MinimalApiResultMappingTests
         await Assert.That(await ApplyFixAsync(source)).IsEqualTo(expectedFixed);
     }
 
+    [Test]
+    public async Task MapGet_Block_Lambda_With_Local_Function_CodeFix_Should_Leave_Local_Returns_Untouched()
+    {
+        // Pin: a `return` inside a local function declared in the handler
+        // belongs to the local function, not the handler lambda — only the
+        // handler's own returns get `.ToEndpointResult()`.
+        const string source = """
+            using LightningArc.Results;
+            using LightningArc.Results.AspNetCore;
+            using Microsoft.AspNetCore.Routing;
+
+            class Program
+            {
+                void Main(IEndpointRouteBuilder app)
+                {
+                    app.MapGet("/test", () =>
+                    {
+                        int Helper() { return 42; }
+                        return Result.Success();
+                    });
+                }
+            }
+            """;
+
+        const string expectedFixed = """
+            using LightningArc.Results;
+            using LightningArc.Results.AspNetCore;
+            using Microsoft.AspNetCore.Routing;
+
+            class Program
+            {
+                void Main(IEndpointRouteBuilder app)
+                {
+                    app.MapGet("/test", () =>
+                    {
+                        int Helper() { return 42; }
+                        return Result.Success().ToEndpointResult();
+                    });
+                }
+            }
+            """;
+
+        await Assert.That(await ApplyFixAsync(source)).IsEqualTo(expectedFixed);
+    }
+
     private static async Task<string> ApplyFixAsync(string source)
     {
         using AdhocWorkspace workspace = new();
