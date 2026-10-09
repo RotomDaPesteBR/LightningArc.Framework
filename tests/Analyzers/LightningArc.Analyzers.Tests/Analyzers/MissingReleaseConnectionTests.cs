@@ -148,6 +148,64 @@ public class MissingReleaseConnectionTests
     }
 
     [Test]
+    public async Task GetConnection_ForwardedViaLocal_NoDiagnostic()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class MyRepository() : RepositoryBase(null!)
+            {
+                public DbConnection Forward()
+                {
+                    var c = GetConnection();
+                    return c;
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<MissingReleaseConnectionAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task GetConnectionAsync_ForwardedViaLocalAwait_NoDiagnostic()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class MyRepository() : RepositoryBase(null!)
+            {
+                public async Task<DbConnection> ForwardAsync()
+                {
+                    var c = await GetConnectionAsync();
+                    return c;
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<MissingReleaseConnectionAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task GetConnection_LocalUsedBeyondReturn_Reports()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class MyRepository() : RepositoryBase(null!)
+            {
+                public DbConnection Forward()
+                {
+                    var c = [|GetConnection()|];
+                    System.Console.WriteLine(c);
+                    return c;
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<MissingReleaseConnectionAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
     public async Task GetConnection_OnNonRepositoryBaseType_NoDiagnostic()
     {
         const string code = """

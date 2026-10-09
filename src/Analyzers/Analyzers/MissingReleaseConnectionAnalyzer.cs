@@ -28,8 +28,10 @@ namespace LightningArc.Analyzers;
 /// connection between them) will false-positive here — this is a deliberate, documented
 /// trade-off for staying purely syntactic rather than attempting call-graph analysis, the same
 /// scoping choice made for <see cref="ResultAccessSafetyRecognizer.IsGuardedByPrecedingExit"/>.
-/// The directly-returned case (see <see cref="IsDirectlyReturned"/>) is one instance of this
-/// same limitation handled explicitly, since it shows up inside RepositoryBase's own forwarding
+/// The directly-returned case (see <see cref="IsDirectlyReturned"/>) and its
+/// local-mediated variant <c>var c = GetConnection(...); return c;</c> (see
+/// <see cref="IsLocalForward"/>) are instances of this same limitation handled
+/// explicitly, since they show up inside RepositoryBase's own forwarding
 /// overloads.
 /// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -126,6 +128,18 @@ public class MissingReleaseConnectionAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        // Local-mediated forwarding: `var c = GetConnection(...); return c;` where the local
+        // is declared in this method, returned once, and never otherwise used. Same rationale
+        // as IsDirectlyReturned — the method hands the connection to its caller rather than
+        // consuming it here. Any additional use (passed to another call, read twice, stored in
+        // a field, ...) means the method does consume/observe the connection, so the
+        // exclusion does not apply. Cross-method acquire/release (e.g. stored in a field and
+        // released from another method) is deliberately NOT excluded.
+        if (IsLocalForward(invocation, enclosingMethod, context.SemanticModel))
+        {
+            return;
+        }
+
         if (HasReleaseConnectionInFinally(enclosingMethod, context.SemanticModel, recognizer))
         {
             return;
@@ -154,6 +168,64 @@ public class MissingReleaseConnectionAnalyzer : DiagnosticAnalyzer
         }
 
         return parent is ReturnStatementSyntax or ArrowExpressionClauseSyntax;
+    }
+
+    /// <summary>
+    /// True when <paramref name="invocation"/>'s result is stored in a local that is declared in
+    /// <paramref name="method"/>, returned exactly once (<c>return c;</c>), and never otherwise
+    /// used — i.e. the local-mediated shape <c>var c = GetConnection(...); return c;</c>. The
+    /// initializer may be awaited (<c>var c = await GetConnectionAsync(...);</c>).
+    /// </summary>
+    private static bool IsLocalForward(
+        InvocationExpressionSyntax invocation,
+        MethodDeclarationSyntax method,
+        SemanticModel semanticModel
+    )
+    {
+        SyntaxNode? initializer = invocation;
+
+        // Unwrap `var c = await GetConnectionAsync(...);`
+        if (initializer.Parent is AwaitExpressionSyntax awaitExpression)
+        {
+            initializer = awaitExpression;
+        }
+
+        if (initializer.Parent is not EqualsValueClauseSyntax equalsClause)
+        {
+            return false;
+        }
+
+        if (
+            equalsClause.Parent is not VariableDeclaratorSyntax declarator
+            || declarator.Parent is not VariableDeclarationSyntax declaration
+            || declaration.Parent is not LocalDeclarationStatementSyntax
+        )
+        {
+            return false;
+        }
+
+        ISymbol? localSymbol = semanticModel.GetDeclaredSymbol(declarator);
+        if (localSymbol == null)
+        {
+            return false;
+        }
+
+        List<IdentifierNameSyntax> references = method
+            .DescendantNodes()
+            .OfType<IdentifierNameSyntax>()
+            .Where(candidate =>
+                candidate.Identifier.ValueText == declarator.Identifier.ValueText
+                && SymbolEqualityComparer.Default.Equals(
+                    semanticModel.GetSymbolInfo(candidate).Symbol,
+                    localSymbol
+                )
+            )
+            .ToList();
+
+        // Exactly one use, and that use is the operand of `return c;`.
+        return references.Count == 1
+            && references[0].Parent is ReturnStatementSyntax returnStatement
+            && returnStatement.Expression == references[0];
     }
 
     private static bool IsRepositoryBaseMethod(
