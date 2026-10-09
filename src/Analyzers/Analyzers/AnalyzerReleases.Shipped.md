@@ -1,3 +1,4 @@
+<!-- Convention: all current rules are tracked as shipped pre-publish; split into per-release sections once published. -->
 ## Release 1.0.0
 
 | Rule ID | Category    | Severity | Notes                                                        |
