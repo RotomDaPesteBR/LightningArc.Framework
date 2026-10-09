@@ -1,4 +1,5 @@
 using LightningArc.Analyzers;
+using LightningArc.Analyzers.CodeFixes;
 using LightningArc.Analyzers.Tests.Verifiers;
 using TUnit.Core;
 
@@ -121,5 +122,81 @@ public class ResultDiscardedTests
             """;
 
         await AnalyzerVerifier<ResultDiscardedAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task Discarded_Result_CodeFix_Should_Assign_Discard()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result DoWork() => Result.Success();
+
+                void Main()
+                {
+                    [|DoWork()|];
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result DoWork() => Result.Success();
+
+                void Main()
+                {
+                    _ = DoWork();
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            ResultDiscardedAnalyzer,
+            ResultDiscardedCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
+    public async Task Discarded_Result_FixAll_Should_Fix_Both_Occurrences()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result DoWork() => Result.Success();
+
+                void Main()
+                {
+                    [|DoWork()|];
+                    [|DoWork()|];
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result DoWork() => Result.Success();
+
+                void Main()
+                {
+                    _ = DoWork();
+                    _ = DoWork();
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            ResultDiscardedAnalyzer,
+            ResultDiscardedCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
     }
 }

@@ -1,4 +1,5 @@
 using LightningArc.Analyzers;
+using LightningArc.Analyzers.CodeFixes;
 using LightningArc.Analyzers.Tests.Verifiers;
 using TUnit.Core;
 
@@ -108,5 +109,41 @@ public class ResultValueUnsafeAccessTests
             """;
 
         await AnalyzerVerifier<ResultValueUnsafeAccessAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task Value_Access_CodeFix_Should_Wrap_In_TryGetValue()
+    {
+        string code = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                void Main(Result<int> result)
+                {
+                    var x = result.[|Value|];
+                }
+            }
+            """;
+
+        string fixedCode = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                void Main(Result<int> result)
+                {
+                    if (result.TryGetValue(out var value))
+                    {
+                        var x = value;
+                    }
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            ResultValueUnsafeAccessAnalyzer,
+            ResultValueUnsafeAccessCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
     }
 }

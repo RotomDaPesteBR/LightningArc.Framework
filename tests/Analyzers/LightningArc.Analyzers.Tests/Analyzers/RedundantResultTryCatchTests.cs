@@ -1,5 +1,6 @@
 using System.Threading;
 using LightningArc.Analyzers;
+using LightningArc.Analyzers.CodeFixes;
 using LightningArc.Analyzers.Tests.Verifiers;
 using LightningArc.Results;
 using Microsoft.CodeAnalysis;
@@ -174,6 +175,88 @@ public class RedundantResultTryCatchTests
             """;
 
         await new WithoutAspNetCoreTest(code).RunAsync(CancellationToken.None);
+    }
+
+    [Test]
+    public async Task Redundant_TryCatch_CodeFix_Should_Splice_Try_Body()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result Main()
+                {
+                    [|try|]
+                    {
+                        return Result.Success();
+                    }
+                    catch (Exception)
+                    {
+                        return Error.Application.Internal();
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result Main()
+                {
+                    return Result.Success();
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            RedundantResultTryCatchAnalyzer,
+            RedundantResultTryCatchCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
+    public async Task Redundant_TryCatch_CodeFix_Should_Preserve_Leading_Comment()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result Main()
+                {
+                    // The middleware already maps exceptions.
+                    [|try|]
+                    {
+                        return Result.Success();
+                    }
+                    catch (Exception)
+                    {
+                        return Error.Application.Internal();
+                    }
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Result Main()
+                {
+                    // The middleware already maps exceptions.
+                    return Result.Success();
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            RedundantResultTryCatchAnalyzer,
+            RedundantResultTryCatchCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
     }
 
     // Minimal harness mirroring AnalyzerVerifier.Test but WITHOUT the
