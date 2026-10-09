@@ -25,6 +25,7 @@ Generated\ Files/
 conductor/
 docs/superpowers/
 .worktrees/
+.worktree/
 
 ## OS specific
 [Tt]humbs.db

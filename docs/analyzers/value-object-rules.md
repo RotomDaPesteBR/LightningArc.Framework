@@ -1,10 +1,10 @@
 # ValueObject Rules
 
-Rules LARC010–LARC012 enforce explicit handling of ValueObject creation and string conversions.
+Rules LARC020–LARC022 enforce explicit handling of ValueObject creation and string conversions.
 
 ---
 
-## LARC010
+## LARC020
 
 **Implicit string → ValueObject conversion may throw**
 
@@ -32,7 +32,7 @@ var email = Email.Create("user@example.com");
 
 ---
 
-## LARC011
+## LARC021
 
 **Potential null ValueObject → string conversion may throw**
 
@@ -55,7 +55,7 @@ string s = email?.ToString() ?? string.Empty;
 
 ---
 
-## LARC012
+## LARC022
 
 **ValueObject creation result discarded**
 

@@ -63,7 +63,7 @@ public class MinimalApiResultMappingTests
             }
             """;
 
-        // MVC is handled by implicit conversion, so LARC031 should not trigger here
+        // MVC is handled by implicit conversion, so LARC060 should not trigger here
         await AnalyzerVerifier<MinimalApiResultMappingAnalyzer>.VerifyAnalyzerAsync(code);
     }
 

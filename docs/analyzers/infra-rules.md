@@ -1,10 +1,10 @@
 # Infra Rules
 
-Rules LARC020, LARC022, and LARC030 cover database connection lifecycle and framework-specific warnings.
+Rules LARC040, LARC080, and LARC043 cover database connection lifecycle and framework-specific warnings.
 
 ---
 
-## LARC020
+## LARC040
 
 **Synchronous `GetConnection()` used in async method**
 
@@ -30,7 +30,7 @@ public async Task<User> GetByIdAsync(int id, CancellationToken ct = default)
 
 ---
 
-## LARC022
+## LARC080
 
 **`IHostedService.StartAsync` performs no work**
 
@@ -62,7 +62,7 @@ public class MyService : IHostedService
 
 ---
 
-## LARC030
+## LARC043
 
 **`ReleaseConnection(null)` has no effect**
 

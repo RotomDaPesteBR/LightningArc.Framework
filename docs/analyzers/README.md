@@ -13,9 +13,9 @@ To use analyzers in an **external** project consuming LightningArc via NuGet, yo
 | Prefix | Scope | IDs |
 |---|---|---|
 | **Result** | Safe usage of the Result pattern | LARC001–LARC003 |
-| **ValueObject** | ValueObject creation and string conversion | LARC010–LARC012 |
-| **Data** | Database connection lifecycle | LARC020, LARC030 |
-| **Infra** | General framework warnings | LARC022 |
+| **ValueObject** | ValueObject creation and string conversion | LARC020–LARC022 |
+| **Data** | Database connection lifecycle | LARC040, LARC043 |
+| **Infra** | General framework warnings | LARC080 |
 
 ## Rules
 
@@ -31,17 +31,17 @@ To use analyzers in an **external** project consuming LightningArc via NuGet, yo
 
 | ID | Title | Severity |
 |---|---|---|
-| [LARC010](value-object-rules.md#larc010) | Implicit string → ValueObject conversion may throw | Warning |
-| [LARC011](value-object-rules.md#larc011) | Null ValueObject → string conversion may throw | Warning |
-| [LARC012](value-object-rules.md#larc012) | ValueObject creation result discarded | Info |
+| [LARC020](value-object-rules.md#larc020) | Implicit string → ValueObject conversion may throw | Warning |
+| [LARC021](value-object-rules.md#larc021) | Null ValueObject → string conversion may throw | Warning |
+| [LARC022](value-object-rules.md#larc022) | ValueObject creation result discarded | Info |
 
 ### Data & Infra Rules
 
 | ID | Title | Severity |
 |---|---|---|
-| [LARC020](infra-rules.md#larc020) | Synchronous `GetConnection()` used in async method | Warning |
-| [LARC022](infra-rules.md#larc022) | `IHostedService.StartAsync` performs no work | Info |
-| [LARC030](infra-rules.md#larc030) | `ReleaseConnection(null)` has no effect | Warning |
+| [LARC040](infra-rules.md#larc040) | Synchronous `GetConnection()` used in async method | Warning |
+| [LARC080](infra-rules.md#larc080) | `IHostedService.StartAsync` performs no work | Info |
+| [LARC043](infra-rules.md#larc043) | `ReleaseConnection(null)` has no effect | Warning |
 
 ## Code Fixes
 

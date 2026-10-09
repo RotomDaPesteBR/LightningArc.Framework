@@ -16,7 +16,7 @@ Value Objects are immutable types that represent domain concepts defined by thei
 - **Immutability**: Once created, the value cannot be changed.
 - **Equality**: Two instances are equal if their values are identical (C# records).
 - **`TryCreate`**: Safe factory that returns `bool` instead of throwing.
-- **Implicit string conversion**: Supported but flagged by LARC010 analyzer.
+- **Implicit string conversion**: Supported but flagged by LARC020 analyzer.
 
 ### Safe Creation (Recommended)
 ```csharp
@@ -38,7 +38,7 @@ Result<Email> result = "bad-email".AsEmail();
 Result<Email> wrapped = email;
 ```
 
-> LARC010 warns on implicit string → ValueObject conversion. LARC011 warns on nullable ValueObject → string. Prefer `TryCreate` or `As{Type}` extensions in critical paths.
+> LARC020 warns on implicit string → ValueObject conversion. LARC021 warns on nullable ValueObject → string. Prefer `TryCreate` or `As{Type}` extensions in critical paths.
 ```csharp
 // Preferred: returns Failure instead of throwing
 Result<Email> result = "bad-email".AsEmail();
@@ -59,4 +59,4 @@ Each ValueObject has its own extensions:
 
 The full list is: `Email`, `Cpf`, `Cnpj`, `PhoneNumber`, `Url`.
 
-⚠️ **Analyzer note**: LARC010 warns on implicit string → ValueObject conversion and LARC011 warns on nullable ValueObject → string. Prefer `TryCreate` or `As{Type}` extensions.
+⚠️ **Analyzer note**: LARC020 warns on implicit string → ValueObject conversion and LARC021 warns on nullable ValueObject → string. Prefer `TryCreate` or `As{Type}` extensions.
