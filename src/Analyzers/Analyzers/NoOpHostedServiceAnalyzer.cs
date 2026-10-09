@@ -21,7 +21,7 @@ public class NoOpHostedServiceAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "HostedService StartAsync performs no work",
         messageFormat: "HostedService StartAsync performs no work",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Reliability,
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

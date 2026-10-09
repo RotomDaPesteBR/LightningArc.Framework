@@ -23,7 +23,7 @@ public class MinimalApiResultMappingAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Missing .ToEndpointResult() in Minimal API",
         messageFormat: "Minimal API endpoints returning Result or Result<TValue> should use '.ToEndpointResult()' to ensure correct HTTP status code mapping",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

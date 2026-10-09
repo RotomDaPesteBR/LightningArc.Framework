@@ -26,7 +26,7 @@ public class ErrorAccumulationInLoopAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Error accumulated via '+=' inside a loop",
         messageFormat: "Accumulating an Error via '+=' inside a loop re-flattens on every iteration. Consider Error.Aggregate(...) or ResultAggregator's Check/Ensure/When methods instead.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

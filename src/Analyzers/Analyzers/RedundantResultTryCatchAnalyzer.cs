@@ -22,7 +22,7 @@ public class RedundantResultTryCatchAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Redundant try-catch for Result mapping",
         messageFormat: "This try-catch block is redundant. The global ResultExceptionHandler already maps unhandled exceptions to standardized errors.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

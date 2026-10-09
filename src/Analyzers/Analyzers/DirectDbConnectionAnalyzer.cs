@@ -22,7 +22,7 @@ public class DirectDbConnectionAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Direct DbConnection instantiation in repository",
         messageFormat: "DbConnection type '{0}' is instantiated directly inside a repository. Use 'GetConnection()' or 'GetConnectionAsync()' to leverage centralized connection management.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Reliability,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

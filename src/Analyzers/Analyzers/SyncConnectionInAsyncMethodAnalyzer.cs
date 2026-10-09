@@ -21,7 +21,7 @@ public class SyncConnectionInAsyncMethodAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Synchronous GetConnection in async method",
         messageFormat: "Synchronous GetConnection() called in async method. Use GetConnectionAsync() instead.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Reliability,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

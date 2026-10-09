@@ -43,7 +43,7 @@ public class MissingReleaseConnectionAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Missing ReleaseConnection after GetConnection",
         messageFormat: "'{0}' is called without a matching ReleaseConnection(...) call in a finally block within this method. This may leak the connection when it was acquired via the connection factory.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Reliability,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

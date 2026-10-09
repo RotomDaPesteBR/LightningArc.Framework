@@ -22,7 +22,7 @@ public class RepositoryTransactionAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Missing transaction in repository call",
         messageFormat: "Database operation '{0}' is called without passing the available 'Transaction' property. This may lead to operations running outside the intended transaction.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Reliability,
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

@@ -21,7 +21,7 @@ public class ResultErrorShadowingAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Result error is shadowed",
         messageFormat: "A new error is being returned without consuming the original error '{0}'. Traceability may be lost.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

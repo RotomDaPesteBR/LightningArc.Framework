@@ -22,7 +22,7 @@ public class ResultErrorUnsafeAccessAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Unsafe access to Result.Error",
         messageFormat: "Accessing 'Error' may throw if the Result is a success. Use TryGetError or check IsFailure first.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
