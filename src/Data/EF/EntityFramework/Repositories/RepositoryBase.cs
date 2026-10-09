@@ -91,4 +91,3 @@ public abstract class RepositoryBase<TContext, TEntity, TResult> : RepositoryBas
     protected RepositoryBase(TContext context, IMapper? mapper = null, ILogger? logger = null)
         : base(context, mapper, logger) { }
 }
-

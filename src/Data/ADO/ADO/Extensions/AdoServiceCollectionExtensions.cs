@@ -1,3 +1,4 @@
+using LightningArc.Data.Abstractions.UnitOfWork;
 using LightningArc.Data.ADO.Factories;
 using LightningArc.Data.ADO.UnitOfWork;
 
@@ -20,9 +21,15 @@ public static class AdoServiceCollectionExtensions
 
         /// <summary>
         /// Registers the ADO.NET-based <see cref="UnitOfWork"/> as a Scoped service under the <see cref="IDbUnitOfWork"/> contract.
+        /// Also aliases <see cref="IUnitOfWork"/> to the same scoped instance, so services
+        /// (via <see cref="IUnitOfWork"/>) and repositories (via <see cref="IDbUnitOfWork"/>)
+        /// always share one transaction per scope. Registering them separately would
+        /// silently split transactions.
         /// </summary>
         /// <returns>The same <see cref="IServiceCollection"/> instance so that multiple calls can be chained.</returns>
         public IServiceCollection AddDbUnitOfWork() =>
-            services.AddScoped<IDbUnitOfWork, UnitOfWork>();
+            services
+                .AddScoped<IDbUnitOfWork, UnitOfWork>()
+                .AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IDbUnitOfWork>());
     }
 }

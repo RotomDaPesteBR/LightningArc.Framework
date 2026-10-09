@@ -51,7 +51,7 @@ Internal implementation details and architecture decisions.
 
 ---
 
-## Philosophy
+## Key Characteristics
 
 * **Fail-Fast and Functional**: Prefer `Result` over exceptions for normal business flow.
 * **Compile-Time Enforcement**: Roslyn analyzers catch misuse before runtime.

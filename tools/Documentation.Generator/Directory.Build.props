@@ -1,0 +1,8 @@
+<Project>
+  <!-- Undo docs/Directory.Build.props defaults — this is a real console app, not a doc artifact -->
+  <PropertyGroup>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <SkipBuild>false</SkipBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>

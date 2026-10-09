@@ -13,10 +13,10 @@ The `Result` class is the core component of the functional error handling patter
 #### Properties
 *   `IsSuccess`: Boolean indicating if the operation succeeded.
 *   `IsFailure`: Boolean indicating if the operation failed (inverse of `IsSuccess`).
-*   `Code`: Returns a generic status code (either from `SuccessDetails.Code` or `Error.Code`).
+*   `Code`: Returns a generic status code (either from `SuccessState.Code` or `Error.Code`).
 *   `Message`: Returns the associated message (either success or error message).
 *   `Error`: Accessor for the `Error` object. Throws `ResultAccessFailedException` if accessed on a successful result.
-*   `SuccessDetails`: Accessor for the `Success` object. Throws `ResultAccessFailedException` if accessed on a failed result.
+*   `SuccessState`: Accessor for the `Success` object. Throws `ResultAccessFailedException` if accessed on a failed result.
 
 #### Safe Access Methods
 *   `TryGetError(out Error error)`: Attempt-free error retrieval. Returns `true` if the result is a failure; otherwise `false`. Prefer this over accessing `.Error` directly.
@@ -25,8 +25,8 @@ The `Result` class is the core component of the functional error handling patter
 *   `_error`: Nullable field holding the `Error` object (null if success).
 *   `_success`: Nullable field holding the `Success` object (null if failure).
 
-#### Constructors (Protected)
-*   The constructors are `protected` to enforce the use of static factory methods.
+#### Constructors (Internal)
+*   The constructors are `internal` to enforce the use of static factory methods.
 *   They validate that `success` or `error` arguments are not null.
 
 #### Static Factory Methods (Success)
@@ -47,6 +47,7 @@ Inherits from `Result` and adds a typed value to the success state.
 
 #### Properties
 *   `Value`: Accessor for the encapsulated value. Throws `ResultAccessFailedException` if accessed on a failed result.
+*   `SuccessState`: Returns the typed `Success<TValue>` (hides base `SuccessState`).
 
 #### Safe Access Methods
 *   `TryGetValue(out TValue value)`: Attempt-free value retrieval. Returns `true` if the result is successful; otherwise `false`. Prefer this over accessing `.Value` directly. (LARC001 warns on unsafe `.Value` access.)
@@ -55,11 +56,11 @@ Inherits from `Result` and adds a typed value to the success state.
 *   `Success<TValue>(TValue value)`: Creates a success result with a value.
 *   `Created<TValue>(TValue value)`: Creates a "Created" success result with a value.
 *   `Accepted<TValue>(TValue value)`: Creates an "Accepted" success result with a value.
-*   `NoContent<TValue>(TValue value)`: Creates a "No Content" success result with a value.
 
 #### Implicit Operators
 *   `implicit operator Result<TValue>(TValue value)`: Allows returning a raw value directly where a `Result<TValue>` is expected (defaults to OK).
 *   `implicit operator Result<TValue>(Error error)`: Allows returning an `Error` directly.
+*   `implicit operator Result<TValue>(Success<TValue> success)`: Allows returning a `Success<TValue>` directly.
 
 #### Conversion
 *   `ToResult(Result<TValue> result)`: Converts a generic result back to a non-generic `Result`, discarding the value but keeping the success/failure status and metadata.

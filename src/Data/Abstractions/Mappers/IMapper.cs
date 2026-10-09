@@ -32,4 +32,3 @@ public interface IMapper
     /// <returns>The <paramref name="destination"/> object updated with mapped data.</returns>
     TDestination Map<TSource, TDestination>(TSource source, TDestination destination);
 }
-

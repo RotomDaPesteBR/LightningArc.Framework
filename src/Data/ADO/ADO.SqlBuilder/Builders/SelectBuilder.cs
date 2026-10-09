@@ -22,7 +22,10 @@ public class SelectBuilder(
     public string Build(bool filterByKey = false, int limit = 0)
     {
         string columnSeparator = Options.Indented ? $",{Environment.NewLine}{Indent}" : ", ";
-        string columnList = string.Join(columnSeparator, Columns.Select(c => QuoteColumnName(c.ColumnName)));
+        string columnList = string.Join(
+            columnSeparator,
+            Columns.Select(c => QuoteColumnName(c.ColumnName))
+        );
 
         // SQL Server TOP
         string topClause =
@@ -84,4 +87,3 @@ public class SelectBuilder(
         return $"{NewLine}ORDER BY {string.Join(orderSeparator, sortExpressions)}";
     }
 }
-

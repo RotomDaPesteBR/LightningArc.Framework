@@ -42,7 +42,7 @@ internal sealed class CollectionValidationRule<T, TElement>(
             else
             {
                 Result result = validator.Validate(item);
-                if (result.TryGetError(out Error error))
+                if (result.TryGetError(out Error? error))
                 {
                     yield return new ValidationFailure(
                         itemPath,
@@ -89,7 +89,7 @@ internal sealed class CollectionValidationRule<T, TElement>(
             else
             {
                 Result result = await validator.ValidateAsync(item, cancellationToken).ConfigureAwait(false);
-                if (result.TryGetError(out Error error))
+                if (result.TryGetError(out Error? error))
                 {
                     yield return new ValidationFailure(
                         itemPath,

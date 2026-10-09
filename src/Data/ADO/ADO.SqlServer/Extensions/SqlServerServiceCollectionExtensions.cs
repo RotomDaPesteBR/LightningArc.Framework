@@ -1,5 +1,8 @@
+using System;
 using LightningArc.Data.ADO.Factories;
 using LightningArc.Data.ADO.SqlServer.Factories;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -20,8 +23,10 @@ public static class SqlServerServiceCollectionExtensions
             string connectionName = "DatabaseConnection"
         ) =>
             services.AddSingleton<IConnectionFactory, SqlConnectionFactory>(sp =>
-                ActivatorUtilities.CreateInstance<SqlConnectionFactory>(sp, connectionName)
-            );
+            {
+                RequireConfiguration(sp, nameof(AddSqlConnectionFactory));
+                return ActivatorUtilities.CreateInstance<SqlConnectionFactory>(sp, connectionName);
+            });
 
         /// <summary>
         /// Registers a Keyed <see cref="SqlConnectionFactory"/> for a secondary SQL Server database.
@@ -36,7 +41,24 @@ public static class SqlServerServiceCollectionExtensions
             services.AddKeyedSingleton<IConnectionFactory, SqlConnectionFactory>(
                 serviceKey,
                 (sp, key) =>
-                    ActivatorUtilities.CreateInstance<SqlConnectionFactory>(sp, connectionName)
+                {
+                    RequireConfiguration(sp, nameof(AddKeyedSqlConnectionFactory));
+                    return ActivatorUtilities.CreateInstance<SqlConnectionFactory>(
+                        sp,
+                        connectionName
+                    );
+                }
             );
+    }
+
+    private static void RequireConfiguration(IServiceProvider provider, string caller)
+    {
+        if (provider.GetService<IConfiguration>() is null)
+        {
+            throw new InvalidOperationException(
+                $"IConfiguration is not registered. Register configuration before calling {caller}, "
+                    + "otherwise the connection string name is mistaken for a connection string."
+            );
+        }
     }
 }

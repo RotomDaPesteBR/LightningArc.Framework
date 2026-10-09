@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using LightningArc.Analyzers;
+using LightningArc.Analyzers.CodeFixes;
 using LightningArc.Analyzers.Tests.Verifiers;
 using LightningArc.Data.ADO.Repositories;
 using TUnit.Core;
@@ -10,6 +11,7 @@ public class SyncConnectionInAsyncMethodTests
 {
     private const string Usings = """
         using LightningArc.Data.ADO.Repositories;
+        using System.Threading;
         using System.Threading.Tasks;
         """;
 
@@ -65,5 +67,152 @@ public class SyncConnectionInAsyncMethodTests
             """;
 
         await AnalyzerVerifier<SyncConnectionInAsyncMethodAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task FakeRepositoryBaseForTests_Without_Inheritance_NoDiagnostic()
+    {
+        // Regression pin (renumbering fix): LARC040 used a .Contains("RepositoryBase")
+        // substring match and false-matched any class with that substring in its
+        // name. The fixture defines its own GetConnection in an async method so a
+        // reverted check still reaches the name match, reports, and fails.
+        const string code = $$"""
+            {{Usings}}
+
+            class FakeRepositoryBaseForTests
+            {
+                public object GetConnection() => new object();
+
+                public async Task DoWorkAsync()
+                {
+                    var conn = GetConnection();
+                    await Task.Delay(1);
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<SyncConnectionInAsyncMethodAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task MyRepositoryBaseClass_Without_Inheritance_NoDiagnostic()
+    {
+        // Regression pin (renumbering fix): second representative name carrying
+        // the "RepositoryBase" substring without deriving from RepositoryBase.
+        const string code = $$"""
+            {{Usings}}
+
+            class MyRepositoryBaseClass
+            {
+                public object GetConnection() => new object();
+
+                public async Task DoWorkAsync()
+                {
+                    var conn = GetConnection();
+                    await Task.Delay(1);
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<SyncConnectionInAsyncMethodAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task Sync_GetConnection_CodeFix_Without_Token_Should_Await_Async_Overload()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class MyRepository() : RepositoryBase(null!)
+            {
+                public async Task DoWorkAsync()
+                {
+                    var conn = [|GetConnection()|];
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class MyRepository() : RepositoryBase(null!)
+            {
+                public async Task DoWorkAsync()
+                {
+                    var conn = await GetConnectionAsync().ConfigureAwait(false);
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            SyncConnectionInAsyncMethodAnalyzer,
+            SyncConnectionInAsyncMethodCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
+    public async Task Sync_GetConnection_CodeFix_With_Token_Should_Thread_Token_Through()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class MyRepository() : RepositoryBase(null!)
+            {
+                public async Task DoWorkAsync(CancellationToken ct)
+                {
+                    var conn = [|GetConnection()|];
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class MyRepository() : RepositoryBase(null!)
+            {
+                public async Task DoWorkAsync(CancellationToken ct)
+                {
+                    var conn = await GetConnectionAsync(ct).ConfigureAwait(false);
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            SyncConnectionInAsyncMethodAnalyzer,
+            SyncConnectionInAsyncMethodCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
+    public async Task Sync_GetConnection_CodeFix_Should_Preserve_This_Qualification()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class MyRepository() : RepositoryBase(null!)
+            {
+                public async Task DoWorkAsync()
+                {
+                    var conn = [|this.GetConnection()|];
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class MyRepository() : RepositoryBase(null!)
+            {
+                public async Task DoWorkAsync()
+                {
+                    var conn = await this.GetConnectionAsync().ConfigureAwait(false);
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            SyncConnectionInAsyncMethodAnalyzer,
+            SyncConnectionInAsyncMethodCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
     }
 }

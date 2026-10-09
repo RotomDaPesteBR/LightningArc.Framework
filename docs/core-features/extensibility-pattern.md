@@ -11,6 +11,56 @@ The extensibility pattern introduces two key entry points:
 
 These entry points return specialized "Hook" classes that act as fluent interfaces for creating domain-specific extensions.
 
+## Access Patterns
+
+### Modern C# / .NET 10+ (Extension Members)
+
+The preferred approach uses static extension members (available in .NET 10+):
+
+```csharp
+extension(Result)
+{
+    public static Result OrderConfirmed()
+    {
+        return new OrderConfirmedSuccess();
+    }
+}
+
+extension(Error)
+{
+    public static Error.ErrorModule<Ordering> Ordering => Error.Of<Ordering>();
+}
+```
+
+**Usage:**
+- `Result.OrderConfirmed()` (accessed via extension member on `Result`)
+- `Error.Ordering.InventoryInsufficient()` (accessed via extension member on `Error`)
+
+### Compatibility Surface (Traditional Extension Methods)
+
+For projects targeting earlier .NET versions, use traditional static extension methods with the `Of` property:
+
+```csharp
+public static class ResultExtensions
+{
+    public static Result OrderConfirmed(this Result result)
+    {
+        return new OrderConfirmedSuccess();
+    }
+}
+
+public static class ErrorExtensions
+{
+    public static Error.ErrorModule<Ordering> Ordering(this Error error) => Error.Of<Ordering>();
+}
+```
+
+**Usage:**
+- `Result.Of.OrderConfirmed()` (accessed via `Result.Of`)
+- `Error.Of<Ordering>().InventoryInsufficient()` (accessed via `Error.Of`)
+
+> **Important**: `Of` is the compatibility entry point for the same extension model on targets where static extension members are unavailable. Both approaches provide identical functionality through different syntax.
+
 ## Core Components
 
 ### Result.Of Property
@@ -161,8 +211,8 @@ extension(Error)
 ```
 
 **Usage with extension blocks:**
-- `Result.OrderConfirmed()` (accessed via Result.Of)
-- `Error.Ordering().InventoryInsufficient()` (accessed via Error.Of)
+- `Result.OrderConfirmed()` (accessed directly on `Result`)
+- `Error.Ordering.InventoryInsufficient()` (accessed directly on `Error`)
 
 This approach provides:
 - Clean, localized extension method definitions
@@ -190,12 +240,12 @@ public static class ErrorExtensions
 ```
 
 **Usage with traditional extensions:**
-- `Result.OrderConfirmed()` (accessed via Result.Of)
-- `Error.Ordering().InventoryInsufficient()` (accessed via Error.Of)
+- `Result.Of.OrderConfirmed()` (accessed via `Result.Of`)
+- `Error.Of<Ordering>().InventoryInsufficient()` (accessed via `Error.Of`)
 
-Both approaches produce identical usage through the `Of` properties:
-- `Result.Of.OrderConfirmed()`
-- `Error.Of<Ordering>().InventoryInsufficient(...)`
+Both approaches produce identical functionality:
+- Extension members (modern): `Result.OrderConfirmed()`, `Error.Ordering.InventoryInsufficient()`
+- Traditional extensions (compatibility): `Result.Of.OrderConfirmed()`, `Error.Of<Ordering>().InventoryInsufficient()`
 
 ## Best Practices
 

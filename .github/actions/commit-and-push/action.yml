@@ -1,0 +1,26 @@
+name: 'Commit and Push Changes'
+description: 'Commits and pushes modified files if changes exist'
+
+inputs:
+  path:
+    description: 'Path or file to check and stage'
+    required: true
+  message:
+    description: 'Commit message'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Commit and push if changed
+      shell: pwsh
+      run: |
+        $status = git status --porcelain "${{ inputs.path }}"
+        if ($status) {
+            Write-Host "Changes detected in '${{ inputs.path }}'. Committing..."
+            git add "${{ inputs.path }}"
+            git commit -m "${{ inputs.message }}"
+            git push --force-with-lease
+        } else {
+            Write-Host "No changes detected in '${{ inputs.path }}'. Skipping."
+        }

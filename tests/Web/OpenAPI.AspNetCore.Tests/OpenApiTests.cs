@@ -5,6 +5,7 @@ using Microsoft.OpenApi;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Nodes;
 
 namespace LightningArc.OpenAPI.AspNetCore.Tests;
 
@@ -42,7 +43,10 @@ public class OpenApiTests
         
 #if NET10_0
         await Assert.That(schema.Type).IsEqualTo(JsonSchemaType.String);
-        await Assert.That(schema.Example?.ToString()).IsEqualTo("usuario@exemplo.com");
+        await Assert.That(schema.Examples!.Count).IsEqualTo(1);
+        await Assert.That(schema.Examples![0].GetValue<string>()).IsEqualTo(
+            "usuario@exemplo.com"
+        );
 #endif
     }
 }

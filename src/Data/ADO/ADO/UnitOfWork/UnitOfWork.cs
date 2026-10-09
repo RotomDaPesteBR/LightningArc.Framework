@@ -1,5 +1,6 @@
 using System.Data;
 using System.Data.Common;
+using LightningArc.Data.Abstractions.UnitOfWork;
 using LightningArc.Data.ADO.Factories;
 
 namespace LightningArc.Data.ADO.UnitOfWork;
@@ -8,155 +9,166 @@ namespace LightningArc.Data.ADO.UnitOfWork;
 /// Implementation of the Unit of Work pattern for database operations using ADO.NET.
 /// Manages the lifecycle of a <see cref="DbConnection"/> and its associated <see cref="DbTransaction"/>.
 /// </summary>
+/// <remarks>
+/// Instances are reusable: after a commit or rollback the underlying resources are released and a new
+/// transaction can be started with <see cref="Begin"/> or <see cref="BeginAsync"/>.
+/// Only <see cref="Dispose"/> and <see cref="DisposeAsync"/> make the instance permanently unusable.
+/// This type is not thread-safe.
+/// </remarks>
 /// <param name="connectionFactory">The factory responsible for providing database connections.</param>
 public sealed class UnitOfWork(IConnectionFactory connectionFactory) : IDbUnitOfWork
 {
-    private bool _isDisposed;
-    private bool _isStarted;
+    private DbConnection? _connection;
+    private DbTransaction? _transaction;
 
     /// <inheritdoc />
-    public DbConnection Connection
-    {
-        get =>
-            field
-            ?? throw new InvalidOperationException(
-                "Unit of Work not started. Call Begin() or BeginAsync() first."
-            );
-        private set;
-    }
+    public UnitOfWorkState State { get; private set; } = UnitOfWorkState.NotStarted;
 
     /// <inheritdoc />
-    public DbTransaction Transaction
-    {
-        get =>
-            field
-            ?? throw new InvalidOperationException(
-                "Unit of Work not started. Call Begin() or BeginAsync() first."
-            );
-        private set;
-    }
+    public DbConnection Connection =>
+        State == UnitOfWorkState.Active ? _connection! : throw CreateNotActiveException();
+
+    /// <inheritdoc />
+    public DbTransaction Transaction =>
+        State == UnitOfWorkState.Active ? _transaction! : throw CreateNotActiveException();
 
     /// <inheritdoc />
     public void Begin()
     {
-        if (_isStarted)
+        EnsureCanBegin();
+
+        try
         {
-            throw new InvalidOperationException("Unit of Work already started.");
+            _connection = connectionFactory.GetConnection();
+
+            if (_connection.State != ConnectionState.Open)
+            {
+                _connection.Open();
+            }
+
+            _transaction = _connection.BeginTransaction();
+            State = UnitOfWorkState.Active;
         }
-
-        Connection = connectionFactory.GetConnection();
-
-        if (Connection.State != ConnectionState.Open)
+        catch
         {
-            Connection.Open();
+            // A failed Begin must not leave a stale State behind (e.g. Committed
+            // from a previous cycle masking the failure).
+            State = UnitOfWorkState.Failed;
+            // Do not leak a connection that was obtained but could not be fully initialized.
+            ReleaseResources();
+            throw;
         }
-
-        Transaction = Connection.BeginTransaction();
-        _isStarted = true;
     }
 
     /// <inheritdoc />
     public async Task BeginAsync(CancellationToken cancellationToken = default)
     {
-        if (_isStarted)
-        {
-            throw new InvalidOperationException("Unit of Work already started.");
-        }
+        EnsureCanBegin();
 
-        Connection = connectionFactory.GetConnection();
-
-        if (Connection.State != ConnectionState.Open)
+        try
         {
-            await Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
-        }
+            _connection = connectionFactory.GetConnection();
+
+            if (_connection.State != ConnectionState.Open)
+            {
+                await _connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            }
 
 #if NETSTANDARD2_0
-        Transaction = Connection.BeginTransaction();
-        await Task.CompletedTask;
+            _transaction = _connection.BeginTransaction();
 #else
-        Transaction = await Connection
-            .BeginTransactionAsync(cancellationToken)
-            .ConfigureAwait(false);
+            _transaction = await _connection
+                .BeginTransactionAsync(cancellationToken)
+                .ConfigureAwait(false);
 #endif
 
-        _isStarted = true;
+            State = UnitOfWorkState.Active;
+        }
+        catch
+        {
+            // A failed Begin must not leave a stale State behind (see Begin()).
+            State = UnitOfWorkState.Failed;
+            // Do not leak a connection that was obtained but could not be fully initialized.
+            await ReleaseResourcesAsync().ConfigureAwait(false);
+            throw;
+        }
     }
 
     /// <inheritdoc />
     public void Commit()
     {
-        if (!_isStarted)
-        {
-            throw new InvalidOperationException(
-                "Unit of Work not started. Call Begin() or BeginAsync() first."
-            );
-        }
+        EnsureActive();
 
         try
         {
-            Transaction.Commit();
+            _transaction!.Commit();
+            State = UnitOfWorkState.Committed;
+        }
+        catch
+        {
+            State = UnitOfWorkState.Failed;
+            throw;
         }
         finally
         {
-            Dispose();
+            ReleaseResources();
         }
     }
 
     /// <inheritdoc />
     public async Task CommitAsync(CancellationToken cancellationToken = default)
     {
-        if (!_isStarted)
-        {
-            throw new InvalidOperationException(
-                "Unit of Work not started. Call Begin() or BeginAsync() first."
-            );
-        }
+        EnsureActive();
 
         try
         {
 #if NETSTANDARD2_0
-            Transaction.Commit();
-            await Task.CompletedTask;
+            _transaction!.Commit();
 #else
-            await Transaction.CommitAsync(cancellationToken).ConfigureAwait(false);
+            await _transaction!.CommitAsync(cancellationToken).ConfigureAwait(false);
 #endif
+            State = UnitOfWorkState.Committed;
+        }
+        catch
+        {
+            State = UnitOfWorkState.Failed;
+            throw;
         }
         finally
         {
-#if NETSTANDARD2_0
-            Dispose();
-#else
-            await DisposeAsync().ConfigureAwait(false);
-#endif
+            await ReleaseResourcesAsync().ConfigureAwait(false);
         }
     }
 
     /// <inheritdoc />
     public void Rollback()
     {
-        if (!_isStarted)
+        if (State != UnitOfWorkState.Active)
         {
             return;
         }
 
         try
         {
-            Transaction.Rollback();
+            _transaction!.Rollback();
+            State = UnitOfWorkState.RolledBack;
         }
         catch (Exception)
         {
-            // Suppress or log rollback exceptions (e.g., connection lost) to ensure Dispose runs
+            // Suppress or log rollback exceptions (e.g., connection lost) to ensure resources are released.
+            // The outcome could not be confirmed, so the state is Failed.
+            State = UnitOfWorkState.Failed;
         }
         finally
         {
-            Dispose();
+            ReleaseResources();
         }
     }
 
     /// <inheritdoc />
     public async Task RollbackAsync(CancellationToken cancellationToken = default)
     {
-        if (!_isStarted)
+        if (State != UnitOfWorkState.Active)
         {
             return;
         }
@@ -164,33 +176,38 @@ public sealed class UnitOfWork(IConnectionFactory connectionFactory) : IDbUnitOf
         try
         {
 #if NETSTANDARD2_0
-            Transaction.Rollback();
-            await Task.CompletedTask;
+            _transaction!.Rollback();
 #else
             // CRITICAL: We intentionally use CancellationToken.None here.
             // If the user's token is canceled, we MUST still attempt to rollback the transaction
             // to release database locks and avoid leaving the transaction in an uncommitted limbo state.
-            await Transaction.RollbackAsync(CancellationToken.None).ConfigureAwait(false);
+            await _transaction!.RollbackAsync(CancellationToken.None).ConfigureAwait(false);
 #endif
+            State = UnitOfWorkState.RolledBack;
         }
         catch (Exception)
         {
-            // Suppress or log rollback exceptions to ensure Dispose/DisposeAsync runs smoothly
+            // Suppress or log rollback exceptions to ensure resources are released smoothly.
+            // The outcome could not be confirmed, so the state is Failed.
+            State = UnitOfWorkState.Failed;
         }
         finally
         {
-#if NETSTANDARD2_0
-            Dispose();
-#else
-            await DisposeAsync().ConfigureAwait(false);
-#endif
+            await ReleaseResourcesAsync().ConfigureAwait(false);
         }
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
-        Dispose(true);
+        if (State == UnitOfWorkState.Disposed)
+        {
+            return;
+        }
+
+        // Disposing an active transaction without committing it causes an implicit rollback.
+        ReleaseResources();
+        State = UnitOfWorkState.Disposed;
     }
 
     /// <summary>
@@ -198,97 +215,166 @@ public sealed class UnitOfWork(IConnectionFactory connectionFactory) : IDbUnitOf
     /// </summary>
     public async ValueTask DisposeAsync()
     {
-        await DisposeAsyncCore().ConfigureAwait(false);
-        Dispose(false);
-    }
-
-    /// <summary>
-    /// Releases unmanaged and optionally managed resources.
-    /// </summary>
-    /// <param name="disposing">True to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-    private void Dispose(bool disposing)
-    {
-        if (_isDisposed)
+        if (State == UnitOfWorkState.Disposed)
         {
             return;
         }
 
-        if (disposing && _isStarted)
-        {
-            try
-            {
-                // Synchronous cleanup fallback
-                Transaction.Dispose();
-
-                if (Connection.State != ConnectionState.Closed)
-                {
-                    Connection.Close();
-                }
-
-                Connection.Dispose();
-            }
-            catch (Exception)
-            {
-                // Prevent exceptions from bubbling up during disposal phases
-            }
-            finally
-            {
-                ResetState();
-            }
-        }
-
-        _isDisposed = true;
+        await ReleaseResourcesAsync().ConfigureAwait(false);
+        State = UnitOfWorkState.Disposed;
     }
 
     /// <summary>
-    /// Performs asynchronous cleanup of database resources.
+    /// Ensures a new transaction can be started from the current state.
     /// </summary>
-    private async ValueTask DisposeAsyncCore()
+    /// <exception cref="ObjectDisposedException">The unit of work was disposed.</exception>
+    /// <exception cref="InvalidOperationException">A transaction is already active.</exception>
+    private void EnsureCanBegin()
     {
-        if (_isDisposed || !_isStarted)
+        if (State == UnitOfWorkState.Disposed)
         {
-            return;
+            throw new ObjectDisposedException(nameof(UnitOfWork));
+        }
+
+        if (State == UnitOfWorkState.Active)
+        {
+            throw new InvalidOperationException($"Unit of Work already started (state: {State}).");
+        }
+    }
+
+    /// <summary>
+    /// Ensures a transaction is currently active.
+    /// </summary>
+    /// <exception cref="ObjectDisposedException">The unit of work was disposed.</exception>
+    /// <exception cref="InvalidOperationException">No transaction is active.</exception>
+    private void EnsureActive()
+    {
+        if (State != UnitOfWorkState.Active)
+        {
+            throw CreateNotActiveException();
+        }
+    }
+
+    /// <summary>
+    /// Creates the exception that describes why the unit of work cannot be used in its current state.
+    /// </summary>
+    /// <returns>An <see cref="ObjectDisposedException"/> when disposed; otherwise an <see cref="InvalidOperationException"/>.</returns>
+    private Exception CreateNotActiveException() =>
+        State == UnitOfWorkState.Disposed
+            ? new ObjectDisposedException(nameof(UnitOfWork))
+            : new InvalidOperationException(
+                $"Unit of Work is not active (state: {State}). Call Begin() or BeginAsync() first."
+            );
+
+    /// <summary>
+    /// Releases the current transaction and connection without changing <see cref="State"/>.
+    /// Exceptions thrown during cleanup are suppressed so that every resource gets a disposal attempt.
+    /// </summary>
+    private void ReleaseResources()
+    {
+        var transaction = _transaction;
+        var connection = _connection;
+        _transaction = null;
+        _connection = null;
+
+        try
+        {
+            transaction?.Dispose();
+        }
+        catch (Exception)
+        {
+            // Prevent exceptions from bubbling up during disposal phases
         }
 
         try
         {
-#if !NETSTANDARD2_0
-            await Transaction.DisposeAsync().ConfigureAwait(false);
-
-            if (Connection.State != ConnectionState.Closed)
+            // Close explicitly before disposing: real providers close on
+            // dispose, but the observable Close + Dispose contract is part
+            // of this type's behavior (and its tests). Guarded like the
+            // previous implementation so an already-closed connection is
+            // left untouched.
+            if (connection is not null && connection.State != ConnectionState.Closed)
             {
-                await Connection.CloseAsync().ConfigureAwait(false);
+                connection.Close();
             }
-
-            await Connection.DisposeAsync().ConfigureAwait(false);
-#else
-            // Fallback for .NET Standard 2.0 which lacks async dispose for ADO.NET
-            Transaction?.Dispose();
-            if (Connection != null)
-            {
-                Connection.Close();
-                Connection.Dispose();
-            }
-            await Task.CompletedTask;
-#endif
         }
         catch (Exception)
         {
-            // Prevent exceptions from bubbling up during asynchronous disposal
+            // Prevent exceptions from bubbling up during disposal phases
         }
-        finally
+
+        try
         {
-            ResetState();
+            connection?.Dispose();
+        }
+        catch (Exception)
+        {
+            // Prevent exceptions from bubbling up during disposal phases
         }
     }
 
     /// <summary>
-    /// Resets the internal operational state of the Unit of Work.
+    /// Performs asynchronous cleanup of database resources without changing <see cref="State"/>.
     /// </summary>
-    private void ResetState()
+    private ValueTask ReleaseResourcesAsync()
     {
-        _isStarted = false;
-        Connection = null!;
-        Transaction = null!;
+#if NETSTANDARD2_0
+        // Fallback for .NET Standard 2.0 which lacks async dispose for ADO.NET
+        ReleaseResources();
+        return default;
+#else
+        return ReleaseResourcesCoreAsync();
+#endif
     }
+
+#if !NETSTANDARD2_0
+    /// <summary>
+    /// Asynchronously disposes the current transaction and connection.
+    /// Exceptions thrown during cleanup are suppressed so that every resource gets a disposal attempt.
+    /// </summary>
+    private async ValueTask ReleaseResourcesCoreAsync()
+    {
+        var transaction = _transaction;
+        var connection = _connection;
+        _transaction = null;
+        _connection = null;
+
+        if (transaction is not null)
+        {
+            try
+            {
+                await transaction.DisposeAsync().ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // Prevent exceptions from bubbling up during asynchronous disposal
+            }
+        }
+
+        if (connection is not null)
+        {
+            try
+            {
+                // Close explicitly before disposing (see ReleaseResources).
+                if (connection.State != ConnectionState.Closed)
+                {
+                    await connection.CloseAsync().ConfigureAwait(false);
+                }
+            }
+            catch (Exception)
+            {
+                // Prevent exceptions from bubbling up during asynchronous disposal
+            }
+
+            try
+            {
+                await connection.DisposeAsync().ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                // Prevent exceptions from bubbling up during asynchronous disposal
+            }
+        }
+    }
+#endif
 }

@@ -18,6 +18,5 @@ public enum SqlDialect
     /// <summary>
     /// Oracle Database dialect.
     /// </summary>
-    Oracle
+    Oracle,
 }
-

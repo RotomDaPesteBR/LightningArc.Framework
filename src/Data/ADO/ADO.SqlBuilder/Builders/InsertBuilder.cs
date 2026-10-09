@@ -37,7 +37,10 @@ public class InsertBuilder(
 
         string columnSeparator = Options.Indented ? $",{Environment.NewLine}{Indent}" : ", ";
 
-        string columnNames = string.Join(columnSeparator, insertColumns.Select(c => QuoteColumnName(c.ColumnName)));
+        string columnNames = string.Join(
+            columnSeparator,
+            insertColumns.Select(c => QuoteColumnName(c.ColumnName))
+        );
         string parameterNames = string.Join(
             columnSeparator,
             insertColumns.Select(c => GetParameter(c.PropertyName))
@@ -120,4 +123,3 @@ public class InsertBuilder(
         return sqlBuilder.ToString();
     }
 }
-

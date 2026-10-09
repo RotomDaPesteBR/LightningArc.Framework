@@ -77,4 +77,4 @@ using var uow = await _uowFactory.CreateAsync();
 await uow.CommitAsync();
 ```
 
-> **LARC020**: The analyzer warns on sync `GetConnection()` inside async methods. Always prefer `await GetConnectionAsync(ct)`.
+> **LARC040**: The analyzer warns on sync `GetConnection()` inside async methods. Always prefer `await GetConnectionAsync(ct)`.

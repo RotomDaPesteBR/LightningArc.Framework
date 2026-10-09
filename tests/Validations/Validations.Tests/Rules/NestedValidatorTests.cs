@@ -114,7 +114,7 @@ public class NestedValidatorTests
         Result result = new UserValidator().Validate(new UserCommand("Alice", new AddressCommand(string.Empty, "Main St")));
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
-        await Assert.That(error.Details).Contains(new ErrorDetail("Address.ZipCode", "ZipCode must not be empty"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail("Address.ZipCode", "ZipCode must not be empty"));
     }
 
     [Test]
@@ -125,8 +125,8 @@ public class NestedValidatorTests
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
         await Assert.That(error).IsNotTypeOf<AggregateError>();
-        await Assert.That(error.Details).Contains(new ErrorDetail("Address.ZipCode", "ZipCode must not be empty"));
-        await Assert.That(error.Details.Count).IsEqualTo(1);
+        await Assert.That(error!.Details).Contains(new ErrorDetail("Address.ZipCode", "ZipCode must not be empty"));
+        await Assert.That(error!.Details.Count).IsEqualTo(1);
     }
 
     [Test]
@@ -137,8 +137,8 @@ public class NestedValidatorTests
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
         await Assert.That(error).IsTypeOf<Error.Application.InvalidOperationError>();
-        await Assert.That(error.Code).IsEqualTo(Error.Application.InvalidOperation().Code);
-        await Assert.That(error.Message).IsEqualTo("Child validator failed without details");
+        await Assert.That(error!.Code).IsEqualTo(Error.Application.InvalidOperation().Code);
+        await Assert.That(error!.Message).IsEqualTo("Child validator failed without details");
     }
 
     [Test]
@@ -149,8 +149,8 @@ public class NestedValidatorTests
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
         await Assert.That(error).IsTypeOf<Error.Resource.NotFoundError>();
-        await Assert.That(error.Code).IsEqualTo(Error.Resource.NotFound().Code);
-        await Assert.That(error.Message).IsEqualTo("Address resource was not found");
+        await Assert.That(error!.Code).IsEqualTo(Error.Resource.NotFound().Code);
+        await Assert.That(error!.Message).IsEqualTo("Address resource was not found");
     }
 
     [Test]
@@ -161,6 +161,6 @@ public class NestedValidatorTests
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
         await Assert.That(error).IsTypeOf<Error.Resource.NotFoundError>();
-        await Assert.That(error.Details).Contains(new ErrorDetail("Address.ZipCode", "Zip code could not be resolved"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail("Address.ZipCode", "Zip code could not be resolved"));
     }
 }

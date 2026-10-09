@@ -1,8 +1,8 @@
-using Microsoft.Extensions.DependencyInjection;
 using LightningArc.Data.Abstractions.Mappers;
 using LightningArc.Mappers.Mapster.Adapters;
 using Mapster;
 using MapsterMapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LightningArc.Mappers.Mapster.DependencyInjection;
 
@@ -17,7 +17,10 @@ public static class DependencyInjection
     /// <param name="services">The service collection.</param>
     /// <param name="config">Optional Mapster configuration.</param>
     /// <returns>The updated service collection.</returns>
-    public static IServiceCollection AddMapsterAdapter(this IServiceCollection services, TypeAdapterConfig? config = null)
+    public static IServiceCollection AddMapsterAdapter(
+        this IServiceCollection services,
+        TypeAdapterConfig? config = null
+    )
     {
         if (config != null)
         {
@@ -30,11 +33,10 @@ public static class DependencyInjection
 
         // Use the standard Mapster registration
         services.AddMapster();
-        
+
         // Register our specific adapter for our abstraction
         services.AddSingleton<LightningArc.Data.Abstractions.Mappers.IMapper, MapsterAdapter>();
 
         return services;
     }
 }
-

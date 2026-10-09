@@ -69,6 +69,31 @@ public class ResultErrorUnsafeAccessTests
     }
 
     [Test]
+    public async Task Error_After_IsSuccess_Early_Return_NoDiagnostic()
+    {
+        // Regression pin (renumbering fix): mirror of the LARC001 early-exit pin.
+        // IsGuardedByPrecedingExit with triggerProperty "IsSuccess" proves this
+        // safe; a wrapping-guard-only check false-positives here.
+        const string code = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                Error Main(Result result)
+                {
+                    if (result.IsSuccess)
+                    {
+                        return Error.Application.Internal();
+                    }
+                    return result.Error;
+                }
+            }
+            """;
+
+        await AnalyzerVerifier<ResultErrorUnsafeAccessAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
     public async Task Error_Access_CodeFix_Should_Wrap_In_TryGetError()
     {
         string code = $$"""

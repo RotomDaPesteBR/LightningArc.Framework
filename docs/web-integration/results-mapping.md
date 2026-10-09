@@ -29,7 +29,7 @@ public async Task<EndpointResult<Product>> Get(int id)
 The library includes `ResultExceptionHandler`, which captures unhandled exceptions and converts them into standardized `Error` objects, ensuring your API never returns a raw stack trace.
 
 ### Setup
-In `Program.cs` (.NET 8.0+):
+In `Program.cs` (.NET 9.0+):
 
 ```csharp
 builder.Services.AddEndpointResults(); // Also registers the ExceptionHandler

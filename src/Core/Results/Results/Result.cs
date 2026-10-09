@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace LightningArc.Results;
 
 /// <summary>
@@ -199,7 +201,7 @@ public class Result : IEquatable<Result>
     /// </summary>
     /// <param name="error">The error if the result is a failure; otherwise, <c>null</c>.</param>
     /// <returns>True if the result is a failure; otherwise, false.</returns>
-    public bool TryGetError(out Error error)
+    public bool TryGetError([NotNullWhen(true)] out Error? error)
     {
         if (IsFailure)
         {
@@ -207,7 +209,7 @@ public class Result : IEquatable<Result>
             return true;
         }
 
-        error = null!;
+        error = null;
         return false;
     }
 
@@ -509,12 +511,12 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
             int hash = base.GetHashCode();
             if (IsSuccess)
             {
-                hash = hash * 23 + Value!.GetHashCode();
+                hash = hash * 23 + (Value?.GetHashCode() ?? 0);
             }
             return hash;
         }
 #else
-        return IsSuccess ? HashCode.Combine(base.GetHashCode(), Value!) : base.GetHashCode();
+        return IsSuccess ? HashCode.Combine(base.GetHashCode(), Value) : base.GetHashCode();
 #endif
     }
 
@@ -523,11 +525,11 @@ public class Result<TValue> : Result, IEquatable<Result<TValue>>
     /// </summary>
     /// <param name="value">The success value if the result is successful; otherwise, <c>default</c>.</param>
     /// <returns>True if the result is successful; otherwise, false.</returns>
-    public bool TryGetValue(out TValue value)
+    public bool TryGetValue([NotNullWhen(true)] out TValue value)
     {
         if (IsSuccess)
         {
-            value = _success!.Value;
+            value = _success!.Value!;
             return true;
         }
 

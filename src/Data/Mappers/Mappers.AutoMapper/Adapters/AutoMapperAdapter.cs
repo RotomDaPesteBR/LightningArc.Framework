@@ -19,4 +19,3 @@ public class AutoMapperAdapter(global::AutoMapper.IMapper mapper)
     public TDestination Map<TSource, TDestination>(TSource source, TDestination destination) =>
         _mapper.Map(source, destination);
 }
-

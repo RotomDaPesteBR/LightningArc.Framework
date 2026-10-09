@@ -40,10 +40,10 @@ public class ObjectRuleExecutionTests
         await Assert.That(result.TryGetError(out var error)).IsTrue();
         await Assert.That(error).IsTypeOf<AggregateError>();
 
-        AggregateError aggregate = (AggregateError)error;
+        AggregateError aggregate = (AggregateError)error!;
         await Assert.That(aggregate.Errors.Count).IsEqualTo(2);
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(RegistrationCommand.Name), "Name is required"));
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(RegistrationCommand.Age), "Age must be at least 18"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(RegistrationCommand.Name), "Name is required"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(RegistrationCommand.Age), "Age must be at least 18"));
     }
 
     [Test]
@@ -53,7 +53,7 @@ public class ObjectRuleExecutionTests
 
         await Assert.That(result.TryGetError(out var error)).IsTrue();
         await Assert.That(error).IsNotTypeOf<AggregateError>();
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(RegistrationCommand.Name), "Name is required"));
-        await Assert.That(error.Details.Count).IsEqualTo(1);
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(RegistrationCommand.Name), "Name is required"));
+        await Assert.That(error!.Details.Count).IsEqualTo(1);
     }
 }

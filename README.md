@@ -15,7 +15,7 @@ LightningArc is not just a collection of utilities — it is a cohesive framewor
 It provides:
 
 * Compile-time enforcement with Roslyn analyzers
-* Structured domain errors with codes and metadata
+* Structured domain errors with codes, messages, and contextual details
 * Built-in Result pattern and strongly typed Value Objects
 * First-class ASP.NET Core integration (RFC 7807 Problem Details)
 * A unified model across domain, data, and web layers
@@ -70,7 +70,7 @@ Foundation types and patterns, framework-agnostic.
 
 | Project                               | Description                                                        |
 | ------------------------------------- | ------------------------------------------------------------------ |
-| **`LightningArc.Results`**            | Complete Result pattern (Success/Failure) with chaining operators. |
+| **`LightningArc.Results`**            | Complete Result pattern (Success/Error) with chaining operators. |
 | **`LightningArc.Primitives`**         | Value Objects: `Email`, `Cpf`, `Cnpj`, `PhoneNumber`, `Url`.       |
 | **`LightningArc.Primitives.Results`** | Result-based extensions for ValueObjects.                          |
 | **`LightningArc.Json`**               | `System.Text.Json` converters and helpers.                         |
@@ -295,18 +295,25 @@ Note: Fields like `title` and `type` are customizable and can be configured glob
 
 ### Using the Analyzers (Roslyn)
 
-All projects referencing the Core libraries automatically receive the analyzers via `Directory.Build.props`. They ensure, for example, that you don't access `.Value` of a `Result` without checking `.IsSuccess` first, or that you don't use dangerous implicit conversions from strings to Value Objects in critical paths.
+LightningArc packages automatically include the relevant Roslyn analyzers as transitive dependencies. Consumers do not normally need to install `LightningArc.Analyzers` separately.
+
+The analyzer package can also be installed explicitly when consuming it independently:
+
+```bash
+dotnet add package LightningArc.Analyzers
+```
+
+The package provides rules covering Result safety, ValueObject usage, ADO.NET patterns, and Minimal API mapping, plus automatic code fixes. They ensure, for example, that you don't access `.Value` of a `Result` without checking `.IsSuccess` first, or that you don't use dangerous implicit conversions from strings to Value Objects in critical paths.
 
 
 ---
 
-## Philosophy
+## Key Characteristics
 
-LightningArc is built around a simple idea:
-
-> Make correct code easier to write than incorrect code.
-
-By combining structured results, compile-time validation, and consistent abstractions, LightningArc enables teams to build reliable systems with less boilerplate and fewer runtime surprises.
+* **Fail-Fast and Functional**: Prefer `Result` over exceptions for normal business flow.
+* **Compile-Time Enforcement**: Roslyn analyzers catch misuse before runtime.
+* **Extensible**: Most classes are designed for inheritance and extension.
+* **Lightweight**: Minimal dependencies, optimized for high-throughput APIs.
 
 ---
 

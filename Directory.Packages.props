@@ -8,65 +8,65 @@
 
   <!-- Microsoft -->
   <PropertyGroup>
-      <MicrosoftPackagesVersion>10.0.10</MicrosoftPackagesVersion> 
+      <MicrosoftPackagesVersion>10.0.12</MicrosoftPackagesVersion> 
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftPackagesVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MicrosoftPackagesVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="[10.0.12,)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MicrosoftPackagesVersion)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftPackagesVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MicrosoftPackagesVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="[10.0.12,)" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftPackagesVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(MicrosoftPackagesVersion)" />
-    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="$(MicrosoftPackagesVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="[10.0.12,)" />
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="[10.0.12,)" />
   </ItemGroup>
 
   <!-- Compatibility -->
   <ItemGroup>
     <PackageVersion Include="PolySharp" Version="1.16.0" />
-    <PackageVersion Include="System.Text.Json" Condition="'$(TargetFramework)' == 'net6.0'" Version="8.0.6" />
+    <PackageVersion Include="System.Text.Json" Condition="'$(TargetFramework)' == 'net6.0'" Version="[6.0.0,)" />
     <PackageVersion Include="System.Text.Json" Condition="'$(TargetFramework)' == 'netstandard2.0' 
                                                        OR '$(TargetFramework)' == 'net8.0' 
                                                        OR '$(TargetFramework)' == 'net9.0' 
                                                        OR '$(TargetFramework)' == 'net10.0'" 
-    Version="$(MicrosoftPackagesVersion)" />
+    Version="[10.0.3,)" />
   </ItemGroup>
 
   <!-- Mappers -->
   <PropertyGroup>
-    <MapsterPackagesVersion>10.0.11</MapsterPackagesVersion> 
+    <MapsterPackagesVersion>[10.0.0,)</MapsterPackagesVersion> 
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="AutoMapper" Version="16.2.0" />
+    <PackageVersion Include="AutoMapper" Version="[16.2.0,)" />
     <PackageVersion Include="Mapster" Version="$(MapsterPackagesVersion)" />
     <PackageVersion Include="Mapster.DependencyInjection" Version="$(MapsterPackagesVersion)" />
   </ItemGroup>
 
   <!-- Drivers -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.0.2" />
-    <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.26.300" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="[7.0.0,)" />
+    <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="[23.26.301,)" />
   </ItemGroup>
   
   <!-- ORMs -->
   <ItemGroup>
-    <PackageVersion Include="Dapper" Version="2.1.79" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'netstandard2.0'" Version="3.1.32" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.18" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net10.0'" Version="$(MicrosoftPackagesVersion)" />
+    <PackageVersion Include="Dapper" Version="2.1.89" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'netstandard2.0'" Version="[3.1.0,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net9.0'" Version="[9.0.0,)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Condition="'$(TargetFramework)' == 'net10.0'" Version="[10.0.12,)" />
   </ItemGroup>
 
   <!-- AspNetCore -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.28" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.0.18" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net10.0'" Version="$(MicrosoftPackagesVersion)" />
-    <PackageVersion Include="Microsoft.OpenApi" Condition="'$(TargetFramework)' == 'net10.0'" Version="2.10.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net8.0'" Version="[8.0.0,)" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net9.0'" Version="[9.0.0,)" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Condition="'$(TargetFramework)' == 'net10.0'" Version="[10.0.0,)" />
+    <PackageVersion Include="Microsoft.OpenApi" Condition="'$(TargetFramework)' == 'net10.0'" Version="[2.12.0,)" />
   </ItemGroup>
   
   <!-- Roslyn Analyzers -->
   <PropertyGroup>
-      <MicrosoftCodeAnalysisPackagesVersion>5.6.0</MicrosoftCodeAnalysisPackagesVersion>
+      <MicrosoftCodeAnalysisPackagesVersion>[5.0.0,)</MicrosoftCodeAnalysisPackagesVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="$(MicrosoftCodeAnalysisPackagesVersion)" />
@@ -78,10 +78,10 @@
 
   <!-- Metalama -->
   <PropertyGroup>
-      <MetalamaPackagesVersion>2026.1.22</MetalamaPackagesVersion>
+      <MetalamaPackagesVersion>2026.1.29</MetalamaPackagesVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Metalama.Framework" Version="$(MetalamaPackagesVersion)" />
+    <PackageVersion Include="Metalama.Framework" Version="[2026.1.29,)" />
     <PackageVersion Include="Metalama.Framework.Sdk" Version="$(MetalamaPackagesVersion)" />
     <PackageVersion Include="Metalama.Extensions.DependencyInjection" Version="$(MetalamaPackagesVersion)" />
   </ItemGroup>
@@ -98,7 +98,7 @@
   
   <!-- Tests -->
   <PropertyGroup>
-    <TUnitPackagesVersion>1.63.0</TUnitPackagesVersion> 
+    <TUnitPackagesVersion>1.72.16</TUnitPackagesVersion> 
   </PropertyGroup>
   <ItemGroup> 
     <PackageVersion Include="TUnit" Version="$(TUnitPackagesVersion)" />

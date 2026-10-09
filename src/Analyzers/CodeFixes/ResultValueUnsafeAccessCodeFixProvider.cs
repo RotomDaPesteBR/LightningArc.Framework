@@ -28,7 +28,10 @@ public class ResultValueUnsafeAccessCodeFixProvider : CodeFixProvider
 
     public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
-        SyntaxNode? root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+        SyntaxNode? root = await context
+            .Document.GetSyntaxRootAsync(context.CancellationToken)
+            .ConfigureAwait(false);
+
         if (root == null)
         {
             return;
@@ -39,8 +42,13 @@ public class ResultValueUnsafeAccessCodeFixProvider : CodeFixProvider
         SyntaxNode? node = root.FindToken(diagnosticSpan.Start).Parent;
 
         // Walk up to find the MemberAccessExpressionSyntax containing ".Value"
-        MemberAccessExpressionSyntax? memberAccess = node?.AncestorsAndSelf().OfType<MemberAccessExpressionSyntax>()
-            .FirstOrDefault(ma => ma.Name.Span.Start == diagnosticSpan.Start && ma.Name.Identifier.ValueText == "Value");
+        MemberAccessExpressionSyntax? memberAccess = node
+            ?.AncestorsAndSelf()
+            .OfType<MemberAccessExpressionSyntax>()
+            .FirstOrDefault(ma =>
+                ma.Name.Span.Start == diagnosticSpan.Start
+                && ma.Name.Identifier.ValueText == "Value"
+            );
 
         if (memberAccess == null)
         {
@@ -48,7 +56,11 @@ public class ResultValueUnsafeAccessCodeFixProvider : CodeFixProvider
         }
 
         // Find the enclosing statement
-        StatementSyntax? statement = memberAccess.AncestorsAndSelf().OfType<StatementSyntax>().FirstOrDefault();
+        StatementSyntax? statement = memberAccess
+            .AncestorsAndSelf()
+            .OfType<StatementSyntax>()
+            .FirstOrDefault();
+
         if (statement == null)
         {
             return;
@@ -57,9 +69,12 @@ public class ResultValueUnsafeAccessCodeFixProvider : CodeFixProvider
         context.RegisterCodeFix(
             CodeAction.Create(
                 title: _title,
-                createChangedDocument: c => ApplyFixAsync(context.Document, root, memberAccess, statement, c),
-                equivalenceKey: nameof(ResultValueUnsafeAccessCodeFixProvider)),
-            diagnostics: context.Diagnostics);
+                createChangedDocument: c =>
+                    ApplyFixAsync(context.Document, root, memberAccess, statement, c),
+                equivalenceKey: nameof(ResultValueUnsafeAccessCodeFixProvider)
+            ),
+            diagnostics: context.Diagnostics
+        );
     }
 
     private static async Task<Document> ApplyFixAsync(
@@ -67,7 +82,8 @@ public class ResultValueUnsafeAccessCodeFixProvider : CodeFixProvider
         SyntaxNode root,
         MemberAccessExpressionSyntax memberAccess,
         StatementSyntax statement,
-        CancellationToken _)
+        CancellationToken _
+    )
     {
         ExpressionSyntax resultExpression = memberAccess.Expression;
 
@@ -76,46 +92,59 @@ public class ResultValueUnsafeAccessCodeFixProvider : CodeFixProvider
                 MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     resultExpression.WithoutLeadingTrivia().WithoutTrailingTrivia(),
-                    IdentifierName("TryGetValue")))
-            .WithArgumentList(ArgumentList(SeparatedList([
-                Argument(DeclarationExpression(
-                    IdentifierName("var"),
-                    SingleVariableDesignation(Identifier("value"))))
-                    .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword))
-            ])));
+                    IdentifierName("TryGetValue")
+                )
+            )
+            .WithArgumentList(
+                ArgumentList(
+                    SeparatedList([
+                        Argument(
+                                DeclarationExpression(
+                                    IdentifierName("var"),
+                                    SingleVariableDesignation(Identifier("value"))
+                                )
+                            )
+                            .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword)),
+                    ])
+                )
+            );
 
         // Build the replacement block statement
         StatementSyntax rewritten = RewriteValueAccess(statement, memberAccess);
 
-        IfStatementSyntax ifStatement = IfStatement(tryGetValueInvocation,
-                Block(rewritten.WithLeadingTrivia(Space)))
+        IfStatementSyntax ifStatement = IfStatement(
+                tryGetValueInvocation,
+                Block(rewritten.WithLeadingTrivia(Space))
+            )
             .WithAdditionalAnnotations(Formatter.Annotation);
 
-        SyntaxNode newRoot = root.ReplaceNode(statement, ifStatement.WithAdditionalAnnotations(Formatter.Annotation));
+        SyntaxNode newRoot = root.ReplaceNode(
+            statement,
+            ifStatement.WithAdditionalAnnotations(Formatter.Annotation)
+        );
         return document.WithSyntaxRoot(newRoot);
     }
 
     private static StatementSyntax RewriteValueAccess(
         StatementSyntax statement,
-        MemberAccessExpressionSyntax valueAccess)
+        MemberAccessExpressionSyntax valueAccess
+    )
     {
         ValueAccessRewriter rewriter = new(valueAccess);
         return (StatementSyntax)rewriter.Visit(statement);
     }
 
-    private class ValueAccessRewriter(MemberAccessExpressionSyntax valueAccess) : CSharpSyntaxRewriter
+    private class ValueAccessRewriter(MemberAccessExpressionSyntax valueAccess)
+        : CSharpSyntaxRewriter
     {
-        public override SyntaxNode? VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
-        {
-            if (node.Name.Identifier.ValueText == "Value" &&
-                node.Expression.IsEquivalentTo(valueAccess.Expression))
-            {
-                return IdentifierName("value")
+        public override SyntaxNode? VisitMemberAccessExpression(
+            MemberAccessExpressionSyntax node
+        ) =>
+            node.Name.Identifier.ValueText == "Value"
+            && node.Expression.IsEquivalentTo(valueAccess.Expression)
+                ? IdentifierName("value")
                     .WithLeadingTrivia(node.GetLeadingTrivia())
-                    .WithTrailingTrivia(node.GetTrailingTrivia());
-            }
-
-            return base.VisitMemberAccessExpression(node);
-        }
+                    .WithTrailingTrivia(node.GetTrailingTrivia())
+                : base.VisitMemberAccessExpression(node);
     }
 }

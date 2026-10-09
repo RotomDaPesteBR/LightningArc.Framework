@@ -36,7 +36,9 @@ public class UpdateBuilder(
         string setSeparator = Options.Indented ? $",{Environment.NewLine}{Indent}" : ", ";
         string setClause = string.Join(
             setSeparator,
-            updateColumns.Select(c => $"{QuoteColumnName(c.ColumnName)} = {GetParameter(c.PropertyName)}")
+            updateColumns.Select(c =>
+                $"{QuoteColumnName(c.ColumnName)} = {GetParameter(c.PropertyName)}"
+            )
         );
 
         string whereClause = BuildKeyWhereClause(keys);
@@ -44,4 +46,3 @@ public class UpdateBuilder(
         return $"UPDATE {QuoteTableName(TableName)}{NewLine}SET {setClause}{NewLine}WHERE {whereClause}";
     }
 }
-

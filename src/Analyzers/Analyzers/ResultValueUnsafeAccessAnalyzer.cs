@@ -15,30 +15,48 @@ namespace LightningArc.Analyzers;
 public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "LARC001";
-    public const string HelpLinkBase = "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
+    public const string HelpLinkBase =
+        "https://github.com/RotomDaPesteBR/LightningArc.Framework/blob/main/docs/analyzers/";
 
     public static readonly DiagnosticDescriptor Rule = new(
         id: DiagnosticId,
         title: "Unsafe access to Result.Value",
         messageFormat: "Accessing 'Value' may throw if the Result is a failure. Use TryGetValue or check IsSuccess first.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
-        helpLinkUri: HelpLinkBase + DiagnosticId + ".md");
+        helpLinkUri: HelpLinkBase + DiagnosticId + ".md"
+    );
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        [Rule];
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
 
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
 
-        context.RegisterSyntaxNodeAction(AnalyzeMemberAccess, SyntaxKind.SimpleMemberAccessExpression);
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            ResultTypeRecognizer recognizer = ResultTypeRecognizer.Resolve(
+                compilationContext.Compilation
+            );
+            if (!recognizer.IsAvailable)
+            {
+                return;
+            }
+
+            compilationContext.RegisterSyntaxNodeAction(
+                nodeContext => AnalyzeMemberAccess(nodeContext, recognizer),
+                SyntaxKind.SimpleMemberAccessExpression
+            );
+        });
     }
 
-    private static void AnalyzeMemberAccess(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeMemberAccess(
+        SyntaxNodeAnalysisContext context,
+        ResultTypeRecognizer recognizer
+    )
     {
         if (context.Node is not MemberAccessExpressionSyntax memberAccess)
         {
@@ -50,13 +68,23 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(memberAccess.Expression, context.CancellationToken);
+        TypeInfo typeInfo = context.SemanticModel.GetTypeInfo(
+            memberAccess.Expression,
+            context.CancellationToken
+        );
         if (typeInfo.Type is not INamedTypeSymbol namedType)
         {
             return;
         }
 
-        if (!IsResultType(namedType))
+        // Note: the previous local check required IsGenericType (i.e. specifically Result<T>,
+        // not the non-generic Result). ResultTypeRecognizer.IsResultType matches both. This is
+        // a deliberate widening, not an oversight — non-generic Result has no .Value member, so
+        // a syntactic `.Value` access on a non-generic Result receiver only occurs in code that
+        // already fails to compile for an unrelated reason (no such member). This analyzer
+        // firing in that case adds a redundant diagnostic on already-broken code, not a false
+        // positive on valid code.
+        if (!recognizer.IsResultType(namedType))
         {
             return;
         }
@@ -74,37 +102,29 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (ResultGuardHelper.IsGuardedByIsSuccess(memberAccess, context.SemanticModel) ||
-            ResultGuardHelper.IsGuardedByTryCall(memberAccess, context.SemanticModel, "TryGetValue"))
+        if (
+            ResultAccessSafetyRecognizer.IsGuardedByIsSuccess(memberAccess, context.SemanticModel)
+            || ResultAccessSafetyRecognizer.IsGuardedByTryCall(
+                memberAccess,
+                context.SemanticModel,
+                "TryGetValue"
+            )
+            || ResultAccessSafetyRecognizer.IsGuardedByPrecedingExit(
+                memberAccess,
+                context.SemanticModel,
+                triggerProperty: "IsFailure"
+            )
+        )
         {
             return;
         }
 
-        Diagnostic diagnostic = Diagnostic.Create(Rule, memberAccess.Name.GetLocation(), namedType.Name);
+        Diagnostic diagnostic = Diagnostic.Create(
+            Rule,
+            memberAccess.Name.GetLocation(),
+            namedType.Name
+        );
         context.ReportDiagnostic(diagnostic);
-    }
-
-    private static bool IsResultType(INamedTypeSymbol namedType)
-    {
-        if (namedType is { IsGenericType: true, Name: "Result" })
-        {
-            return true;
-        }
-
-        if (namedType.BaseType != null && IsResultType(namedType.BaseType))
-        {
-            return true;
-        }
-
-        foreach (INamedTypeSymbol? namedTypeSymbol in namedType.AllInterfaces)
-        {
-            if (namedTypeSymbol.Name.StartsWith("IResult"))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static bool IsInsideConversionOperator(MemberAccessExpressionSyntax memberAccess)
@@ -130,7 +150,7 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
 
     private static bool HasNullForgivingOperator(MemberAccessExpressionSyntax memberAccess)
     {
-        return memberAccess.Parent is PostfixUnaryExpressionSyntax postfix &&
-               postfix.IsKind(SyntaxKind.SuppressNullableWarningExpression);
+        return memberAccess.Parent is PostfixUnaryExpressionSyntax postfix
+            && postfix.IsKind(SyntaxKind.SuppressNullableWarningExpression);
     }
 }

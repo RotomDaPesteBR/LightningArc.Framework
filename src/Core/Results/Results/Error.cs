@@ -94,27 +94,41 @@ namespace LightningArc.Results
             string message,
             IEnumerable<ErrorDetail>? details = null
         )
+            : this(codePrefix, codeSuffix, new LiteralMessageProvider(message), details)
         {
-            if (codePrefix <= 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(codePrefix),
-                    "Code prefix must be a positive integer."
-                );
-            }
+        }
 
-            if (codeSuffix <= 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(codeSuffix),
-                    "Code suffix must be a positive integer."
-                );
-            }
+        /// <summary>
+        /// Combines zero or more errors into a single <see cref="Error"/>.
+        /// </summary>
+        /// <param name="errors">The errors to combine. Individual <c>null</c> entries are ignored.</param>
+        /// <returns>
+        /// <c>null</c> if <paramref name="errors"/> is empty (or all entries are <c>null</c>);
+        /// the single error unwrapped if exactly one non-null error is provided;
+        /// otherwise an <see cref="AggregateError"/> containing all provided errors, already flattened.
+        /// </returns>
+        /// <remarks>
+        /// Unlike repeated use of <see cref="operator +(Error?, Error?)"/>, this performs a single
+        /// flatten pass over all inputs rather than re-flattening on every pairwise combination,
+        /// making it the preferred entry point when aggregating more than two errors (e.g. in a
+        /// validation loop) rather than accumulating via <c>+=</c>.
+        /// </remarks>
+        public static Error? Aggregate(params IEnumerable<Error> errors)
+        {
+            List<Error> list = [.. errors.Where(e => e is not null)];
 
-            CodePrefix = codePrefix;
-            CodeSuffix = codeSuffix;
-            _messageProvider = new LiteralMessageProvider(message);
-            Details = details?.ToList() ?? [];
+            if (list.Count == 0)
+                return null;
+
+            if (list.Count == 1)
+                return list[0];
+
+            int firstCode = list[0].Code;
+            bool sameCode = list.TrueForAll(e => e.Code == firstCode);
+
+            return sameCode
+                ? new AggregateError(list[0].CodePrefix, list[0].CodeSuffix, list[0]._messageProvider, list)
+                : new AggregateError((int)ModuleCodes.General, 1, "Multiple errors occurred.", list);
         }
 
         /// <summary>
@@ -125,6 +139,7 @@ namespace LightningArc.Results
         /// <remarks>
         /// Equality is based on the <see cref="CodePrefix"/>, <see cref="CodeSuffix"/>, and <see cref="Details"/> properties.
         /// The localized <see cref="Message"/> is not considered.
+        /// For <see cref="AggregateError"/>, equality compares the flattened errors as a multiset (order-independent).
         /// </remarks>
         public virtual bool Equals(Error? other)
         {
@@ -133,9 +148,19 @@ namespace LightningArc.Results
             if (ReferenceEquals(this, other))
                 return true;
 
-            return CodePrefix == other.CodePrefix
-                && CodeSuffix == other.CodeSuffix
-                && Details.SequenceEqual(other.Details);
+            if (CodePrefix != other.CodePrefix || CodeSuffix != other.CodeSuffix)
+                return false;
+
+            return DetailsEqual(other);
+        }
+
+        /// <summary>
+        /// Compares details as a multiset (order-independent).
+        /// Overridden in <see cref="AggregateError"/> to use FlattenedErrors.
+        /// </summary>
+        protected virtual bool DetailsEqual(Error other)
+        {
+            return Details.SequenceEqual(other.Details);
         }
 
         /// <inheritdoc />
@@ -210,11 +235,16 @@ namespace LightningArc.Results
         /// If both errors have the same code, the result maintains that code.
         /// If codes are different, a general aggregate code (99000) is used.
         /// </summary>
-        /// <param name="left">The first error to combine.</param>
-        /// <param name="right">The second error to combine.</param>
-        /// <returns>An <see cref="AggregateError"/> containing both errors.</returns>
-        public static Error operator +(Error left, Error right)
+        /// <param name="left">The first error to combine, or <c>null</c> meaning no errors yet.</param>
+        /// <param name="right">The second error to combine, or <c>null</c> meaning no errors yet.</param>
+        /// <returns>An <see cref="AggregateError"/> containing both errors, or the non-null error if one is <c>null</c>.</returns>
+        public static Error operator +(Error? left, Error? right)
         {
+            if (left is null)
+                return right!;
+            if (right is null)
+                return left;
+
             var errors = new List<Error> { left, right };
 
             return left.Code == right.Code

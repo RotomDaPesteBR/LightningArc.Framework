@@ -59,7 +59,7 @@ public class ValidationServiceTests
         Result result = service.Validate(new PingCommand(""));
 
         await Assert.That(result.TryGetError(out Error? error)).IsTrue();
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(PingCommand.Value), "Value is required"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(PingCommand.Value), "Value is required"));
     }
 
     [Test]
@@ -73,7 +73,7 @@ public class ValidationServiceTests
         Result result = service.Validate(new PingCommand(""));
 
         await Assert.That(result.TryGetError(out Error? error)).IsTrue();
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(PingCommand.Value), "Value is required"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(PingCommand.Value), "Value is required"));
     }
 
     [Test]
@@ -87,7 +87,7 @@ public class ValidationServiceTests
         Result result = service.Validate(new PingCommand(""));
 
         await Assert.That(result.TryGetError(out Error? error)).IsTrue();
-        await Assert.That(error.Details).Contains(new ErrorDetail(nameof(PingCommand.Value), "Value is required"));
+        await Assert.That(error!.Details).Contains(new ErrorDetail(nameof(PingCommand.Value), "Value is required"));
     }
 
     [Test]

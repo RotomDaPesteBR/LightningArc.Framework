@@ -1,4 +1,5 @@
 using LightningArc.Primitives.ValueObjects;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 
@@ -46,7 +47,10 @@ namespace LightningArc.OpenAPI.AspNetCore.Filters
 #if NET10_0
                 schema.Properties?.Clear();
                 schema.Type = JsonSchemaType.String;
-                schema.Example = "usuario@exemplo.com";
+                schema.Examples = new List<JsonNode>
+                {
+                    JsonValue.Create("usuario@exemplo.com")
+                };
 #endif
 
                 schema.Format = "email";

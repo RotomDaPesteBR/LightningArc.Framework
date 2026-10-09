@@ -3,9 +3,7 @@ namespace LightningArc.Data.Abstractions.Repositories;
 /// <summary>
 /// A base marker interface for all repositories in the system.
 /// </summary>
-public interface IRepository
-{
-}
+public interface IRepository { }
 
 /// <summary>
 /// Defines a generic repository for a specific entity type.
@@ -16,4 +14,3 @@ public interface IRepository<TEntity> : IRepository
 {
     // Basic agnostic CRUD operations could be defined here in the future
 }
-
