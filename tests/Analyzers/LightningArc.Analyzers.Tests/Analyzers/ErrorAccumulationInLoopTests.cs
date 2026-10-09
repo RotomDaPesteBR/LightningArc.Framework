@@ -1,5 +1,12 @@
+using System.Linq;
+using System.Threading;
 using LightningArc.Analyzers;
+using LightningArc.Analyzers.CodeFixes;
 using LightningArc.Analyzers.Tests.Verifiers;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using TUnit.Core;
 
 namespace LightningArc.Analyzers.Tests.Analyzers;
@@ -192,5 +199,209 @@ public class ErrorAccumulationInLoopTests
             """;
 
         await AnalyzerVerifier<ErrorAccumulationInLoopAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task Foreach_Accumulation_CodeFix_Should_Collect_And_Aggregate_Once()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class C
+            {
+                void M(List<Error> es)
+                {
+                    Error? errors = null;
+                    foreach (var e in es) { [|errors += e|]; }
+                    if (errors is not null) { throw new System.InvalidOperationException(errors.Message); }
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class C
+            {
+                void M(List<Error> es)
+                {
+                    Error? errors = null;
+                    var errorsList = new List<Error>();
+                    foreach (var e in es) { errorsList.Add(e); }
+                    errors = Error.Aggregate(errorsList);
+                    if (errors is not null) { throw new System.InvalidOperationException(errors.Message); }
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            ErrorAccumulationInLoopAnalyzer,
+            ErrorAccumulationInLoopCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
+    public async Task For_Accumulation_Without_Collections_Using_CodeFix_Should_Add_Using()
+    {
+        const string code = """
+            #nullable enable
+            using LightningArc.Results;
+
+            class C
+            {
+                void M(System.Collections.Generic.List<Error> es)
+                {
+                    Error? errors = null;
+                    for (int i = 0; i < es.Count; i++) { [|errors += es[i]|]; }
+                    if (errors is not null) { throw new System.InvalidOperationException(errors.Message); }
+                }
+            }
+            """;
+
+        const string fixedCode = """
+            #nullable enable
+            using LightningArc.Results;
+            using System.Collections.Generic;
+
+            class C
+            {
+                void M(System.Collections.Generic.List<Error> es)
+                {
+                    Error? errors = null;
+                    var errorsList = new List<Error>();
+                    for (int i = 0; i < es.Count; i++) { errorsList.Add(es[i]); }
+                    errors = Error.Aggregate(errorsList);
+                    if (errors is not null) { throw new System.InvalidOperationException(errors.Message); }
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            ErrorAccumulationInLoopAnalyzer,
+            ErrorAccumulationInLoopCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
+    }
+
+    [Test]
+    public async Task CodeFix_With_Field_Accumulator_Offers_No_Fix()
+    {
+        const string source = """
+            #nullable enable
+            using System.Collections.Generic;
+            using LightningArc.Results;
+
+            class C
+            {
+                Error? _errors;
+
+                void M(List<Error> es)
+                {
+                    foreach (var e in es) { _errors += e; }
+                }
+            }
+            """;
+
+        await Assert.That(await CountFixesOfferedAsync(source)).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task CodeFix_With_Read_Before_Loop_Offers_No_Fix()
+    {
+        const string source = """
+            #nullable enable
+            using System.Collections.Generic;
+            using LightningArc.Results;
+
+            class C
+            {
+                void M(List<Error> es)
+                {
+                    Error? errors = null;
+                    System.Console.WriteLine(errors is null);
+                    foreach (var e in es) { errors += e; }
+                    System.Console.WriteLine(errors is null);
+                }
+            }
+            """;
+
+        await Assert.That(await CountFixesOfferedAsync(source)).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task CodeFix_With_Read_Inside_Loop_Offers_No_Fix()
+    {
+        const string source = """
+            #nullable enable
+            using System.Collections.Generic;
+            using LightningArc.Results;
+
+            class C
+            {
+                void M(List<Error> es)
+                {
+                    Error? errors = null;
+                    foreach (var e in es)
+                    {
+                        errors += e;
+                        System.Console.WriteLine(errors is null);
+                    }
+                    System.Console.WriteLine(errors is null);
+                }
+            }
+            """;
+
+        await Assert.That(await CountFixesOfferedAsync(source)).IsEqualTo(0);
+    }
+
+    private static async Task<int> CountFixesOfferedAsync(string source)
+    {
+        // The diagnostic still fires, but the provider must decline when the
+        // accumulator is not a loop-local rewrite candidate. Drive the provider
+        // directly, since CodeFixVerifier cannot express "no fix offered".
+        using AdhocWorkspace workspace = new();
+        var project = workspace
+            .AddProject("Guards", LanguageNames.CSharp)
+            .AddMetadataReference(
+                MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
+            )
+            .AddMetadataReference(
+                MetadataReference.CreateFromFile(
+                    typeof(System.Collections.Generic.List<>).Assembly.Location
+                )
+            )
+            .AddMetadataReference(
+                MetadataReference.CreateFromFile(
+                    typeof(LightningArc.Results.Error).Assembly.Location
+                )
+            );
+        Document document = project.AddDocument("Guard.cs", source);
+
+        SyntaxTree? tree = await document.GetSyntaxTreeAsync(CancellationToken.None);
+        await Assert.That(tree).IsNotNull();
+
+        var root = await tree!.GetRootAsync(CancellationToken.None);
+        var accumulation = root
+            .DescendantNodes()
+            .OfType<AssignmentExpressionSyntax>()
+            .First(a =>
+                a.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.AddAssignmentExpression)
+            );
+
+        Diagnostic diagnostic = Diagnostic.Create(
+            ErrorAccumulationInLoopAnalyzer.Rule,
+            Location.Create(tree, accumulation.Span)
+        );
+
+        int fixesOffered = 0;
+        var context = new CodeFixContext(
+            document,
+            diagnostic,
+            (action, diagnostics) => fixesOffered++,
+            CancellationToken.None
+        );
+
+        await new ErrorAccumulationInLoopCodeFixProvider().RegisterCodeFixesAsync(context);
+
+        return fixesOffered;
     }
 }
