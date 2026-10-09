@@ -52,7 +52,7 @@ internal readonly struct ResultTypeRecognizer(
     /// <see cref="Compilation.GetTypeByMetadataName"/> repeatedly per node is unnecessary work,
     /// and checking <see cref="IsAvailable"/> gives every analyzer using this a free, correct
     /// way to bail out entirely when the compilation being analyzed doesn't reference
-    /// LightningArc.Results at all — the same gate that fixed LARC032's false positive outside
+    /// LightningArc.Results at all — the same gate that fixed LARC006's false positive outside
     /// ASP.NET Core contexts, generalized.
     /// </summary>
     public static ResultTypeRecognizer Resolve(Compilation compilation) =>

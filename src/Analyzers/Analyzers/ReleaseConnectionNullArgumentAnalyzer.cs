@@ -20,7 +20,7 @@ public class ReleaseConnectionNullArgumentAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "ReleaseConnection called with null argument",
         messageFormat: "ReleaseConnection called with null argument. This call has no effect.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Reliability,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

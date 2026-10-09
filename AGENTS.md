@@ -43,7 +43,7 @@ Working conventions for AI assistants operating in this repository.
 - **Metalama.Results** — Result-related Metalama utilities
 
 ### Analyzers (`src/Analyzers/`)
-- **9 rules** (LARC001–030) + 2 code fix providers
+- **19 rules** across domain bands (Result `LARC001–008`, ValueObject `LARC020–023`, Data `LARC040–044`, Web `LARC060`, Infra `LARC080`) + 9 code fix providers
 - Auto-referenced by all library projects via `src/Directory.Build.props`
 - See `docs/analyzers/README.md` for rule details
 
@@ -82,7 +82,7 @@ Working conventions for AI assistants operating in this repository.
 - Namespaces: always `LightningArc.*` (NOT `Utils.*`, NOT `Abstractions.*`)
 - Deleted/removed namespaces: `Results`, `Abstractions`, `Json`, `Data`, `Mappers`, `Metalama` (these were shortened prefixes)
 - Use `TryGetValue`/`TryGetError` for safe Result access (not `.Value`/`.Error`)
-- Prefer `GetConnectionAsync()` in async methods; analyzer LARC020 warns on sync version
+- Prefer `GetConnectionAsync()` in async methods; analyzer LARC040 warns on sync version
 
 ### Result Pattern
 ```csharp

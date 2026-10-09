@@ -10,12 +10,13 @@ To use analyzers in an **external** project consuming LightningArc via NuGet, yo
 
 ## Rule Categories
 
-| Prefix | Scope | IDs |
-|---|---|---|
-| **Result** | Safe usage of the Result pattern | LARC001–LARC003 |
-| **ValueObject** | ValueObject creation and string conversion | LARC010–LARC012 |
-| **Data** | Database connection lifecycle | LARC020, LARC030 |
-| **Infra** | General framework warnings | LARC022 |
+| Band | Scope | IDs | Details |
+|---|---|---|---|
+| **Result** | Safe usage of the Result pattern | LARC001–LARC008 | [result-rules.md](result-rules.md) |
+| **ValueObject** | ValueObject creation, conversion, and shape | LARC020–LARC023 | [value-object-rules.md](value-object-rules.md) |
+| **Data** | Repository connection lifecycle and transactions | LARC040–LARC045 | [data-rules.md](data-rules.md) |
+| **Web** | Minimal API Result mapping | LARC060 | [web-rules.md](web-rules.md) |
+| **Infra** | Hosted-service scaffolding | LARC080 | [hosting-rules.md](hosting-rules.md) |
 
 ## Rules
 
@@ -23,31 +24,65 @@ To use analyzers in an **external** project consuming LightningArc via NuGet, yo
 
 | ID | Title | Severity |
 |---|---|---|
-| [LARC001](result-rules.md#larc001) | Unsafe `.Value` access without `IsSuccess` check | Warning |
-| [LARC002](result-rules.md#larc002) | Unsafe `.Error` access without `IsFailure` check | Warning |
-| [LARC003](result-rules.md#larc003) | Result return value discarded | Info |
+| [LARC001](./LARC001.md) | Unsafe access to `Result.Value` | Warning |
+| [LARC002](./LARC002.md) | Unsafe access to `Result.Error` | Warning |
+| [LARC003](./LARC003.md) | Result value is discarded | Info |
+| [LARC004](./LARC004.md) | `Result.Success(null)` for non-nullable type | Warning |
+| [LARC005](./LARC005.md) | Result error is shadowed | Warning |
+| [LARC006](./LARC006.md) | Redundant try-catch for Result mapping | Warning |
+| [LARC007](./LARC007.md) | `ResultAggregator` built with no checks | Info |
+| [LARC008](./LARC008.md) | `Error` accumulated via `+=` inside a loop | Info |
 
 ### ValueObject Rules
 
 | ID | Title | Severity |
 |---|---|---|
-| [LARC010](value-object-rules.md#larc010) | Implicit string → ValueObject conversion may throw | Warning |
-| [LARC011](value-object-rules.md#larc011) | Null ValueObject → string conversion may throw | Warning |
-| [LARC012](value-object-rules.md#larc012) | ValueObject creation result discarded | Info |
+| [LARC020](./LARC020.md) | Implicit conversion from `string` to ValueObject | Warning |
+| [LARC021](./LARC021.md) | Potential null ValueObject conversion to `string` | Warning |
+| [LARC022](./LARC022.md) | ValueObject creation result is discarded | Info |
+| [LARC023](./LARC023.md) | ValueObject should be a record | Warning |
 
-### Data & Infra Rules
+### Data Rules
 
 | ID | Title | Severity |
 |---|---|---|
-| [LARC020](infra-rules.md#larc020) | Synchronous `GetConnection()` used in async method | Warning |
-| [LARC022](infra-rules.md#larc022) | `IHostedService.StartAsync` performs no work | Info |
-| [LARC030](infra-rules.md#larc030) | `ReleaseConnection(null)` has no effect | Warning |
+| [LARC040](./LARC040.md) | Synchronous `GetConnection` in async method | Warning |
+| [LARC041](./LARC041.md) | Missing transaction in repository call | Info |
+| [LARC042](./LARC042.md) | Direct `DbConnection` instantiation in repository | Warning |
+| [LARC043](./LARC043.md) | `ReleaseConnection` called with null argument | Warning |
+| [LARC044](./LARC044.md) | Missing `ReleaseConnection` after `GetConnection` | Warning |
+| [LARC045](./LARC045.md) | Repository never uses `Transaction` | Info |
+
+### Web Rules
+
+| ID | Title | Severity |
+|---|---|---|
+| [LARC060](./LARC060.md) | Missing `.ToEndpointResult()` in Minimal API | Warning |
+
+### Infra Rules
+
+| ID | Title | Severity |
+|---|---|---|
+| [LARC080](./LARC080.md) | `HostedService` `StartAsync` performs no work | Info |
 
 ## Code Fixes
 
-Two rules have automatic code fixes available in supported IDEs (Visual Studio, VS Code with C# Dev Kit):
+Fifteen rules have automatic code fixes available in supported IDEs (Visual Studio, VS Code with C# Dev Kit):
 
 | Rule | Fix Action |
 |---|---|
 | LARC001 | Wraps `.Value` access in `TryGetValue(out var value)` |
 | LARC002 | Wraps `.Error` access in `TryGetError(out var error)` |
+| LARC003 | Prefixes the statement with `_ = ` (explicit discard) |
+| LARC006 | Removes the try/catch and splices the try body in its place |
+| LARC021 | Rewrites the expression to `expr?.Value ?? string.Empty` |
+| LARC022 | Prefixes the statement with `_ = ` (explicit discard) |
+| LARC023 | Rewrites `class` to `record` |
+| LARC040 | Rewrites to `await GetConnectionAsync(...).ConfigureAwait(false)` |
+| LARC041 | Appends `transaction: Transaction` to the call |
+| LARC005 | Rewrites `return <newError>;` to `return <guard>.Error + <newError>;` |
+| LARC007 | Replaces check-less `Result.Aggregate().Build()` with `Result.Success()` (sync only) |
+| LARC008 | Collects into a `List<Error>` and calls `Error.Aggregate(list)` once (no Fix-All) |
+| LARC020 | Wraps the literal as `<VO>.Create("literal")` |
+| LARC043 | Replaces the null argument with the single `GetConnection`-assigned local |
+| LARC060 | Appends `.ToEndpointResult()` to the lambda's returned expression(s) |

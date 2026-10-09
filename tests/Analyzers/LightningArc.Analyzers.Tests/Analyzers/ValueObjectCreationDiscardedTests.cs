@@ -1,4 +1,5 @@
 using LightningArc.Analyzers;
+using LightningArc.Analyzers.CodeFixes;
 using LightningArc.Analyzers.Tests.Verifiers;
 using TUnit.Core;
 
@@ -62,5 +63,38 @@ public class ValueObjectCreationDiscardedTests
             """;
 
         await AnalyzerVerifier<ValueObjectCreationDiscardedAnalyzer>.VerifyAnalyzerAsync(code);
+    }
+
+    [Test]
+    public async Task Discarded_Create_CodeFix_Should_Assign_Discard()
+    {
+        const string code = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                void Main()
+                {
+                    [|Email.Create("test@example.com")|];
+                }
+            }
+            """;
+
+        const string fixedCode = $$"""
+            {{Usings}}
+
+            class Program
+            {
+                void Main()
+                {
+                    _ = Email.Create("test@example.com");
+                }
+            }
+            """;
+
+        await CodeFixVerifier<
+            ValueObjectCreationDiscardedAnalyzer,
+            ValueObjectCreationDiscardedCodeFixProvider
+        >.VerifyCodeFixAsync(code, fixedCode);
     }
 }

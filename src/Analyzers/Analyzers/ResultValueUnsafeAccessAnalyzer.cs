@@ -22,7 +22,7 @@ public class ResultValueUnsafeAccessAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Unsafe access to Result.Value",
         messageFormat: "Accessing 'Value' may throw if the Result is a failure. Use TryGetValue or check IsSuccess first.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

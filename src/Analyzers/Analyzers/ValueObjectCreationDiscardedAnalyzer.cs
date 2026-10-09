@@ -21,7 +21,7 @@ public class ValueObjectCreationDiscardedAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "ValueObject creation result is discarded",
         messageFormat: "ValueObject creation result is discarded",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

@@ -20,7 +20,7 @@ public class PreventNullSuccessAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Result.Success(null) for non-nullable type",
         messageFormat: "Passing 'null' to Result.Success for non-nullable type '{0}' may lead to unexpected nulls. Use a nullable Result or provide a value.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

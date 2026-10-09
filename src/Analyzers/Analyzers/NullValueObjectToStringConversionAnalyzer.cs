@@ -21,7 +21,7 @@ public class NullValueObjectToStringConversionAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Potential null ValueObject conversion to string",
         messageFormat: "Potential null conversion to string may throw",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

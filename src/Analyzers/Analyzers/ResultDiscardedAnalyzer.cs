@@ -21,7 +21,7 @@ public class ResultDiscardedAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Result value is discarded",
         messageFormat: "Result return value is discarded. Potential errors may be silently ignored.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

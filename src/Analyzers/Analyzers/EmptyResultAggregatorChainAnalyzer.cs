@@ -24,7 +24,7 @@ public class EmptyResultAggregatorChainAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "ResultAggregator built with no checks",
         messageFormat: "Result.Aggregate() is built with no Check/Ensure/When/CheckAll/WhenAll calls in the chain. This always succeeds — likely dead code or a removed check.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

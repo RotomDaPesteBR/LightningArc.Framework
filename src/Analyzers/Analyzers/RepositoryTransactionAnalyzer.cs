@@ -22,7 +22,7 @@ public class RepositoryTransactionAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Missing transaction in repository call",
         messageFormat: "Database operation '{0}' is called without passing the available 'Transaction' property. This may lead to operations running outside the intended transaction.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Reliability,
         defaultSeverity: DiagnosticSeverity.Info,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
@@ -30,22 +30,6 @@ public class RepositoryTransactionAnalyzer : DiagnosticAnalyzer
     );
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [Rule];
-
-    private static readonly string[] DapperMethods =
-    [
-        "Query",
-        "QueryAsync",
-        "Execute",
-        "ExecuteAsync",
-        "QuerySingle",
-        "QuerySingleAsync",
-        "QueryFirst",
-        "QueryFirstAsync",
-        "QueryFirstOrDefault",
-        "QueryFirstOrDefaultAsync",
-        "QuerySingleOrDefault",
-        "QuerySingleOrDefaultAsync",
-    ];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -122,28 +106,8 @@ public class RepositoryTransactionAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static bool IsDatabaseOperation(IMethodSymbol method)
-    {
-        // Check Dapper extension methods
-        if (DapperMethods.Contains(method.Name))
-        {
-            return true;
-        }
-
-        // Check DbConnection methods
-        if (
-            method.ContainingType != null
-            && (
-                method.ContainingType.Name == "DbConnection"
-                || method.ContainingType.Name == "IDbConnection"
-            )
-        )
-        {
-            return true;
-        }
-
-        return false;
-    }
+    private static bool IsDatabaseOperation(IMethodSymbol method) =>
+        DatabaseOperationRecognizer.IsDatabaseOperation(method);
 
     private static bool IsTransactionArgumentProvided(
         InvocationExpressionSyntax invocation,

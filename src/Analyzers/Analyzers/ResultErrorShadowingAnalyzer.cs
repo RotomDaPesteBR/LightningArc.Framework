@@ -21,7 +21,7 @@ public class ResultErrorShadowingAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Result error is shadowed",
         messageFormat: "A new error is being returned without consuming the original error '{0}'. Traceability may be lost.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
@@ -92,7 +92,11 @@ public class ResultErrorShadowingAnalyzer : DiagnosticAnalyzer
         }
 
         // 2. Find any Result/Error variables in scope that are in a failure state at this point
-        var failureGuards = FindActiveFailureGuards(expression, context.SemanticModel, recognizer);
+        var failureGuards = FailureGuardResolver.FindActiveFailureGuards(
+            expression,
+            context.SemanticModel,
+            recognizer
+        );
         if (failureGuards.Length == 0)
         {
             return;
@@ -161,77 +165,6 @@ public class ResultErrorShadowingAnalyzer : DiagnosticAnalyzer
         }
 
         return false;
-    }
-
-    private static ImmutableArray<ISymbol> FindActiveFailureGuards(
-        ExpressionSyntax expression,
-        SemanticModel semanticModel,
-        ResultTypeRecognizer recognizer
-    )
-    {
-        var results = ImmutableArray.CreateBuilder<ISymbol>();
-        var current = expression.Parent;
-
-        while (current != null)
-        {
-            if (current is IfStatementSyntax ifStmt)
-            {
-                // We are looking for guards that prove a variable is in a failure state
-                var failureSymbol = GetGuardedFailureSymbol(
-                    ifStmt.Condition,
-                    semanticModel,
-                    recognizer
-                );
-                if (failureSymbol != null)
-                {
-                    results.Add(failureSymbol);
-                }
-            }
-            // Add more guard types if needed (switch, etc.)
-
-            if (
-                current
-                is MethodDeclarationSyntax
-                    or LocalFunctionStatementSyntax
-                    or AnonymousFunctionExpressionSyntax
-            )
-            {
-                break;
-            }
-
-            current = current.Parent;
-        }
-
-        return results.ToImmutable();
-    }
-
-    private static ISymbol? GetGuardedFailureSymbol(
-        ExpressionSyntax condition,
-        SemanticModel semanticModel,
-        ResultTypeRecognizer recognizer
-    )
-    {
-        // result.IsFailure
-        if (
-            condition is MemberAccessExpressionSyntax memberAccess
-            && memberAccess.Name.Identifier.ValueText == "IsFailure"
-        )
-        {
-            return semanticModel.GetSymbolInfo(memberAccess.Expression).Symbol;
-        }
-
-        // !result.IsSuccess
-        if (
-            condition is PrefixUnaryExpressionSyntax prefix
-            && prefix.IsKind(SyntaxKind.LogicalNotExpression)
-            && prefix.Operand is MemberAccessExpressionSyntax negated
-            && negated.Name.Identifier.ValueText == "IsSuccess"
-        )
-        {
-            return semanticModel.GetSymbolInfo(negated.Expression).Symbol;
-        }
-
-        return null;
     }
 
     private static bool IsErrorConsumed(

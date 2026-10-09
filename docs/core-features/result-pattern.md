@@ -413,14 +413,21 @@ All sync and async `Check`/`Ensure`/`When`/`CheckAll` methods have corresponding
 - Multiple errors with different codes: `AggregateError` with general code (99001)
 - `AggregateError.FlattenedErrors` provides all leaf errors recursively
 
+> **Analyzers:** [LARC007](../analyzers/LARC007.md) flags a `Result.Aggregate()` chain built with no checks (always succeeds — dead code or a forgotten check); [LARC008](../analyzers/LARC008.md) flags `Error` accumulated via `+=` inside a loop (prefer collecting failures and combining once with `Error.Aggregate`, or `CheckAll` for concurrent checks).
+
 ---
 
 ## 8. Analyzers
 
-LightningArc includes a Roslyn analyzer that warns about:
+LightningArc includes Roslyn analyzers that warn about:
 
-- **Unsafe access** to `Result.Value` (use `TryGetValue` or pattern matching instead).
-- **Unsafe access** to `Result.Error` (use `TryGetError` or pattern matching instead).
-- **Implicit string-to-ValueObject conversion** pitfalls.
+- **Unsafe access** to `Result.Value` ([LARC001](../analyzers/LARC001.md)) — use `TryGetValue` or pattern matching instead.
+- **Unsafe access** to `Result.Error` ([LARC002](../analyzers/LARC002.md)) — use `TryGetError` or pattern matching instead.
+- **Discarded results** ([LARC003](../analyzers/LARC003.md)) — don't silently drop a `Result`; discard explicitly with `_ =` when deliberate.
+- **Null success values** ([LARC004](../analyzers/LARC004.md)) — `Result.Success(null)` for a non-nullable type defeats nullable guarantees.
+- **Shadowed errors** ([LARC005](../analyzers/LARC005.md)) — don't replace the original error inside an `IsFailure` guard without consuming it.
+- **Redundant try-catch mapping** ([LARC006](../analyzers/LARC006.md)) — the `ResultExceptionHandler` middleware already maps unhandled exceptions.
+- **Empty aggregation chains** ([LARC007](../analyzers/LARC007.md)) and **`+=` error accumulation in loops** ([LARC008](../analyzers/LARC008.md)) — see §7 above.
+- **Implicit string-to-ValueObject conversion** pitfalls ([LARC020](../analyzers/LARC020.md)).
 
-For details, see [Analyzers](../analyzers/README.md).
+For the full rule set across all bands, see [Analyzers](../analyzers/README.md).

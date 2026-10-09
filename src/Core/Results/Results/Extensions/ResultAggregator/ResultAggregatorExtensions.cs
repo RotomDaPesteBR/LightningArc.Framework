@@ -433,14 +433,8 @@ public static class ResultAggregatorExtensions
     }
 
     /// <remarks>
-    /// LARC032 fires on this method (see suppression below) but is a false positive here:
-    /// <c>ResultExceptionHandler</c> is ASP.NET Core middleware — it only intercepts exceptions
-    /// that escape an HTTP request pipeline, which has no bearing on this library-internal
-    /// method. This code may run outside any HTTP context entirely (console apps, background
-    /// jobs), and even under ASP.NET Core, the middleware cannot prevent a single faulted task
-    /// from aborting the surrounding <see cref="Task.WhenAll{TResult}(IEnumerable{Task{TResult}})"/>
-    /// call in <see cref="CheckAll(ResultAggregator, IEnumerable{Func{Task{Result}}})"/> before the middleware would ever see anything. The
-    /// try/catch here is required for <see cref="CheckAll(ResultAggregator, IEnumerable{Func{Task{Result}}})"/>'s per-check fault isolation.
+    /// The try/catch here provides per-check fault isolation for CheckAll;
+    /// the ASP.NET Core exception-handling middleware cannot isolate individual checks.
     /// </remarks>
     private static async Task<Result> RunSafelyAsync(Func<Task<Result>> factory)
     {

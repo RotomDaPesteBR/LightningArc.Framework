@@ -21,7 +21,7 @@ public class ValueObjectRecordTypeAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "ValueObject should be a record",
         messageFormat: "Value Object '{0}' should be defined as a 'record' to ensure value-based equality",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Design,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,

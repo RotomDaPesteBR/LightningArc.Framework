@@ -21,7 +21,7 @@ public class ImplicitStringToValueObjectAnalyzer : DiagnosticAnalyzer
         id: DiagnosticId,
         title: "Implicit conversion from string to ValueObject",
         messageFormat: "Implicit conversion from string to '{0}' may throw. Use TryCreate or Create for explicit validation.",
-        category: DiagnosticCategory.Category,
+        category: DiagnosticCategory.Usage,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         customTags: DiagnosticCategory.EditAndContinueTags,
